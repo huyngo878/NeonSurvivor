@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { updateMovement } from '../../src/systems/movement.js'
 import { createPlayer, createEnemy } from '../../src/entities.js'
+import { WORLD_W } from '../../src/constants.js'
 
 const noInput = { up: false, down: false, left: false, right: false }
 
@@ -48,6 +49,13 @@ describe('updateMovement — player', () => {
     player.iframes = 0.05
     updateMovement([player], 0.1, noInput)
     expect(player.iframes).toBe(0)
+  })
+
+  it('clamps player position to world boundary', () => {
+    const player = createPlayer()
+    player.pos.x = WORLD_W
+    updateMovement([player], 1, { ...noInput, right: true })
+    expect(player.pos.x).toBe(WORLD_W)
   })
 })
 
