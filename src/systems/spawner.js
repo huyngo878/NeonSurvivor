@@ -4,7 +4,7 @@ import { createEnemy, ENEMY_TYPES } from '../entities.js'
 const BASE_WAVES = [
   { enemyType: 'chaser', count: 5, interval: 2.75, minWave: 1 },
   { enemyType: 'tank', count: 2, interval: 6.9, minWave: 2 },
-  { enemyType: 'speedster', count: 4, interval: 4.0, minWave: 5 },
+  { enemyType: 'speedster', count: 4, interval: 4.0, minWave: 11 },
   { enemyType: 'brute', count: 1, interval: 11.25, minWave: 7 },
 ]
 
