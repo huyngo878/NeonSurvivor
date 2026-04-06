@@ -47,6 +47,7 @@ describe('updateWeapons - wand', () => {
     const fired = pool.find(projectile => projectile.active)
     expect(fired.bouncesRemaining).toBe(2)
     expect(fired.forkOnHit).toBe(true)
+    expect(fired.hitEnemyIds).toBeInstanceOf(Set)
   })
 
   it('bounce retargets to a new enemy instead of the one just hit', () => {
@@ -66,7 +67,31 @@ describe('updateWeapons - wand', () => {
     updateCollision(entities, { kills: 0, state: 'playing', time: 0 })
     expect(projectile.active).toBe(true)
     expect(projectile.lastHitEnemyId).toBe(near.id)
+    expect(projectile.hitEnemyIds.has(near.id)).toBe(true)
     expect(Math.hypot(projectile.pos.x - near.pos.x, projectile.pos.y - near.pos.y)).toBeGreaterThan(near.radius)
+  })
+
+  it('bounce stops once every reachable target has already been hit', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    const weapon = player.weapons[0]
+    weapon.timer = 0
+    weapon.bounce = 5
+    const e1 = createEnemy('chaser', player.pos.x + 100, player.pos.y)
+    const e2 = createEnemy('chaser', player.pos.x + 150, player.pos.y)
+    const pool = initProjectilePool()
+    const entities = [player, e1, e2, ...pool]
+    updateWeapons(entities, 0.016)
+    const projectile = pool.find(entry => entry.active)
+    projectile.pos.x = e1.pos.x
+    projectile.pos.y = e1.pos.y
+    updateCollision(entities, { kills: 0, state: 'playing', time: 0 })
+    projectile.pos.x = e2.pos.x
+    projectile.pos.y = e2.pos.y
+    updateCollision(entities, { kills: 0, state: 'playing', time: 0 })
+    expect(projectile.active).toBe(false)
+    expect(projectile.hitEnemyIds.has(e1.id)).toBe(true)
+    expect(projectile.hitEnemyIds.has(e2.id)).toBe(true)
   })
 
   it('forked wand projectiles can fork again on their own first hit', () => {

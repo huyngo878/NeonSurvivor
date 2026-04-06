@@ -55,9 +55,11 @@ export function updateCollision(entities, gameState) {
   for (const proj of projectiles) {
     const candidates = shQuery(hash, proj.pos.x, proj.pos.y, proj.radius + MAX_ENEMY_RADIUS)
     for (const enemy of candidates) {
-      if (proj.lastHitEnemyId === enemy.id) continue
+      if (proj.hitEnemyIds?.has(enemy.id) || proj.lastHitEnemyId === enemy.id) continue
       const dist = Math.hypot(proj.pos.x - enemy.pos.x, proj.pos.y - enemy.pos.y)
       if (dist < proj.radius + enemy.radius) {
+        if (!proj.hitEnemyIds) proj.hitEnemyIds = new Set()
+        proj.hitEnemyIds.add(enemy.id)
         enemy.hp -= proj.damage
         _applyHitImpulse(enemy, proj)
         if (enemy.hp <= 0) {
@@ -218,7 +220,7 @@ function _killEnemy(enemy, entities, player, gameState) {
 
 function _retargetProjectile(proj, hitEnemy, enemies) {
   const target = enemies
-    .filter(enemy => enemy !== hitEnemy && !enemy.dead)
+    .filter(enemy => enemy !== hitEnemy && !enemy.dead && !proj.hitEnemyIds?.has(enemy.id))
     .map(enemy => ({ enemy, dist: Math.hypot(enemy.pos.x - hitEnemy.pos.x, enemy.pos.y - hitEnemy.pos.y) }))
     .sort((a, b) => a.dist - b.dist)[0]
   if (!target) return false
@@ -264,6 +266,7 @@ function _forkProjectile(proj, hitEnemy, enemies, entities) {
     fork.forkOnHit = proj.forkOnHit
     fork.forked = false
     fork.lastHitEnemyId = hitEnemy.id
+    fork.hitEnemyIds = new Set(proj.hitEnemyIds || [])
   }
 }
 

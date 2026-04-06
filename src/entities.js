@@ -179,6 +179,7 @@ export function initProjectilePool() {
       knockback: 0,
       fragmentChance: 0,
       lastHitEnemyId: null,
+      hitEnemyIds: new Set(),
     })
   }
   return pool

@@ -50,6 +50,7 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
     proj.forkOnHit = weapon.forkOnHit
     proj.forked = false
     proj.lastHitEnemyId = null
+    proj.hitEnemyIds = new Set()
   }
 }
 
@@ -116,5 +117,6 @@ function _tickRocket(weapon, dt, player, enemies, projectiles) {
     proj.knockback = weapon.knockback
     proj.fragmentChance = weapon.fragmentChance
     proj.lastHitEnemyId = null
+    proj.hitEnemyIds = new Set()
   }
 }

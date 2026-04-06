@@ -84,6 +84,14 @@ describe('pickChestCards', () => {
     expect(player.weapons[0].shots).toBe(2)
   })
 
+  it('wand bounce card adds 1 bounce but caps at 5', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    const card = CARDS.find(entry => entry.id === 'wand_bounce')
+    for (let i = 0; i < 7; i++) card.apply(player)
+    expect(player.weapons[0].bounce).toBe(5)
+  })
+
   it('applies unlock weapon cards correctly', () => {
     const player = createPlayer()
     const card = CARDS.find(entry => entry.id === 'unlock_rocket')

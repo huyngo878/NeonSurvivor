@@ -96,11 +96,14 @@ export const CARDS = [
   {
     id: 'wand_bounce',
     label: 'RICOCHET MATRIX',
-    desc: '+1 bounce for wand projectiles',
+    desc: '+1 bounce for wand projectiles, up to 5 total',
     rarity: 'epic',
     requires: 'wand',
     icon: 'B',
-    apply: player => { _weapon(player, 'wand').bounce += 1 },
+    apply: player => {
+      const weapon = _weapon(player, 'wand')
+      weapon.bounce = Math.min(5, weapon.bounce + 1)
+    },
   },
   {
     id: 'wand_fork',
