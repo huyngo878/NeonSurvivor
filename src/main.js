@@ -15,6 +15,7 @@ import { drawRunSummary } from './ui/runSummary.js'
 import { drawMetaScreen, handleMetaClick } from './ui/metaScreen.js'
 import { saveRun, loadBest, calcPrestige, applyMetaUpgrades } from './meta.js'
 import { META_UPGRADES } from './metaUpgrades.js'
+import { drawJoystick, getJoystickInput, joystickState, joystickTouchStart, joystickTouchMove, joystickTouchEnd } from './ui/joystick.js'
 
 // --- Canvas ---
 const canvas = document.getElementById('game')
@@ -32,6 +33,7 @@ function resize() {
 }
 resize()
 window.addEventListener('resize', resize)
+const isMobile = 'ontouchstart' in window
 
 // --- Input ---
 const input = { up: false, down: false, left: false, right: false }
@@ -103,8 +105,7 @@ document.addEventListener('keyup', e => {
   if (keyMap[e.code]) input[keyMap[e.code]] = false
 })
 
-canvas.addEventListener('click', e => {
-  const mx = e.clientX, my = e.clientY
+function _handlePointer(mx, my) {
   function hit(r) { return mx >= r.x && mx <= r.x + r.w && my >= r.y && my <= r.y + r.h }
 
   if (gameState.state === 'levelup') {
@@ -149,10 +150,37 @@ canvas.addEventListener('click', e => {
   }
 
   if (gameState.state === 'upgrades') {
-    handleMetaClick(e, gameState)
+    handleMetaClick({ clientX: mx, clientY: my }, gameState)
     return
   }
+}
+
+canvas.addEventListener('click', e => {
+  _handlePointer(e.clientX, e.clientY)
 })
+
+if (isMobile) {
+  canvas.addEventListener('touchstart', e => {
+    e.preventDefault()
+    const t = e.changedTouches[0]
+    const inJoystickZone = t.clientX < canvas.clientWidth / 2 && t.clientY > canvas.clientHeight / 2
+    if (gameState.state === 'playing' && inJoystickZone) {
+      joystickTouchStart(t)
+    } else {
+      _handlePointer(t.clientX, t.clientY)
+    }
+  }, { passive: false })
+
+  canvas.addEventListener('touchmove', e => {
+    e.preventDefault()
+    joystickTouchMove(e.changedTouches[0])
+  }, { passive: false })
+
+  canvas.addEventListener('touchend', e => {
+    e.preventDefault()
+    joystickTouchEnd()
+  }, { passive: false })
+}
 
 function _navigateMenu(state) {
   if (state === 'start' || state === 'upgrades') {
@@ -251,7 +279,8 @@ function loop(timestamp) {
     gameState.time += dt
     const player = entities.find(e => e.type === 'player')
 
-    updateMovement(entities, dt, input)
+    const effectiveInput = isMobile ? { ...input, ...getJoystickInput() } : input
+    updateMovement(entities, dt, effectiveInput)
     updateWeapons(entities, dt)
     updateCollision(entities, gameState)
     updateSpawner(entities, spawnerState, dt, gameState.time)
@@ -279,6 +308,7 @@ function loop(timestamp) {
     const player = entities.find(e => e.type === 'player')
     renderWorld(ctx, canvas, entities, camera)
     drawHud(ctx, canvas, player, gameState)
+    if (isMobile) drawJoystick(ctx, canvas)
   }
 }
 
