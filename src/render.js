@@ -8,6 +8,7 @@ export function renderWorld(ctx, canvas, entities, camera) {
     if (e.type === 'enemy') _drawEnemy(ctx, e)
     else if (e.type === 'projectile' && e.active) _drawProjectile(ctx, e)
     else if (e.type === 'pickup') _drawPickup(ctx, e)
+    else if (e.type === 'gem') _drawGem(ctx, e)
   }
 
   const player = entities.find(e => e.type === 'player')
@@ -106,6 +107,24 @@ function _drawPickup(ctx, pickup) {
   ctx.fillStyle = '#ffffff'
   ctx.beginPath()
   ctx.arc(x - 3, y + yOff - 3, pickup.radius * 0.35, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.restore()
+}
+
+function _drawGem(ctx, gem) {
+  const yOff = Math.sin(gem.bobTimer * 4) * 3
+  const { x, y } = gem.pos
+  ctx.save()
+  ctx.shadowBlur = 12
+  ctx.shadowColor = gem.color
+  ctx.fillStyle = gem.color
+  ctx.beginPath()
+  ctx.arc(x, y + yOff, gem.radius, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.globalAlpha = 0.5
+  ctx.fillStyle = '#ffffff'
+  ctx.beginPath()
+  ctx.arc(x - gem.radius * 0.3, y + yOff - gem.radius * 0.3, gem.radius * 0.3, 0, Math.PI * 2)
   ctx.fill()
   ctx.restore()
 }
