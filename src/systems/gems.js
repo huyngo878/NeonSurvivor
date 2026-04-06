@@ -23,7 +23,7 @@ export function updateGems(entities, player, dt, gameState) {
     const idx = entities.indexOf(gem)
     if (idx !== -1) entities.splice(idx, 1)
     player.xp += gem.value
-    if (player.xp >= player.xpToNext) {
+    if (player.xp >= player.xpToNext && gameState.state !== 'levelup') {
       _levelUp(player, gameState)
     }
   }

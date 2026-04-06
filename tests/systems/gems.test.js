@@ -94,4 +94,19 @@ describe('updateGems', () => {
     updateGems(entities, player, 0.016, gameState)
     expect(player.xp).toBe(1)  // 48+3=51, 51-50=1 carries over
   })
+
+  it('only triggers one level-up per frame when two gems are collected', () => {
+    const player = createPlayer()
+    player.pos = { x: 100, y: 100 }
+    player.xp = 49
+    player.xpToNext = 50
+    player.weapons = [createWeapon('wand')]
+    const gem1 = createGem(1, 6, '#00ff88', 104, 100)
+    const gem2 = createGem(1, 6, '#00ff88', 107, 100)
+    const entities = [player, gem1, gem2]
+    const gameState = { state: 'playing', kills: 0, time: 0 }
+    updateGems(entities, player, 0.016, gameState)
+    expect(player.level).toBe(2)
+    expect(gameState.state).toBe('levelup')
+  })
 })
