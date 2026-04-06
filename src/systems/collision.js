@@ -1,5 +1,5 @@
 import { CELL_SIZE } from '../constants.js'
-import { ENEMY_TYPES, createPickup } from '../entities.js'
+import { ENEMY_TYPES, createPickup, createGem } from '../entities.js'
 
 const MAX_ENEMY_RADIUS = Math.max(...Object.values(ENEMY_TYPES).map(e => e.radius))
 
@@ -53,6 +53,7 @@ export function updateCollision(entities, gameState) {
         if (enemy.hp <= 0) {
           gameState.kills++
           enemy.dead = true
+          _dropGem(enemy, entities)
           _rollWeaponDrop(enemy, entities)
         }
         break
@@ -80,6 +81,7 @@ export function updateCollision(entities, gameState) {
         if (enemy.hp <= 0) {
           gameState.kills++
           enemy.dead = true
+          _dropGem(enemy, entities)
           _rollWeaponDrop(enemy, entities)
         }
       }
@@ -103,6 +105,12 @@ export function updateCollision(entities, gameState) {
   for (let i = entities.length - 1; i >= 0; i--) {
     if (entities[i].dead) entities.splice(i, 1)
   }
+}
+
+function _dropGem(enemy, entities) {
+  const cfg = ENEMY_TYPES[enemy.enemyType]
+  if (!cfg) return
+  entities.push(createGem(cfg.gemValue, cfg.gemRadius, cfg.gemColor, enemy.pos.x, enemy.pos.y))
 }
 
 function _rollWeaponDrop(enemy, entities) {
