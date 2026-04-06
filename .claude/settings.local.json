@@ -21,7 +21,14 @@
       "mcp__github__create_repository",
       "Bash(bash \"C:/Users/huyng/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/brainstorming/scripts/start-server.sh\" --project-dir \"c:/Users/huyng/Desktop/ClaudeProjects/ClaudeGame\")",
       "Bash(npx vitest:*)",
-      "Bash(npx --yes serve -l 3001)"
+      "Bash(npx --yes serve -l 3001)",
+      "Bash(node scripts/gen-icons.js)",
+      "Bash(ls -lh assets/icon-*.png)",
+      "Bash(git add:*)",
+      "Bash(git commit -m 'feat: PWA icons — 192 and 512px cyan ring on black:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(gh run:*)",
+      "Bash(curl -s \"https://api.github.com/repos/huyngo878/NeonSurvivor/pages\" -H \"Accept: application/vnd.github+json\")"
     ]
   }
 }
