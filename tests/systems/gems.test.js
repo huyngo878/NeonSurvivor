@@ -52,11 +52,11 @@ describe('updateGems', () => {
     player.pos = { x: 100, y: 100 }
     player.xp = 19
     player.xpToNext = 20
-    const gem = createGem(30, 6, '#00ff88', 105, 100)
+    const gem = createGem(80, 6, '#00ff88', 105, 100)
     const entities = [player, gem]
     updateGems(entities, player, 0.016, { state: 'playing' })
     const chests = entities.filter(entity => entity.type === 'pickup' && entity.pickupType === 'chest')
-    expect(player.level).toBeGreaterThan(2)
+    expect(player.level).toBe(3)
     expect(chests.length).toBe(player.level - 1)
   })
 })
