@@ -40,9 +40,9 @@ export function drawHud(ctx, canvas, player, gameState) {
 
   // Paused overlay
   if (gameState.state === 'paused') {
+    ctx.save()
     ctx.fillStyle = 'rgba(0,0,0,0.55)'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
-    ctx.save()
     ctx.font = 'bold 36px monospace'
     ctx.textAlign = 'center'
     ctx.shadowBlur = 15
@@ -54,9 +54,9 @@ export function drawHud(ctx, canvas, player, gameState) {
 
   // Death overlay
   if (gameState.state === 'dead') {
+    ctx.save()
     ctx.fillStyle = 'rgba(0,0,0,0.7)'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
-    ctx.save()
     ctx.font = 'bold 48px monospace'
     ctx.textAlign = 'center'
     ctx.shadowBlur = 20
