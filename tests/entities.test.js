@@ -45,6 +45,24 @@ describe('createEnemy', () => {
   it('throws on unknown enemy type', () => {
     expect(() => createEnemy('dragon', 0, 0)).toThrow('Unknown enemy type: dragon')
   })
+
+  it('creates speedster with correct stats', () => {
+    const e = createEnemy('speedster', 50, 50)
+    expect(e.enemyType).toBe('speedster')
+    expect(e.speed).toBe(220)
+    expect(e.hp).toBe(18)
+    expect(e.radius).toBe(6)
+    expect(e.damage).toBe(8)
+  })
+
+  it('creates brute with correct stats', () => {
+    const e = createEnemy('brute', 50, 50)
+    expect(e.enemyType).toBe('brute')
+    expect(e.speed).toBe(35)
+    expect(e.hp).toBe(280)
+    expect(e.radius).toBe(18)
+    expect(e.damage).toBe(35)
+  })
 })
 
 describe('initProjectilePool', () => {

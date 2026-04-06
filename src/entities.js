@@ -1,8 +1,10 @@
 import { WORLD_W, WORLD_H, POOL_SIZE } from './constants.js'
 
 export const ENEMY_TYPES = {
-  chaser: { speed: 120, hp: 30,  maxHp: 30,  radius: 8,  color: '#ff0080', damage: 10, gemValue: 1, gemRadius: 6, gemColor: '#00ff88' },
-  tank:   { speed: 55,  hp: 120, maxHp: 120, radius: 14, color: '#ff4400', damage: 20, gemValue: 3, gemRadius: 8, gemColor: '#ffd700' },
+  chaser:    { speed: 120, hp: 30,  maxHp: 30,  radius: 8,  color: '#ff0080', damage: 10, gemValue: 1, gemRadius: 6,  gemColor: '#00ff88' },
+  tank:      { speed: 55,  hp: 120, maxHp: 120, radius: 14, color: '#ff4400', damage: 20, gemValue: 3, gemRadius: 8,  gemColor: '#ffd700' },
+  speedster: { speed: 220, hp: 18,  maxHp: 18,  radius: 6,  color: '#ff44ff', damage: 8,  gemValue: 1, gemRadius: 6,  gemColor: '#00ffff' },
+  brute:     { speed: 35,  hp: 280, maxHp: 280, radius: 18, color: '#aa00ff', damage: 35, gemValue: 6, gemRadius: 10, gemColor: '#cc88ff' },
 }
 
 const WEAPON_CONFIGS = {
