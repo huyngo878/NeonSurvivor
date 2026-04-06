@@ -15,35 +15,34 @@ export function drawMainMenu(ctx, canvas, gameState) {
   const runs = loadRuns()
 
   // Layout — vertically centered
-  // Total block height: title(48) + gap(8) + subtitle(12) + gap(20) + strip(50) + gap(20) + 4 buttons(38*4+10*3) + optional last run(30)
-  const btnH = 38, btnGap = 10
-  const totalContentH = 48 + 8 + 12 + 20 + 50 + 20 + (MENU_ITEMS.length * btnH + (MENU_ITEMS.length - 1) * btnGap) + (runs.length > 0 ? 30 : 0)
-  let y = Math.max(20, (canvas.clientHeight - totalContentH) / 2) + 36  // +36 to convert top-of-title to baseline
+  const btnH = 57, btnGap = 14
+  const totalContentH = 72 + 12 + 18 + 28 + 75 + 28 + (MENU_ITEMS.length * btnH + (MENU_ITEMS.length - 1) * btnGap) + (runs.length > 0 ? 40 : 0)
+  let y = Math.max(20, (canvas.clientHeight - totalContentH) / 2) + 54
 
   // Title
   ctx.save()
-  ctx.font = 'bold 48px monospace'
+  ctx.font = 'bold 72px monospace'
   ctx.textAlign = 'center'
-  ctx.shadowBlur = 24
+  ctx.shadowBlur = 32
   ctx.shadowColor = '#00ffc8'
   ctx.fillStyle = '#00ffc8'
   ctx.fillText('NEON SURVIVE', cx, y)
-  y += 24
-  ctx.font = '11px monospace'
+  y += 36
+  ctx.font = '17px monospace'
   ctx.shadowBlur = 0
   ctx.fillStyle = 'rgba(0,255,200,0.3)'
   ctx.fillText('SURVIVE THE NEON APOCALYPSE', cx, y)
   ctx.restore()
-  y += 24
+  y += 28
 
   // Stats strip
   const stats = [
-    { label: 'BEST TIME', value: best ? _fmtTime(best.timeSecs) : '--:--', color: '#ffd700' },
-    { label: 'BEST KILLS', value: best ? String(best.kills) : '--', color: '#ff0080' },
-    { label: 'BEST LEVEL', value: best ? String(best.level) : '--', color: '#00ffc8' },
-    { label: 'RUNS', value: String(runs.length), color: '#888' },
+    { label: 'BEST TIME',  value: best ? _fmtTime(best.timeSecs) : '--:--', color: '#ffd700' },
+    { label: 'BEST KILLS', value: best ? String(best.kills) : '--',          color: '#ff0080' },
+    { label: 'BEST LEVEL', value: best ? String(best.level) : '--',          color: '#00ffc8' },
+    { label: 'RUNS',       value: String(runs.length),                       color: '#888' },
   ]
-  const stripW = 340, stripH = 50, stripX = cx - stripW / 2
+  const stripW = 510, stripH = 75, stripX = cx - stripW / 2
   ctx.save()
   ctx.fillStyle = 'rgba(0,255,200,0.04)'
   ctx.strokeStyle = 'rgba(0,255,200,0.15)'
@@ -53,22 +52,22 @@ export function drawMainMenu(ctx, canvas, gameState) {
   const colW = stripW / stats.length
   stats.forEach((s, i) => {
     const x = stripX + colW * i + colW / 2
-    ctx.font = 'bold 15px monospace'
+    ctx.font = 'bold 23px monospace'
     ctx.textAlign = 'center'
     ctx.fillStyle = s.color
-    ctx.shadowBlur = 6
+    ctx.shadowBlur = 8
     ctx.shadowColor = s.color
-    ctx.fillText(s.value, x, y + 22)
-    ctx.font = '8px monospace'
+    ctx.fillText(s.value, x, y + 33)
+    ctx.font = '12px monospace'
     ctx.shadowBlur = 0
     ctx.fillStyle = '#444'
-    ctx.fillText(s.label, x, y + 38)
+    ctx.fillText(s.label, x, y + 57)
   })
   ctx.restore()
-  y += stripH + 24
+  y += stripH + 28
 
   // Menu buttons
-  const btnW = 240
+  const btnW = 360
   gameState.menuRects = []
 
   MENU_ITEMS.forEach((item, i) => {
@@ -82,19 +81,19 @@ export function drawMainMenu(ctx, canvas, gameState) {
     ctx.globalAlpha = disabled ? 0.3 : 1
     ctx.fillStyle = selected ? `${item.color}22` : 'rgba(0,0,0,0.6)'
     ctx.strokeStyle = selected ? item.color : `${item.color}50`
-    ctx.lineWidth = selected ? 1.5 : 1
+    ctx.lineWidth = selected ? 2 : 1
     if (selected && !disabled) {
-      ctx.shadowBlur = 14
+      ctx.shadowBlur = 18
       ctx.shadowColor = item.color
     }
     ctx.fillRect(x, y, btnW, btnH)
     ctx.strokeRect(x, y, btnW, btnH)
-    ctx.font = 'bold 13px monospace'
+    ctx.font = 'bold 20px monospace'
     ctx.textAlign = 'center'
     ctx.fillStyle = item.color
-    ctx.shadowBlur = selected ? 8 : 0
+    ctx.shadowBlur = selected ? 10 : 0
     ctx.shadowColor = item.color
-    ctx.fillText(item.label, cx, y + btnH / 2 + 5)
+    ctx.fillText(item.label, cx, y + btnH / 2 + 7)
     ctx.restore()
 
     y += btnH + btnGap
@@ -104,22 +103,22 @@ export function drawMainMenu(ctx, canvas, gameState) {
   if (runs.length > 0) {
     const last = runs[0]
     ctx.save()
-    ctx.font = '10px monospace'
+    ctx.font = '15px monospace'
     ctx.textAlign = 'center'
     ctx.fillStyle = '#444'
     ctx.fillText(
       `Last run: ${_fmtTime(last.timeSecs)} · ${last.kills} kills · Level ${last.level}`,
-      cx, y + 16
+      cx, y + 22
     )
     ctx.restore()
   }
 
   // Version
   ctx.save()
-  ctx.font = '9px monospace'
+  ctx.font = '13px monospace'
   ctx.textAlign = 'right'
   ctx.fillStyle = '#222'
-  ctx.fillText('v0.1.0', canvas.clientWidth - 12, canvas.clientHeight - 10)
+  ctx.fillText('v0.1.0', canvas.clientWidth - 16, canvas.clientHeight - 14)
   ctx.restore()
 }
 
