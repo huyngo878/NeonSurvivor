@@ -54,7 +54,7 @@ export function updateCollision(entities, gameState) {
           gameState.kills++
           enemy.dead = true
           _dropGem(enemy, entities)
-          _rollWeaponDrop(enemy, entities)
+          _rollWeaponDrop(enemy, entities, player)
         }
         break
       }
@@ -82,7 +82,7 @@ export function updateCollision(entities, gameState) {
           gameState.kills++
           enemy.dead = true
           _dropGem(enemy, entities)
-          _rollWeaponDrop(enemy, entities)
+          _rollWeaponDrop(enemy, entities, player)
         }
       }
     }
@@ -113,8 +113,9 @@ function _dropGem(enemy, entities) {
   entities.push(createGem(cfg.gemValue, cfg.gemRadius, cfg.gemColor, enemy.pos.x, enemy.pos.y))
 }
 
-function _rollWeaponDrop(enemy, entities) {
-  if (Math.random() >= 0.05) return
+function _rollWeaponDrop(enemy, entities, player) {
+  const baseRate = 0.05 + (player ? (player.dropRateBonus || 0) : 0)
+  if (Math.random() >= baseRate) return
   const dropType = Math.random() < 0.5 ? 'wand' : 'whip'
   entities.push(createPickup(dropType, enemy.pos.x, enemy.pos.y))
 }

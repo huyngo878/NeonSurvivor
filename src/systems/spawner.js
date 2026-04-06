@@ -6,12 +6,12 @@ export const WAVES = [
   { enemyType: 'tank',   count: 2, interval: 6.0, startTime: 15 },
 ]
 
-export function createSpawnerState() {
+export function createSpawnerState(spawnDelayBonus = 0) {
   return {
     timers: WAVES.map(() => 0),
     difficultyTimer: 0,
     countMult: 1.0,
-    intervalMult: 1.0,
+    intervalMult: 1.0 + spawnDelayBonus,
   }
 }
 
