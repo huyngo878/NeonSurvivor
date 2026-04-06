@@ -20,11 +20,17 @@ import { drawJoystick, getJoystickInput, joystickTouchStart, joystickTouchMove, 
 // --- Canvas ---
 const canvas = document.getElementById('game')
 const ctx = canvas.getContext('2d')
+const isMobile = 'ontouchstart' in window
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+const ZOOM_LEVELS = isIOS ? [1, 0.85, 0.72] : [1]
+const storedZoom = Number(window.localStorage.getItem('ios_zoom') || '')
+const initialZoom = ZOOM_LEVELS.includes(storedZoom) ? storedZoom : (isIOS ? 0.85 : 1)
 
 function resize() {
   const dpr = window.devicePixelRatio || 1
-  const w = window.innerWidth
-  const h = window.innerHeight
+  const viewport = window.visualViewport
+  const w = Math.round(viewport?.width || window.innerWidth)
+  const h = Math.round(viewport?.height || window.innerHeight)
   canvas.width  = w * dpr
   canvas.height = h * dpr
   canvas.style.width  = w + 'px'
@@ -33,7 +39,7 @@ function resize() {
 }
 resize()
 window.addEventListener('resize', resize)
-const isMobile = 'ontouchstart' in window
+window.visualViewport?.addEventListener('resize', resize)
 
 // --- Input ---
 const input = { up: false, down: false, left: false, right: false }
@@ -124,6 +130,11 @@ document.addEventListener('keyup', e => {
 
 function _handlePointer(mx, my) {
   function hit(r) { return mx >= r.x && mx <= r.x + r.w && my >= r.y && my <= r.y + r.h }
+
+  if ((gameState.state === 'playing' || gameState.state === 'paused') && gameState.zoomRect && hit(gameState.zoomRect)) {
+    _cycleZoom()
+    return
+  }
 
   if (gameState.state === 'chest') {
     const rects = gameState.cardRects || []
@@ -228,7 +239,10 @@ function _applyUpgrade(upgrade) {
 
 // --- Game state ---
 let entities = []
-let gameState = { state: 'menu', selectedWeapon: 'wand', menuIndex: 0, metaTab: 0, time: 0, kills: 0, wave: 1, pauseIndex: 0 }
+let gameState = {
+  state: 'menu', selectedWeapon: 'wand', menuIndex: 0, metaTab: 0, time: 0, kills: 0, wave: 1, pauseIndex: 0,
+  zoom: initialZoom, zoomLabel: `${initialZoom.toFixed(2)}x`, showZoomControl: isIOS,
+}
 let spawnerState = {}
 let camera = { x: 0, y: 0 }
 
@@ -243,6 +257,7 @@ function initGame(selectedWeapon) {
     menuIndex: 0, metaTab: 0,
     time: 0, kills: 0, upgradesTaken: [],
     wave: 1, pauseIndex: 0,
+    zoom: gameState.zoom, zoomLabel: gameState.zoomLabel, showZoomControl: isIOS,
   }
   spawnerState = createSpawnerState(player.spawnDelayBonus || 0)
   camera       = { x: 0, y: 0 }
@@ -250,8 +265,22 @@ function initGame(selectedWeapon) {
 
 // --- Camera ---
 function updateCamera(player) {
-  camera.x = Math.max(0, Math.min(player.pos.x - canvas.clientWidth  / 2, WORLD_W - canvas.clientWidth))
-  camera.y = Math.max(0, Math.min(player.pos.y - canvas.clientHeight / 2, WORLD_H - canvas.clientHeight))
+  const zoom = gameState.zoom || 1
+  const viewW = canvas.clientWidth / zoom
+  const viewH = canvas.clientHeight / zoom
+  camera.x = Math.max(0, Math.min(player.pos.x - viewW / 2, WORLD_W - viewW))
+  camera.y = Math.max(0, Math.min(player.pos.y - viewH / 2, WORLD_H - viewH))
+}
+
+function _cycleZoom() {
+  const current = gameState.zoom || 1
+  const index = ZOOM_LEVELS.indexOf(current)
+  const next = ZOOM_LEVELS[(index + 1) % ZOOM_LEVELS.length]
+  gameState.zoom = next
+  gameState.zoomLabel = `${next.toFixed(2)}x`
+  window.localStorage.setItem('ios_zoom', String(next))
+  const player = entities.find(e => e.type === 'player')
+  if (player) updateCamera(player)
 }
 
 // --- Build run data on death ---
@@ -310,7 +339,7 @@ function loop(timestamp) {
 
   if (gameState.state === 'chest') {
     const player = entities.find(e => e.type === 'player')
-    renderWorld(ctx, canvas, entities, camera)
+    renderWorld(ctx, canvas, entities, camera, gameState.zoom)
     drawHud(ctx, canvas, player, gameState)
     drawLevelUpScreen(ctx, canvas, player, gameState)
     return
@@ -339,7 +368,7 @@ function loop(timestamp) {
 
   if (gameState.state === 'paused' || gameState.state === 'playing') {
     const player = entities.find(e => e.type === 'player')
-    renderWorld(ctx, canvas, entities, camera)
+    renderWorld(ctx, canvas, entities, camera, gameState.zoom)
     drawHud(ctx, canvas, player, gameState)
     if (isMobile) drawJoystick(ctx, canvas)
   }

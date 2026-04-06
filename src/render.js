@@ -1,16 +1,23 @@
-export function renderWorld(ctx, canvas, entities, camera) {
+export function renderWorld(ctx, canvas, entities, camera, zoom = 1) {
   ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight)
 
   ctx.save()
+  ctx.scale(zoom, zoom)
   ctx.translate(-camera.x, -camera.y)
 
   for (const e of entities) {
-    if (e.type === 'enemy') _drawEnemy(ctx, e)
-    else if (e.type === 'projectile' && e.active) _drawProjectile(ctx, e)
-    else if (e.type === 'enemyProjectile') _drawEnemyProjectile(ctx, e)
-    else if (e.type === 'pickup') _drawPickup(ctx, e)
+    if (e.type === 'pickup') _drawPickup(ctx, e)
     else if (e.type === 'gem') _drawGem(ctx, e)
     else if (e.type === 'shockwave') _drawShockwave(ctx, e)
+  }
+
+  for (const e of entities) {
+    if (e.type === 'enemy') _drawEnemy(ctx, e)
+  }
+
+  for (const e of entities) {
+    if (e.type === 'projectile' && e.active) _drawProjectile(ctx, e)
+    else if (e.type === 'enemyProjectile') _drawEnemyProjectile(ctx, e)
   }
 
   const player = entities.find(e => e.type === 'player')

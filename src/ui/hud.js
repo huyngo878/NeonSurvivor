@@ -86,6 +86,29 @@ export function drawHud(ctx, canvas, player, gameState) {
     ctx.restore()
   }
 
+  if (gameState.showZoomControl) {
+    const x = canvas.clientWidth - 120
+    const y = canvas.clientHeight - 124
+    const w = 96
+    const h = 36
+    gameState.zoomRect = { x, y, w, h }
+    ctx.save()
+    ctx.fillStyle = 'rgba(0,0,0,0.55)'
+    ctx.strokeStyle = '#00ffc8'
+    ctx.lineWidth = 1
+    ctx.fillRect(x, y, w, h)
+    ctx.strokeRect(x, y, w, h)
+    ctx.font = 'bold 16px monospace'
+    ctx.textAlign = 'center'
+    ctx.shadowBlur = 8
+    ctx.shadowColor = '#00ffc8'
+    ctx.fillStyle = '#00ffc8'
+    ctx.fillText(`ZOOM ${gameState.zoomLabel || '1.0x'}`, x + w / 2, y + 24)
+    ctx.restore()
+  } else {
+    gameState.zoomRect = null
+  }
+
   if (gameState.state === 'paused') {
     ctx.save()
     ctx.fillStyle = 'rgba(0,0,0,0.65)'
