@@ -133,13 +133,15 @@ export function drawRunSummary(ctx, canvas, gameState) {
   // Buttons
   ctx.save()
   const btn = [
-    { label: '▶ PLAY AGAIN  [R]', color: '#00ffc8' },
-    { label: 'MENU  [M]',         color: '#ffd700' },
+    { label: '▶ PLAY AGAIN  [R]', color: '#00ffc8', action: 'replay' },
+    { label: 'MENU  [M]',         color: '#ffd700', action: 'menu' },
   ]
   const btnW = 160, btnH = 34, gap = 12
   const bx = cx - (btnW * 2 + gap) / 2
+  gameState.summaryBtnRects = []
   btn.forEach((b, i) => {
     const x = bx + i * (btnW + gap)
+    gameState.summaryBtnRects.push({ x, y, w: btnW, h: btnH, action: b.action })
     ctx.fillStyle = `${b.color}15`
     ctx.strokeStyle = b.color
     ctx.lineWidth = 1

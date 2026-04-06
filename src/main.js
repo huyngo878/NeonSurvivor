@@ -21,8 +21,14 @@ const canvas = document.getElementById('game')
 const ctx = canvas.getContext('2d')
 
 function resize() {
-  canvas.width  = window.innerWidth
-  canvas.height = window.innerHeight
+  const dpr = window.devicePixelRatio || 1
+  const w = window.innerWidth
+  const h = window.innerHeight
+  canvas.width  = w * dpr
+  canvas.height = h * dpr
+  canvas.style.width  = w + 'px'
+  canvas.style.height = h + 'px'
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 }
 resize()
 window.addEventListener('resize', resize)
@@ -98,25 +104,44 @@ document.addEventListener('keyup', e => {
 })
 
 canvas.addEventListener('click', e => {
+  const mx = e.clientX, my = e.clientY
+  function hit(r) { return mx >= r.x && mx <= r.x + r.w && my >= r.y && my <= r.y + r.h }
+
   if (gameState.state === 'levelup') {
     const rects = gameState.cardRects || []
     const choices = gameState.upgradeChoices || []
     for (let i = 0; i < rects.length; i++) {
-      const r = rects[i]
-      if (e.clientX >= r.x && e.clientX <= r.x + r.w && e.clientY >= r.y && e.clientY <= r.y + r.h) {
-        if (choices[i]) _applyUpgrade(choices[i])
-        break
-      }
+      if (hit(rects[i]) && choices[i]) { _applyUpgrade(choices[i]); break }
     }
     return
   }
 
   if (gameState.state === 'menu') {
     for (const rect of (gameState.menuRects || [])) {
-      if (!rect.disabled &&
-          e.clientX >= rect.x && e.clientX <= rect.x + rect.w &&
-          e.clientY >= rect.y && e.clientY <= rect.y + rect.h) {
-        _navigateMenu(rect.state)
+      if (!rect.disabled && hit(rect)) { _navigateMenu(rect.state); break }
+    }
+    return
+  }
+
+  if (gameState.state === 'start') {
+    for (const rect of (gameState.weaponRects || [])) {
+      if (hit(rect)) {
+        if (gameState.selectedWeapon === rect.type) {
+          initGame(rect.type)  // double-click same card = start
+        } else {
+          gameState.selectedWeapon = rect.type  // first click = select
+        }
+        break
+      }
+    }
+    return
+  }
+
+  if (gameState.state === 'summary') {
+    for (const btn of (gameState.summaryBtnRects || [])) {
+      if (hit(btn)) {
+        if (btn.action === 'replay') initGame(gameState.selectedWeapon)
+        else gameState.state = 'menu'
         break
       }
     }

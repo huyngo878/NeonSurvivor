@@ -43,10 +43,12 @@ export function drawStartScreen(ctx, canvas, gameState) {
     },
   ]
 
+  gameState.weaponRects = []
   weapons.forEach((w, i) => {
     const x = startX + i * (cardW + gap)
     const y = cy - 40
     const selected = gameState.selectedWeapon === w.type
+    gameState.weaponRects.push({ x, y, w: cardW, h: cardH, type: w.type })
 
     ctx.save()
     ctx.fillStyle = selected ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.02)'
@@ -92,6 +94,6 @@ export function drawStartScreen(ctx, canvas, gameState) {
   ctx.font = '13px monospace'
   ctx.textAlign = 'center'
   ctx.fillStyle = 'rgba(0,255,200,0.4)'
-  ctx.fillText('← → to select   ·   ENTER or SPACE to start', cx, cy + 145)
+  ctx.fillText('Click to select   ·   ENTER or SPACE to start', cx, cy + 145)
   ctx.restore()
 }
