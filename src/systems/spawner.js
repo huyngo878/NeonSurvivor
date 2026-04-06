@@ -3,7 +3,7 @@ import { createEnemy } from '../entities.js'
 
 export const WAVES = [
   { enemyType: 'chaser',    count: 5, interval: 2.0,  startTime: 0  },
-  { enemyType: 'speedster', count: 3, interval: 3.5,  startTime: 20  },
+  { enemyType: 'speedster', count: 3, interval: 1.5,  startTime: 0  },
   { enemyType: 'tank',      count: 2, interval: 6.0,  startTime: 15 },
   { enemyType: 'brute',     count: 1, interval: 15.0, startTime: 30 },
 ]
