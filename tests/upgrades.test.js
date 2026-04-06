@@ -92,6 +92,14 @@ describe('pickChestCards', () => {
     expect(player.weapons[0].bounce).toBe(5)
   })
 
+  it('wand fork card adds 1 fork generation but caps at 3', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    const card = CARDS.find(entry => entry.id === 'wand_fork')
+    for (let i = 0; i < 5; i++) card.apply(player)
+    expect(player.weapons[0].forkCount).toBe(3)
+  })
+
   it('applies unlock weapon cards correctly', () => {
     const player = createPlayer()
     const card = CARDS.find(entry => entry.id === 'unlock_rocket')
@@ -102,7 +110,7 @@ describe('pickChestCards', () => {
   it('legendary unique card is unavailable once taken', () => {
     const player = createPlayer()
     player.weapons = [createWeapon('wand')]
-    player.cardHistory = ['wand_fork']
+    player.weapons[0].forkCount = 3
     const picks = pickChestCards(player, 100)
     expect(picks.some(card => card.id === 'wand_fork')).toBe(false)
   })

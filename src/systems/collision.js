@@ -65,7 +65,7 @@ export function updateCollision(entities, gameState) {
         if (enemy.hp <= 0) {
           _killEnemy(enemy, entities, player, gameState)
         }
-        if (proj.weaponType === 'wand' && proj.forkOnHit && !proj.forked) {
+        if (proj.weaponType === 'wand' && proj.forkCountRemaining > 0 && !proj.forked) {
           _forkProjectile(proj, enemy, enemies, entities)
         }
         if (proj.aoe) {
@@ -263,7 +263,7 @@ function _forkProjectile(proj, hitEnemy, enemies, entities) {
     fork.weaponType = 'wand'
     fork.explode = false
     fork.bouncesRemaining = proj.bouncesRemaining
-    fork.forkOnHit = proj.forkOnHit
+    fork.forkCountRemaining = proj.forkCountRemaining - 1
     fork.forked = false
     fork.lastHitEnemyId = hitEnemy.id
     fork.hitEnemyIds = new Set(proj.hitEnemyIds || [])

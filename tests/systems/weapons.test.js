@@ -40,13 +40,13 @@ describe('updateWeapons - wand', () => {
     player.weapons = [createWeapon('wand')]
     player.weapons[0].timer = 0
     player.weapons[0].bounce = 2
-    player.weapons[0].forkOnHit = true
+    player.weapons[0].forkCount = 2
     const enemy = createEnemy('chaser', player.pos.x + 100, player.pos.y)
     const pool = initProjectilePool()
     updateWeapons([player, enemy, ...pool], 0.016)
     const fired = pool.find(projectile => projectile.active)
     expect(fired.bouncesRemaining).toBe(2)
-    expect(fired.forkOnHit).toBe(true)
+    expect(fired.forkCountRemaining).toBe(2)
     expect(fired.hitEnemyIds).toBeInstanceOf(Set)
   })
 
@@ -99,7 +99,7 @@ describe('updateWeapons - wand', () => {
     player.weapons = [createWeapon('wand')]
     const weapon = player.weapons[0]
     weapon.timer = 0
-    weapon.forkOnHit = true
+    weapon.forkCount = 2
     const e1 = createEnemy('chaser', player.pos.x + 100, player.pos.y)
     const e2 = createEnemy('chaser', player.pos.x + 150, player.pos.y + 20)
     const e3 = createEnemy('chaser', player.pos.x + 180, player.pos.y - 20)
@@ -113,12 +113,38 @@ describe('updateWeapons - wand', () => {
     updateCollision(entities, { kills: 0, state: 'playing', time: 0 })
     const firstFork = pool.filter(entry => entry.active && entry !== root)
     expect(firstFork.length).toBeGreaterThanOrEqual(2)
+    expect(firstFork[0].forkCountRemaining).toBe(1)
     const branch = firstFork[0]
     branch.pos.x = e2.pos.x
     branch.pos.y = e2.pos.y
     updateCollision(entities, { kills: 0, state: 'playing', time: 0 })
     const activeForks = pool.filter(entry => entry.active)
     expect(activeForks.length).toBeGreaterThanOrEqual(3)
+  })
+
+  it('fork count does not continue past the configured depth', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    const weapon = player.weapons[0]
+    weapon.timer = 0
+    weapon.forkCount = 1
+    const e1 = createEnemy('chaser', player.pos.x + 100, player.pos.y)
+    const e2 = createEnemy('chaser', player.pos.x + 150, player.pos.y + 20)
+    const e3 = createEnemy('chaser', player.pos.x + 180, player.pos.y - 20)
+    const pool = initProjectilePool()
+    const entities = [player, e1, e2, e3, ...pool]
+    updateWeapons(entities, 0.016)
+    const root = pool.find(entry => entry.active)
+    root.pos.x = e1.pos.x
+    root.pos.y = e1.pos.y
+    updateCollision(entities, { kills: 0, state: 'playing', time: 0 })
+    const branch = pool.filter(entry => entry.active && entry !== root)[0]
+    expect(branch.forkCountRemaining).toBe(0)
+    branch.pos.x = e2.pos.x
+    branch.pos.y = e2.pos.y
+    updateCollision(entities, { kills: 0, state: 'playing', time: 0 })
+    const postSecondHit = pool.filter(entry => entry.active)
+    expect(postSecondHit.length).toBeLessThanOrEqual(2)
   })
 })
 

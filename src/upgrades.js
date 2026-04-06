@@ -108,13 +108,15 @@ export const CARDS = [
   {
     id: 'wand_fork',
     label: 'SPLIT LATTICE',
-    desc: 'Each wand projectile forks into 2 on its first hit',
+    desc: '+1 fork generation for wand projectiles, up to 3 total',
     rarity: 'legendary',
     requires: 'wand',
-    unique: true,
     icon: 'Y',
-    available: player => !_weapon(player, 'wand').forkOnHit,
-    apply: player => { _weapon(player, 'wand').forkOnHit = true },
+    available: player => _weapon(player, 'wand').forkCount < 3,
+    apply: player => {
+      const weapon = _weapon(player, 'wand')
+      weapon.forkCount = Math.min(3, weapon.forkCount + 1)
+    },
   },
 
   {

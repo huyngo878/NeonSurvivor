@@ -47,7 +47,7 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
     proj.weaponType = 'wand'
     proj.explode = false
     proj.bouncesRemaining = weapon.bounce
-    proj.forkOnHit = weapon.forkOnHit
+    proj.forkCountRemaining = weapon.forkCount
     proj.forked = false
     proj.lastHitEnemyId = null
     proj.hitEnemyIds = new Set()
