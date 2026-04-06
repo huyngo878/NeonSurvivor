@@ -1,3 +1,5 @@
+import { createWeapon } from './entities.js'
+
 const WEIGHTS = { common: 55, rare: 25, epic: 10, legendary: 10 }
 
 export const CARDS = [
@@ -35,6 +37,33 @@ export const CARDS = [
     rarity: 'common',
     icon: '>',
     apply: player => { player.speed *= 1.1 },
+  },
+  {
+    id: 'unlock_wand',
+    label: 'ARCANE CACHE',
+    desc: 'Add the wand weapon to your loadout',
+    rarity: 'epic',
+    icon: 'W',
+    excludes: 'wand',
+    apply: player => { player.weapons.push(createWeapon('wand')) },
+  },
+  {
+    id: 'unlock_whip',
+    label: 'CHAIN CACHE',
+    desc: 'Add the whip weapon to your loadout',
+    rarity: 'epic',
+    icon: 'H',
+    excludes: 'whip',
+    apply: player => { player.weapons.push(createWeapon('whip')) },
+  },
+  {
+    id: 'unlock_rocket',
+    label: 'ORDNANCE CACHE',
+    desc: 'Add the rocket launcher to your loadout',
+    rarity: 'epic',
+    icon: 'R',
+    excludes: 'rocket',
+    apply: player => { player.weapons.push(createWeapon('rocket')) },
   },
 
   {
@@ -132,7 +161,7 @@ export const CARDS = [
   {
     id: 'rocket_multi',
     label: 'SALVO BAY',
-    desc: '+1 rocket per volley',
+    desc: 'Fire 1 extra rocket each time the launcher shoots',
     rarity: 'rare',
     requires: 'rocket',
     icon: '2',
@@ -189,6 +218,7 @@ export const CARDS = [
 export function pickChestCards(player, n) {
   const eligible = CARDS.filter(card => {
     if (card.requires && !_weapon(player, card.requires)) return false
+    if (card.excludes && _weapon(player, card.excludes)) return false
     if (card.unique && player.cardHistory?.includes(card.id)) return false
     if (card.available && !card.available(player)) return false
     return true

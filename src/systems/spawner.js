@@ -2,10 +2,10 @@ import { SPAWN_RADIUS, WAVE_DURATION } from '../constants.js'
 import { createEnemy, ENEMY_TYPES } from '../entities.js'
 
 const BASE_WAVES = [
-  { enemyType: 'chaser', count: 5, interval: 2.2, minWave: 1 },
-  { enemyType: 'tank', count: 2, interval: 5.5, minWave: 2 },
-  { enemyType: 'speedster', count: 4, interval: 3.2, minWave: 5 },
-  { enemyType: 'brute', count: 1, interval: 9.0, minWave: 7 },
+  { enemyType: 'chaser', count: 5, interval: 2.75, minWave: 1 },
+  { enemyType: 'tank', count: 2, interval: 6.9, minWave: 2 },
+  { enemyType: 'speedster', count: 4, interval: 4.0, minWave: 5 },
+  { enemyType: 'brute', count: 1, interval: 11.25, minWave: 7 },
 ]
 
 const BOSS_PATTERNS = ['spiral', 'ring', 'cross']

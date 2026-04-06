@@ -1,5 +1,5 @@
 import { CELL_SIZE } from '../constants.js'
-import { ENEMY_TYPES, createChest, createPickup, createGem, createMagnet, createShockwave, createEnemyProjectile } from '../entities.js'
+import { ENEMY_TYPES, createChest, createGem, createMagnet, createShockwave, createEnemyProjectile } from '../entities.js'
 
 const MAX_ENEMY_RADIUS = Math.max(...Object.values(ENEMY_TYPES).map(e => e.radius))
 
@@ -148,15 +148,8 @@ function _dropGem(enemy, entities) {
 
 function _rollPickupDrop(enemy, entities, player) {
   const bonus = player ? (player.dropRateBonus || 0) : 0
-  const chestRate = 0.05 + bonus
-  const weaponRate = 0.05 + bonus
+  const chestRate = 0.15 + bonus
   const magnetRate = 0.005
-
-  if (Math.random() < weaponRate) {
-    const weapons = ['wand', 'whip', 'rocket']
-    const dropType = weapons[Math.floor(Math.random() * weapons.length)]
-    entities.push(createPickup(dropType, enemy.pos.x, enemy.pos.y))
-  }
 
   if (Math.random() < chestRate) {
     entities.push(createChest(enemy.pos.x, enemy.pos.y))

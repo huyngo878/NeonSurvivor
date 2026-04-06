@@ -36,6 +36,15 @@ describe('pickChestCards', () => {
     }
   })
 
+  it('offers weapon unlock cards only when that weapon is not already owned', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    const picks = pickChestCards(player, 100)
+    expect(picks.some(card => card.id === 'unlock_wand')).toBe(false)
+    expect(picks.some(card => card.id === 'unlock_whip')).toBe(true)
+    expect(picks.some(card => card.id === 'unlock_rocket')).toBe(true)
+  })
+
   it('does not return duplicate cards in one roll', () => {
     const player = createPlayer()
     player.weapons = [createWeapon('wand'), createWeapon('rocket')]
@@ -58,6 +67,13 @@ describe('pickChestCards', () => {
     const card = CARDS.find(entry => entry.id === 'rocket_multi')
     card.apply(player)
     expect(player.weapons[0].shots).toBe(2)
+  })
+
+  it('applies unlock weapon cards correctly', () => {
+    const player = createPlayer()
+    const card = CARDS.find(entry => entry.id === 'unlock_rocket')
+    card.apply(player)
+    expect(player.weapons.some(weapon => weapon.type === 'rocket')).toBe(true)
   })
 
   it('legendary unique card is unavailable once taken', () => {
