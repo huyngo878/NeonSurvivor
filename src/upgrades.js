@@ -85,9 +85,18 @@ export const CARDS = [
     apply: player => { _weapon(player, 'wand').projectileSpeed += 120 },
   },
   {
+    id: 'wand_shots',
+    label: 'TWIN CAST',
+    desc: '+1 wand projectile per attack',
+    rarity: 'rare',
+    requires: 'wand',
+    icon: '2',
+    apply: player => { _weapon(player, 'wand').shots += 1 },
+  },
+  {
     id: 'wand_bounce',
     label: 'RICOCHET MATRIX',
-    desc: 'Wand projectiles bounce to the nearest target',
+    desc: '+1 bounce for wand projectiles',
     rarity: 'epic',
     requires: 'wand',
     icon: 'B',
@@ -96,7 +105,7 @@ export const CARDS = [
   {
     id: 'wand_fork',
     label: 'SPLIT LATTICE',
-    desc: 'Projectiles fork on first hit',
+    desc: 'Each wand projectile forks into 2 on its first hit',
     rarity: 'legendary',
     requires: 'wand',
     unique: true,

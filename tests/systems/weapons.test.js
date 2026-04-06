@@ -68,6 +68,33 @@ describe('updateWeapons - wand', () => {
     expect(projectile.lastHitEnemyId).toBe(near.id)
     expect(Math.hypot(projectile.pos.x - near.pos.x, projectile.pos.y - near.pos.y)).toBeGreaterThan(near.radius)
   })
+
+  it('forked wand projectiles can fork again on their own first hit', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    const weapon = player.weapons[0]
+    weapon.timer = 0
+    weapon.forkOnHit = true
+    const e1 = createEnemy('chaser', player.pos.x + 100, player.pos.y)
+    const e2 = createEnemy('chaser', player.pos.x + 150, player.pos.y + 20)
+    const e3 = createEnemy('chaser', player.pos.x + 180, player.pos.y - 20)
+    const e4 = createEnemy('chaser', player.pos.x + 220, player.pos.y + 10)
+    const pool = initProjectilePool()
+    const entities = [player, e1, e2, e3, e4, ...pool]
+    updateWeapons(entities, 0.016)
+    const root = pool.find(entry => entry.active)
+    root.pos.x = e1.pos.x
+    root.pos.y = e1.pos.y
+    updateCollision(entities, { kills: 0, state: 'playing', time: 0 })
+    const firstFork = pool.filter(entry => entry.active && entry !== root)
+    expect(firstFork.length).toBeGreaterThanOrEqual(2)
+    const branch = firstFork[0]
+    branch.pos.x = e2.pos.x
+    branch.pos.y = e2.pos.y
+    updateCollision(entities, { kills: 0, state: 'playing', time: 0 })
+    const activeForks = pool.filter(entry => entry.active)
+    expect(activeForks.length).toBeGreaterThanOrEqual(3)
+  })
 })
 
 describe('updateWeapons - whip', () => {

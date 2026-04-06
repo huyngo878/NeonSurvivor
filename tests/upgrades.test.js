@@ -45,6 +45,13 @@ describe('pickChestCards', () => {
     expect(picks.some(card => card.id === 'unlock_rocket')).toBe(true)
   })
 
+  it('includes the wand +1 projectile card in wand chest rolls', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    const picks = pickChestCards(player, 100)
+    expect(picks.some(card => card.id === 'wand_shots')).toBe(true)
+  })
+
   it('does not return duplicate cards in one roll', () => {
     const player = createPlayer()
     player.weapons = [createWeapon('wand'), createWeapon('rocket')]
@@ -65,6 +72,14 @@ describe('pickChestCards', () => {
     const player = createPlayer()
     player.weapons = [createWeapon('rocket')]
     const card = CARDS.find(entry => entry.id === 'rocket_multi')
+    card.apply(player)
+    expect(player.weapons[0].shots).toBe(2)
+  })
+
+  it('applies wand +1 projectile card correctly', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    const card = CARDS.find(entry => entry.id === 'wand_shots')
     card.apply(player)
     expect(player.weapons[0].shots).toBe(2)
   })

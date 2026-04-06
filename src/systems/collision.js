@@ -148,7 +148,7 @@ function _dropGem(enemy, entities) {
 
 function _rollPickupDrop(enemy, entities, player) {
   const bonus = player ? (player.dropRateBonus || 0) : 0
-  const chestRate = 0.15 + bonus
+  const chestRate = 0.05 + bonus
   const magnetRate = 0.005
 
   if (Math.random() < chestRate) {
@@ -261,8 +261,8 @@ function _forkProjectile(proj, hitEnemy, enemies, entities) {
     fork.weaponType = 'wand'
     fork.explode = false
     fork.bouncesRemaining = proj.bouncesRemaining
-    fork.forkOnHit = false
-    fork.forked = true
+    fork.forkOnHit = proj.forkOnHit
+    fork.forked = false
     fork.lastHitEnemyId = hitEnemy.id
   }
 }
