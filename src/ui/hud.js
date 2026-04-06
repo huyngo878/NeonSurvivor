@@ -93,22 +93,4 @@ export function drawHud(ctx, canvas, player, gameState) {
     ctx.restore()
   }
 
-  // Death overlay
-  if (gameState.state === 'dead') {
-    ctx.save()
-    ctx.fillStyle = 'rgba(0,0,0,0.7)'
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-    ctx.font = 'bold 48px monospace'
-    ctx.textAlign = 'center'
-    ctx.shadowBlur = 20
-    ctx.shadowColor = '#ff0080'
-    ctx.fillStyle = '#ff0080'
-    ctx.fillText('YOU DIED', canvas.width / 2, canvas.height / 2 - 20)
-    ctx.font = '20px monospace'
-    ctx.shadowBlur = 10
-    ctx.shadowColor = '#00ffc8'
-    ctx.fillStyle = '#00ffc8'
-    ctx.fillText('[R] to Restart', canvas.width / 2, canvas.height / 2 + 30)
-    ctx.restore()
-  }
 }
