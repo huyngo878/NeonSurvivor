@@ -25,7 +25,7 @@ describe('createPlayer', () => {
     const player = createPlayer()
     expect(player.xp).toBe(0)
     expect(player.level).toBe(1)
-    expect(player.xpToNext).toBe(50)
+    expect(player.xpToNext).toBe(20)
   })
 })
 

@@ -25,8 +25,8 @@ describe('updateGems', () => {
   it('levels the player without opening a card screen', () => {
     const player = createPlayer()
     player.pos = { x: 100, y: 100 }
-    player.xp = 49
-    player.xpToNext = 50
+    player.xp = 19
+    player.xpToNext = 20
     const gem = createGem(3, 6, '#00ff88', 105, 100)
     const entities = [player, gem]
     const gameState = { state: 'playing' }
@@ -34,6 +34,7 @@ describe('updateGems', () => {
     expect(player.level).toBe(2)
     expect(player.xp).toBe(2)
     expect(gameState.state).toBe('playing')
+    expect(entities.some(entity => entity.type === 'pickup' && entity.pickupType === 'chest')).toBe(true)
   })
 
   it('moves attracted gem toward player each frame', () => {
@@ -44,5 +45,18 @@ describe('updateGems', () => {
     const entities = [player, gem]
     updateGems(entities, player, 0.1, { state: 'playing' })
     expect(gem.pos.x).toBeLessThan(500)
+  })
+
+  it('spawns one chest per level gained from a large XP burst', () => {
+    const player = createPlayer()
+    player.pos = { x: 100, y: 100 }
+    player.xp = 19
+    player.xpToNext = 20
+    const gem = createGem(30, 6, '#00ff88', 105, 100)
+    const entities = [player, gem]
+    updateGems(entities, player, 0.016, { state: 'playing' })
+    const chests = entities.filter(entity => entity.type === 'pickup' && entity.pickupType === 'chest')
+    expect(player.level).toBeGreaterThan(2)
+    expect(chests.length).toBe(player.level - 1)
   })
 })

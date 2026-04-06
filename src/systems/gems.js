@@ -1,4 +1,5 @@
 import { createSpatialHash, shInsert, shQuery } from './collision.js'
+import { createChest } from '../entities.js'
 
 const MAGNET_SPEED = 400  // px/s
 
@@ -24,7 +25,7 @@ export function updateGems(entities, player, dt, gameState) {
     if (dist <= collectRadius) {
       entities.splice(i, 1)
       player.xp += Math.floor(gem.value * (player.xpMult || 1))
-      _levelUp(player)
+      _levelUp(player, entities)
     } else {
       gem.pos.x += (dx / dist) * MAGNET_SPEED * dt
       gem.pos.y += (dy / dist) * MAGNET_SPEED * dt
@@ -46,14 +47,15 @@ export function updateGems(entities, player, dt, gameState) {
     const idx = entities.indexOf(gem)
     if (idx !== -1) entities.splice(idx, 1)
     player.xp += Math.floor(gem.value * (player.xpMult || 1))
-    _levelUp(player)
+    _levelUp(player, entities)
   }
 }
 
-function _levelUp(player) {
+function _levelUp(player, entities) {
   while (player.xp >= player.xpToNext) {
     player.xp -= player.xpToNext
     player.level++
-    player.xpToNext = Math.floor(50 * Math.pow(player.level, 1.2))
+    player.xpToNext = Math.floor(20 * Math.pow(player.level, 1.2))
+    entities.push(createChest(player.pos.x, player.pos.y))
   }
 }
