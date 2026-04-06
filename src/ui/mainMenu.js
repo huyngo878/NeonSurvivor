@@ -11,23 +11,27 @@ export function drawMainMenu(ctx, canvas, gameState) {
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
   const cx = canvas.width / 2
-  const cy = canvas.height / 2
   const best = loadBest()
   const runs = loadRuns()
 
+  // Layout — top-down, fixed spacing
+  let y = 70
+
   // Title
   ctx.save()
-  ctx.font = 'bold 52px monospace'
+  ctx.font = 'bold 48px monospace'
   ctx.textAlign = 'center'
   ctx.shadowBlur = 24
   ctx.shadowColor = '#00ffc8'
   ctx.fillStyle = '#00ffc8'
-  ctx.fillText('NEON SURVIVE', cx, cy - 140)
+  ctx.fillText('NEON SURVIVE', cx, y)
+  y += 24
   ctx.font = '11px monospace'
   ctx.shadowBlur = 0
   ctx.fillStyle = 'rgba(0,255,200,0.3)'
-  ctx.fillText('SURVIVE THE NEON APOCALYPSE', cx, cy - 115)
+  ctx.fillText('SURVIVE THE NEON APOCALYPSE', cx, y)
   ctx.restore()
+  y += 24
 
   // Stats strip
   const stats = [
@@ -36,13 +40,13 @@ export function drawMainMenu(ctx, canvas, gameState) {
     { label: 'BEST LEVEL', value: best ? String(best.level) : '--', color: '#00ffc8' },
     { label: 'RUNS', value: String(runs.length), color: '#888' },
   ]
-  const stripW = 320, stripH = 48, stripX = cx - stripW / 2, stripY = cy - 90
+  const stripW = 340, stripH = 50, stripX = cx - stripW / 2
   ctx.save()
   ctx.fillStyle = 'rgba(0,255,200,0.04)'
   ctx.strokeStyle = 'rgba(0,255,200,0.15)'
   ctx.lineWidth = 1
-  ctx.fillRect(stripX, stripY, stripW, stripH)
-  ctx.strokeRect(stripX, stripY, stripW, stripH)
+  ctx.fillRect(stripX, y, stripW, stripH)
+  ctx.strokeRect(stripX, y, stripW, stripH)
   const colW = stripW / stats.length
   stats.forEach((s, i) => {
     const x = stripX + colW * i + colW / 2
@@ -51,23 +55,21 @@ export function drawMainMenu(ctx, canvas, gameState) {
     ctx.fillStyle = s.color
     ctx.shadowBlur = 6
     ctx.shadowColor = s.color
-    ctx.fillText(s.value, x, stripY + 20)
+    ctx.fillText(s.value, x, y + 22)
     ctx.font = '8px monospace'
     ctx.shadowBlur = 0
     ctx.fillStyle = '#444'
-    ctx.fillText(s.label, x, stripY + 36)
+    ctx.fillText(s.label, x, y + 38)
   })
   ctx.restore()
+  y += stripH + 24
 
   // Menu buttons
-  const btnW = 240, btnH = 36, btnGap = 10
-  const totalH = MENU_ITEMS.length * (btnH + btnGap) - btnGap
-  const btnStartY = cy - totalH / 2 + 20
+  const btnW = 240, btnH = 38, btnGap = 10
   gameState.menuRects = []
 
   MENU_ITEMS.forEach((item, i) => {
     const x = cx - btnW / 2
-    const y = btnStartY + i * (btnH + btnGap)
     const selected = gameState.menuIndex === i
     const disabled = item.disabled
 
@@ -75,9 +77,7 @@ export function drawMainMenu(ctx, canvas, gameState) {
 
     ctx.save()
     ctx.globalAlpha = disabled ? 0.3 : 1
-    ctx.fillStyle = selected
-      ? `${item.color}22`
-      : 'rgba(0,0,0,0.6)'
+    ctx.fillStyle = selected ? `${item.color}22` : 'rgba(0,0,0,0.6)'
     ctx.strokeStyle = selected ? item.color : `${item.color}50`
     ctx.lineWidth = selected ? 1.5 : 1
     if (selected && !disabled) {
@@ -93,6 +93,8 @@ export function drawMainMenu(ctx, canvas, gameState) {
     ctx.shadowColor = item.color
     ctx.fillText(item.label, cx, y + btnH / 2 + 5)
     ctx.restore()
+
+    y += btnH + btnGap
   })
 
   // Last run hint
@@ -101,10 +103,10 @@ export function drawMainMenu(ctx, canvas, gameState) {
     ctx.save()
     ctx.font = '10px monospace'
     ctx.textAlign = 'center'
-    ctx.fillStyle = '#333'
+    ctx.fillStyle = '#444'
     ctx.fillText(
       `Last run: ${_fmtTime(last.timeSecs)} · ${last.kills} kills · Level ${last.level}`,
-      cx, cy + 180
+      cx, y + 16
     )
     ctx.restore()
   }
