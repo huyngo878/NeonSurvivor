@@ -5,9 +5,11 @@ import { updateCollision } from './systems/collision.js'
 import { updateWeapons } from './systems/weapons.js'
 import { updateSpawner, createSpawnerState } from './systems/spawner.js'
 import { updatePickup } from './systems/pickup.js'
+import { updateGems } from './systems/gems.js'
 import { renderWorld } from './render.js'
 import { drawHud } from './ui/hud.js'
 import { drawStartScreen } from './ui/startScreen.js'
+import { drawLevelUpScreen } from './ui/levelUpScreen.js'
 
 // --- Canvas ---
 const canvas = document.getElementById('game')
@@ -46,6 +48,17 @@ document.addEventListener('keydown', e => {
     return
   }
 
+  // Level-up card selection
+  if (gameState.state === 'levelup') {
+    const choices = gameState.upgradeChoices || []
+    let picked = null
+    if (e.code === 'Digit1' && choices[0]) picked = choices[0]
+    if (e.code === 'Digit2' && choices[1]) picked = choices[1]
+    if (e.code === 'Digit3' && choices[2]) picked = choices[2]
+    if (picked) _applyUpgrade(picked)
+    return
+  }
+
   if (e.code === 'KeyP') {
     if (gameState.state === 'playing') gameState.state = 'paused'
     else if (gameState.state === 'paused') gameState.state = 'playing'
@@ -55,9 +68,32 @@ document.addEventListener('keydown', e => {
     gameState.selectedWeapon = 'wand'
   }
 })
+
 document.addEventListener('keyup', e => {
   if (keyMap[e.code]) input[keyMap[e.code]] = false
 })
+
+canvas.addEventListener('click', e => {
+  if (gameState.state !== 'levelup') return
+  const rects = gameState.cardRects || []
+  const choices = gameState.upgradeChoices || []
+  for (let i = 0; i < rects.length; i++) {
+    const r = rects[i]
+    if (e.clientX >= r.x && e.clientX <= r.x + r.w &&
+        e.clientY >= r.y && e.clientY <= r.y + r.h) {
+      if (choices[i]) _applyUpgrade(choices[i])
+      break
+    }
+  }
+})
+
+function _applyUpgrade(upgrade) {
+  const player = entities.find(e => e.type === 'player')
+  if (player) upgrade.apply(player)
+  gameState.upgradeChoices = null
+  gameState.cardRects = null
+  gameState.state = 'playing'
+}
 
 // --- Game state ---
 let entities = []
@@ -95,6 +131,14 @@ function loop(timestamp) {
     return
   }
 
+  if (gameState.state === 'levelup') {
+    const player = entities.find(e => e.type === 'player')
+    renderWorld(ctx, canvas, entities, camera)
+    drawHud(ctx, canvas, player, gameState)
+    drawLevelUpScreen(ctx, canvas, player, gameState)
+    return
+  }
+
   if (gameState.state === 'playing') {
     gameState.time += dt
     const player = entities.find(e => e.type === 'player')
@@ -103,8 +147,14 @@ function loop(timestamp) {
     updateWeapons(entities, dt)
     updateCollision(entities, gameState)
     updateSpawner(entities, spawnerState, dt, gameState.time)
-    if (player) updatePickup(entities, player, dt)
-    if (player) updateCamera(player)
+    if (player) {
+      updatePickup(entities, player, dt)
+      updateGems(entities, player, dt, gameState)
+      if (player.regenRate > 0) {
+        player.hp = Math.min(player.maxHp, player.hp + player.regenRate * dt)
+      }
+      updateCamera(player)
+    }
 
     if (player && player.hp <= 0) {
       player.hp = 0
