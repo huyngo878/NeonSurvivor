@@ -29,7 +29,7 @@ function _drawPlayer(ctx, player) {
   // Whip arc overlay
   for (const weapon of player.weapons) {
     if (weapon.type === 'whip' && weapon.active) {
-      const angle = Math.atan2(player.facing.y, player.facing.x)
+      const angle = weapon.aimAngle
       ctx.save()
       ctx.strokeStyle = '#ffd700'
       ctx.lineWidth = 3

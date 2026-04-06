@@ -6,10 +6,10 @@ export const ENEMY_TYPES = {
 }
 
 const WEAPON_CONFIGS = {
-  wand: { type: 'wand', cooldown: 0.8, damage: 20, range: 400 },
+  wand: { type: 'wand', cooldown: 0.8, damage: 20, range: 400, shots: 1 },
   whip: {
     type: 'whip', cooldown: 0.6, damage: 15, range: 120,
-    sweepAngle: Math.PI, activeDuration: 0.12,
+    sweepAngle: Math.PI, activeDuration: 0.12, aimAngle: 0,
   },
 }
 

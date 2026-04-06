@@ -73,6 +73,7 @@ describe('createWeapon', () => {
     expect(w.timer).toBe(0)
     expect(w.damage).toBe(20)
     expect(w.range).toBe(400)
+    expect(w.shots).toBe(1)
   })
 
   it('creates whip with correct shape', () => {
@@ -86,6 +87,7 @@ describe('createWeapon', () => {
     expect(w.active).toBe(false)
     expect(w.activeTimer).toBe(0)
     expect(w.activeDuration).toBe(0.12)
+    expect(w.aimAngle).toBe(0)
     expect(w.hitIds).toBeInstanceOf(Set)
   })
 

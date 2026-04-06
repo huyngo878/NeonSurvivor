@@ -24,26 +24,39 @@ describe('updatePickup', () => {
     expect(entities.find(e => e === pickup)).toBeUndefined()
   })
 
-  it('does not add duplicate weapon type', () => {
+  it('upgrades wand shots when duplicate wand is picked up', () => {
     const player = createPlayer()
     player.pos = { x: 100, y: 100 }
     player.weapons = [createWeapon('wand')]
     const pickup = createPickup('wand', 105, 100)
-    const pool = initProjectilePool()
-    const entities = [player, pickup, ...pool]
+    const entities = [player, pickup, ...initProjectilePool()]
     updatePickup(entities, player, 0.016)
     expect(player.weapons).toHaveLength(1)
+    expect(player.weapons[0].shots).toBe(2)
   })
 
-  it('removes pickup even when weapon is duplicate', () => {
+  it('removes wand pickup even when upgrading', () => {
     const player = createPlayer()
     player.pos = { x: 100, y: 100 }
     player.weapons = [createWeapon('wand')]
     const pickup = createPickup('wand', 105, 100)
-    const pool = initProjectilePool()
-    const entities = [player, pickup, ...pool]
+    const entities = [player, pickup, ...initProjectilePool()]
     updatePickup(entities, player, 0.016)
     expect(entities.find(e => e === pickup)).toBeUndefined()
+  })
+
+  it('upgrades whip cooldown/damage/arc when duplicate whip is picked up', () => {
+    const player = createPlayer()
+    player.pos = { x: 100, y: 100 }
+    player.weapons = [createWeapon('whip')]
+    const before = { cooldown: player.weapons[0].cooldown, damage: player.weapons[0].damage, sweepAngle: player.weapons[0].sweepAngle }
+    const pickup = createPickup('whip', 105, 100)
+    const entities = [player, pickup, ...initProjectilePool()]
+    updatePickup(entities, player, 0.016)
+    expect(player.weapons).toHaveLength(1)
+    expect(player.weapons[0].cooldown).toBeLessThan(before.cooldown)
+    expect(player.weapons[0].damage).toBeGreaterThan(before.damage)
+    expect(player.weapons[0].sweepAngle).toBeGreaterThan(before.sweepAngle)
   })
 
   it('does not collect pickup out of range', () => {

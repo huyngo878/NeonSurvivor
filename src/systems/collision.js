@@ -64,7 +64,7 @@ export function updateCollision(entities, gameState) {
   if (player) {
     for (const weapon of player.weapons) {
       if (weapon.type !== 'whip' || !weapon.active) continue
-      const facingAngle = Math.atan2(player.facing.y, player.facing.x)
+      const facingAngle = weapon.aimAngle
       const candidates = shQuery(hash, player.pos.x, player.pos.y, weapon.range + MAX_ENEMY_RADIUS)
       for (const enemy of candidates) {
         if (weapon.hitIds.has(enemy.id)) continue

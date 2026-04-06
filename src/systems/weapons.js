@@ -10,7 +10,7 @@ export function updateWeapons(entities, dt) {
     if (weapon.type === 'wand') {
       _tickWand(weapon, dt, player, enemies, projectiles)
     } else if (weapon.type === 'whip') {
-      _tickWhip(weapon, dt)
+      _tickWhip(weapon, dt, player, enemies)
     }
   }
 }
@@ -20,30 +20,30 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
   if (weapon.timer > 0) return
   weapon.timer = weapon.cooldown
 
-  let nearest = null
-  let nearestDist = weapon.range
-  for (const enemy of enemies) {
-    const dist = Math.hypot(enemy.pos.x - player.pos.x, enemy.pos.y - player.pos.y)
-    if (dist < nearestDist) { nearest = enemy; nearestDist = dist }
+  // Sort enemies by distance, fire at the N nearest (one projectile each)
+  const inRange = enemies
+    .map(e => ({ e, dist: Math.hypot(e.pos.x - player.pos.x, e.pos.y - player.pos.y) }))
+    .filter(({ dist }) => dist <= weapon.range)
+    .sort((a, b) => a.dist - b.dist)
+    .slice(0, weapon.shots)
+
+  for (const { e: target } of inRange) {
+    const proj = projectiles.find(p => !p.active)
+    if (!proj) break
+    const dx = target.pos.x - player.pos.x
+    const dy = target.pos.y - player.pos.y
+    const dist = Math.hypot(dx, dy)
+    proj.active = true
+    proj.pos.x = player.pos.x
+    proj.pos.y = player.pos.y
+    proj.vel.x = (dx / dist) * PROJ_SPEED
+    proj.vel.y = (dy / dist) * PROJ_SPEED
+    proj.age = 0
+    proj.damage = weapon.damage
   }
-  if (!nearest) return
-
-  const proj = projectiles.find(p => !p.active)
-  if (!proj) return
-
-  const dx = nearest.pos.x - player.pos.x
-  const dy = nearest.pos.y - player.pos.y
-  const dist = Math.hypot(dx, dy)
-  proj.active = true
-  proj.pos.x = player.pos.x
-  proj.pos.y = player.pos.y
-  proj.vel.x = (dx / dist) * PROJ_SPEED
-  proj.vel.y = (dy / dist) * PROJ_SPEED
-  proj.age = 0
-  proj.damage = weapon.damage
 }
 
-function _tickWhip(weapon, dt) {
+function _tickWhip(weapon, dt, player, enemies) {
   if (weapon.active) {
     weapon.activeTimer -= dt
     if (weapon.activeTimer <= 0) weapon.active = false
@@ -52,6 +52,23 @@ function _tickWhip(weapon, dt) {
   weapon.timer -= dt
   if (weapon.timer > 0) return
   weapon.timer = weapon.cooldown
+
+  // Aim at nearest enemy, fall back to player.facing
+  let nearest = null
+  let nearestDist = Infinity
+  for (const enemy of enemies) {
+    const dist = Math.hypot(enemy.pos.x - player.pos.x, enemy.pos.y - player.pos.y)
+    if (dist < nearestDist) { nearest = enemy; nearestDist = dist }
+  }
+  if (nearest) {
+    weapon.aimAngle = Math.atan2(
+      nearest.pos.y - player.pos.y,
+      nearest.pos.x - player.pos.x,
+    )
+  } else {
+    weapon.aimAngle = Math.atan2(player.facing.y, player.facing.x)
+  }
+
   weapon.active = true
   weapon.activeTimer = weapon.activeDuration
   weapon.hitIds = new Set()
