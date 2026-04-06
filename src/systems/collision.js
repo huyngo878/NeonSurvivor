@@ -1,5 +1,5 @@
 import { CELL_SIZE } from '../constants.js'
-import { ENEMY_TYPES } from '../entities.js'
+import { ENEMY_TYPES, createPickup } from '../entities.js'
 
 const MAX_ENEMY_RADIUS = Math.max(...Object.values(ENEMY_TYPES).map(e => e.radius))
 
@@ -53,13 +53,40 @@ export function updateCollision(entities, gameState) {
         if (enemy.hp <= 0) {
           gameState.kills++
           enemy.dead = true
+          _rollWeaponDrop(enemy, entities)
         }
-        break // one enemy per projectile
+        break
       }
     }
   }
 
-  // Enemy vs Player (skip if iframes active)
+  // Whip arc vs Enemy
+  if (player) {
+    for (const weapon of player.weapons) {
+      if (weapon.type !== 'whip' || !weapon.active) continue
+      const facingAngle = Math.atan2(player.facing.y, player.facing.x)
+      const candidates = shQuery(hash, player.pos.x, player.pos.y, weapon.range + MAX_ENEMY_RADIUS)
+      for (const enemy of candidates) {
+        if (weapon.hitIds.has(enemy.id)) continue
+        const dist = Math.hypot(enemy.pos.x - player.pos.x, enemy.pos.y - player.pos.y)
+        if (dist > weapon.range + enemy.radius) continue
+        const angleToEnemy = Math.atan2(enemy.pos.y - player.pos.y, enemy.pos.x - player.pos.x)
+        let diff = angleToEnemy - facingAngle
+        while (diff > Math.PI)  diff -= 2 * Math.PI
+        while (diff < -Math.PI) diff += 2 * Math.PI
+        if (Math.abs(diff) > weapon.sweepAngle / 2) continue
+        enemy.hp -= weapon.damage
+        weapon.hitIds.add(enemy.id)
+        if (enemy.hp <= 0) {
+          gameState.kills++
+          enemy.dead = true
+          _rollWeaponDrop(enemy, entities)
+        }
+      }
+    }
+  }
+
+  // Enemy vs Player
   if (player && player.iframes <= 0) {
     const nearby = shQuery(hash, player.pos.x, player.pos.y, MAX_ENEMY_RADIUS + player.radius)
     for (const enemy of nearby) {
@@ -67,13 +94,19 @@ export function updateCollision(entities, gameState) {
       if (dist < enemy.radius + player.radius) {
         player.hp -= enemy.damage
         player.iframes = 0.5
-        break // one hit per frame
+        break
       }
     }
   }
 
-  // Remove dead enemies from array
+  // Remove dead entities
   for (let i = entities.length - 1; i >= 0; i--) {
     if (entities[i].dead) entities.splice(i, 1)
   }
+}
+
+function _rollWeaponDrop(enemy, entities) {
+  if (Math.random() >= 0.05) return
+  const dropType = Math.random() < 0.5 ? 'wand' : 'whip'
+  entities.push(createPickup(dropType, enemy.pos.x, enemy.pos.y))
 }

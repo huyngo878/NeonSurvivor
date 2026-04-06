@@ -38,7 +38,7 @@ describe('spatial hash', () => {
 })
 
 import { updateCollision } from '../../src/systems/collision.js'
-import { createPlayer, createEnemy, initProjectilePool } from '../../src/entities.js'
+import { createPlayer, createEnemy, initProjectilePool, createWeapon } from '../../src/entities.js'
 
 describe('updateCollision — projectile vs enemy', () => {
   it('damages enemy when projectile overlaps', () => {
@@ -100,5 +100,65 @@ describe('updateCollision — enemy vs player', () => {
     const gameState = { kills: 0, state: 'playing', time: 0 }
     updateCollision([player, enemy, ...pool], gameState)
     expect(player.hp).toBe(100)
+  })
+})
+
+describe('updateCollision — whip arc', () => {
+  it('damages enemy directly in front of player (within arc)', () => {
+    const player = createPlayer()
+    player.pos = { x: 500, y: 500 }
+    player.facing = { x: 1, y: 0 }
+    player.weapons = [createWeapon('whip')]
+    player.weapons[0].active = true
+    player.weapons[0].activeTimer = 0.1
+    const enemy = createEnemy('chaser', 550, 500)
+    const pool = initProjectilePool()
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision([player, enemy, ...pool], gameState)
+    expect(enemy.hp).toBeLessThan(enemy.maxHp)
+  })
+
+  it('does not damage enemy behind player (outside arc)', () => {
+    const player = createPlayer()
+    player.pos = { x: 500, y: 500 }
+    player.facing = { x: 1, y: 0 }
+    player.weapons = [createWeapon('whip')]
+    player.weapons[0].active = true
+    player.weapons[0].activeTimer = 0.1
+    const enemy = createEnemy('chaser', 450, 500)
+    const pool = initProjectilePool()
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision([player, enemy, ...pool], gameState)
+    expect(enemy.hp).toBe(enemy.maxHp)
+  })
+
+  it('does not damage same enemy twice in one swing', () => {
+    const player = createPlayer()
+    player.pos = { x: 500, y: 500 }
+    player.facing = { x: 1, y: 0 }
+    player.weapons = [createWeapon('whip')]
+    player.weapons[0].active = true
+    player.weapons[0].activeTimer = 0.1
+    const enemy = createEnemy('chaser', 550, 500)
+    enemy.hp = 100
+    const pool = initProjectilePool()
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision([player, enemy, ...pool], gameState)
+    const hpAfterFirst = enemy.hp
+    updateCollision([player, enemy, ...pool], gameState)
+    expect(enemy.hp).toBe(hpAfterFirst)
+  })
+
+  it('does not damage enemy when whip is inactive', () => {
+    const player = createPlayer()
+    player.pos = { x: 500, y: 500 }
+    player.facing = { x: 1, y: 0 }
+    player.weapons = [createWeapon('whip')]
+    player.weapons[0].active = false
+    const enemy = createEnemy('chaser', 550, 500)
+    const pool = initProjectilePool()
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision([player, enemy, ...pool], gameState)
+    expect(enemy.hp).toBe(enemy.maxHp)
   })
 })
