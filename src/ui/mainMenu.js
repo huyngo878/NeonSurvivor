@@ -14,8 +14,11 @@ export function drawMainMenu(ctx, canvas, gameState) {
   const best = loadBest()
   const runs = loadRuns()
 
-  // Layout — top-down, fixed spacing
-  let y = 70
+  // Layout — vertically centered
+  // Total block height: title(48) + gap(8) + subtitle(12) + gap(20) + strip(50) + gap(20) + 4 buttons(38*4+10*3) + optional last run(30)
+  const btnH = 38, btnGap = 10
+  const totalContentH = 48 + 8 + 12 + 20 + 50 + 20 + (MENU_ITEMS.length * btnH + (MENU_ITEMS.length - 1) * btnGap) + (runs.length > 0 ? 30 : 0)
+  let y = Math.max(20, (canvas.height - totalContentH) / 2) + 36  // +36 to convert top-of-title to baseline
 
   // Title
   ctx.save()
@@ -65,7 +68,7 @@ export function drawMainMenu(ctx, canvas, gameState) {
   y += stripH + 24
 
   // Menu buttons
-  const btnW = 240, btnH = 38, btnGap = 10
+  const btnW = 240
   gameState.menuRects = []
 
   MENU_ITEMS.forEach((item, i) => {
