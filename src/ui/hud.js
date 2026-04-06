@@ -38,6 +38,22 @@ export function drawHud(ctx, canvas, player, gameState) {
   ctx.fillText(`KILLS: ${gameState.kills}`, canvas.width - 16, 30)
   ctx.restore()
 
+  // Weapon inventory — bottom-left
+  if (player.weapons.length > 0) {
+    ctx.save()
+    ctx.font = '13px monospace'
+    ctx.textAlign = 'left'
+    player.weapons.forEach((weapon, i) => {
+      const color = weapon.type === 'whip' ? '#ffd700' : '#00ffc8'
+      const label = weapon.type === 'whip' ? 'WHIP' : 'WAND'
+      ctx.shadowBlur = 8
+      ctx.shadowColor = color
+      ctx.fillStyle = color
+      ctx.fillText(label, 16, canvas.height - 16 - i * 20)
+    })
+    ctx.restore()
+  }
+
   // Paused overlay
   if (gameState.state === 'paused') {
     ctx.save()
