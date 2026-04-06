@@ -15,7 +15,7 @@ import { drawRunSummary } from './ui/runSummary.js'
 import { drawMetaScreen, handleMetaClick } from './ui/metaScreen.js'
 import { saveRun, loadBest, calcPrestige, applyMetaUpgrades } from './meta.js'
 import { META_UPGRADES } from './metaUpgrades.js'
-import { drawJoystick, getJoystickInput, joystickState, joystickTouchStart, joystickTouchMove, joystickTouchEnd } from './ui/joystick.js'
+import { drawJoystick, getJoystickInput, joystickTouchStart, joystickTouchMove, joystickTouchEnd } from './ui/joystick.js'
 
 // --- Canvas ---
 const canvas = document.getElementById('game')
