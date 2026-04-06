@@ -68,6 +68,11 @@ export function createPlayer() {
     level: 1,
     xpToNext: 50,
     regenRate: 0,
+    xpMult: 1.0,        // multiplier for XP gained (meta upgrade)
+    extraChoices: 0,    // extra level-up cards shown (meta upgrade)
+    magnetBonus: 0,     // extra gem pickup radius in px (meta upgrade)
+    dropRateBonus: 0,   // extra weapon drop % (meta upgrade)
+    spawnDelayBonus: 0, // starting intervalMult bonus (meta upgrade)
   }
 }
 
