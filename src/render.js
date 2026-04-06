@@ -69,10 +69,12 @@ function _drawEnemy(ctx, enemy) {
 
 function _drawProjectile(ctx, proj) {
   const { x, y } = proj.pos
+  const isRocket = proj.weaponType === 'rocket'
+  const color = isRocket ? '#ff6600' : '#ffffff'
   ctx.save()
-  ctx.shadowBlur = 12
-  ctx.shadowColor = '#ffffff'
-  ctx.fillStyle = '#ffffff'
+  ctx.shadowBlur = isRocket ? 16 : 12
+  ctx.shadowColor = color
+  ctx.fillStyle = color
   ctx.beginPath()
   ctx.arc(x, y, proj.radius, 0, Math.PI * 2)
   ctx.fill()

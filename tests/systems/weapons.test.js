@@ -157,3 +157,54 @@ describe('updateWeapons — whip', () => {
     expect(player.weapons[0].hitIds.size).toBe(0)
   })
 })
+
+describe('updateWeapons — rocket', () => {
+  it('fires at nearest enemy when timer expires', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('rocket')]
+    player.weapons[0].timer = 0
+    const enemy = createEnemy('chaser', player.pos.x + 100, player.pos.y)
+    const pool = initProjectilePool()
+    updateWeapons([player, enemy, ...pool], 0.016)
+    const fired = pool.find(p => p.active)
+    expect(fired).toBeDefined()
+  })
+
+  it('rocket projectile has aoe flag and aoeRadius', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('rocket')]
+    player.weapons[0].timer = 0
+    const enemy = createEnemy('chaser', player.pos.x + 100, player.pos.y)
+    const pool = initProjectilePool()
+    updateWeapons([player, enemy, ...pool], 0.016)
+    const fired = pool.find(p => p.active)
+    expect(fired.aoe).toBe(true)
+    expect(fired.aoeRadius).toBe(80)
+    expect(fired.weaponType).toBe('rocket')
+  })
+
+  it('rocket fires shots=2 projectiles after upgrade', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('rocket')]
+    player.weapons[0].timer = 0
+    player.weapons[0].shots = 2
+    const e1 = createEnemy('chaser', player.pos.x + 100, player.pos.y)
+    const e2 = createEnemy('chaser', player.pos.x + 150, player.pos.y)
+    const pool = initProjectilePool()
+    updateWeapons([player, e1, e2, ...pool], 0.016)
+    const fired = pool.filter(p => p.active)
+    expect(fired.length).toBe(2)
+  })
+
+  it('wand projectile has aoe=false', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    player.weapons[0].timer = 0
+    const enemy = createEnemy('chaser', player.pos.x + 100, player.pos.y)
+    const pool = initProjectilePool()
+    updateWeapons([player, enemy, ...pool], 0.016)
+    const fired = pool.find(p => p.active)
+    expect(fired.aoe).toBe(false)
+    expect(fired.weaponType).toBe('wand')
+  })
+})

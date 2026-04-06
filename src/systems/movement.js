@@ -46,11 +46,15 @@ function _moveProjectile(proj, dt) {
   proj.pos.x += proj.vel.x * dt
   proj.pos.y += proj.vel.y * dt
   proj.age += dt
-  if (
+  const expired =
     proj.age >= proj.lifetime ||
     proj.pos.x < 0 || proj.pos.x > WORLD_W ||
     proj.pos.y < 0 || proj.pos.y > WORLD_H
-  ) {
-    proj.active = false
+  if (expired) {
+    if (proj.aoe) {
+      proj.explode = true  // AOE explosion handled in collision.js
+    } else {
+      proj.active = false
+    }
   }
 }

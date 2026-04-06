@@ -42,6 +42,14 @@ export function updateCollision(entities, gameState) {
   const hash = createSpatialHash()
   for (const enemy of enemies) shInsert(hash, enemy)
 
+  // Handle exploding rockets (expired aoe projectiles set proj.explode in movement.js)
+  for (const proj of projectiles) {
+    if (!proj.explode) continue
+    _aoeExplosion(proj.pos.x, proj.pos.y, proj.aoeRadius, proj.damage * 0.5, enemies, entities, player, gameState, null)
+    proj.active = false
+    proj.explode = false
+  }
+
   // Projectile vs Enemy
   for (const proj of projectiles) {
     const candidates = shQuery(hash, proj.pos.x, proj.pos.y, proj.radius + MAX_ENEMY_RADIUS)
@@ -55,6 +63,9 @@ export function updateCollision(entities, gameState) {
           enemy.dead = true
           _dropGem(enemy, entities)
           _rollPickupDrop(enemy, entities, player)
+        }
+        if (proj.aoe) {
+          _aoeExplosion(proj.pos.x, proj.pos.y, proj.aoeRadius, proj.damage * 0.5, enemies, entities, player, gameState, enemy)
         }
         break
       }
@@ -126,5 +137,21 @@ function _rollPickupDrop(enemy, entities, player) {
   // Magnet drop (rare, independent roll)
   if (Math.random() < baseRate) {
     entities.push(createMagnet(enemy.pos.x, enemy.pos.y))
+  }
+}
+
+function _aoeExplosion(cx, cy, radius, damage, enemies, entities, player, gameState, skipEnemy) {
+  for (const enemy of enemies) {
+    if (enemy === skipEnemy || enemy.dead) continue
+    const dist = Math.hypot(enemy.pos.x - cx, enemy.pos.y - cy)
+    if (dist <= radius + enemy.radius) {
+      enemy.hp -= damage
+      if (enemy.hp <= 0) {
+        gameState.kills++
+        enemy.dead = true
+        _dropGem(enemy, entities)
+        _rollPickupDrop(enemy, entities, player)
+      }
+    }
   }
 }

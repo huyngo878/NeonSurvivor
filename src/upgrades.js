@@ -74,6 +74,31 @@ export const UPGRADES = [
     rarity: 'epic', icon: '🔱', excludes: 'whip',
     apply: (p) => { p.weapons.push(createWeapon('whip')) },
   },
+
+  // Rocket upgrades
+  {
+    id: 'rocket_dmg', label: 'ROCKET POWER', desc: '+15 rocket damage',
+    rarity: 'common', icon: '💥', requires: 'rocket',
+    apply: (p) => { p.weapons.find(w => w.type === 'rocket').damage += 15 },
+  },
+  {
+    id: 'rocket_aoe', label: 'BIGGER BLAST', desc: '+20 explosion radius',
+    rarity: 'rare', icon: '🔥', requires: 'rocket',
+    apply: (p) => { p.weapons.find(w => w.type === 'rocket').aoeRadius += 20 },
+  },
+  {
+    id: 'rocket_cd', label: 'RAPID ROCKETS', desc: 'Rocket fires 15% faster',
+    rarity: 'rare', icon: '🚀', requires: 'rocket',
+    apply: (p) => {
+      const w = p.weapons.find(w => w.type === 'rocket')
+      w.cooldown = Math.max(0.8, w.cooldown * 0.85)
+    },
+  },
+  {
+    id: 'get_rocket', label: 'ROCKET LAUNCHER', desc: 'Add the rocket weapon',
+    rarity: 'epic', icon: '🚀', excludes: 'rocket',
+    apply: (p) => { p.weapons.push(createWeapon('rocket')) },
+  },
 ]
 
 export function pickUpgrades(player, n) {
