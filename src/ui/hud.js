@@ -49,8 +49,33 @@ export function drawHud(ctx, canvas, player, gameState) {
       ctx.shadowBlur = 8
       ctx.shadowColor = color
       ctx.fillStyle = color
-      ctx.fillText(label, 16, canvas.height - 16 - i * 20)
+      ctx.fillText(label, 16, canvas.height - 52 - i * 20)
     })
+    ctx.restore()
+  }
+
+  // XP bar — bottom-center (playing and paused only)
+  if (gameState.state === 'playing' || gameState.state === 'paused') {
+    const xpBarW = canvas.width - 32
+    const xpBarH = 6
+    const xpBarX = 16
+    const xpBarY = canvas.height - 14
+    const xpRatio = Math.max(0, Math.min(1, player.xp / player.xpToNext))
+
+    ctx.save()
+    // Level label
+    ctx.font = '12px monospace'
+    ctx.textAlign = 'center'
+    ctx.fillStyle = 'rgba(255,215,0,0.7)'
+    ctx.fillText(`LVL ${player.level}`, canvas.width / 2, canvas.height - 20)
+    // Bar background
+    ctx.fillStyle = '#111'
+    ctx.fillRect(xpBarX, xpBarY, xpBarW, xpBarH)
+    // Bar fill
+    ctx.shadowBlur = 8
+    ctx.shadowColor = '#ffd700'
+    ctx.fillStyle = '#ffd700'
+    ctx.fillRect(xpBarX, xpBarY, xpBarW * xpRatio, xpBarH)
     ctx.restore()
   }
 
