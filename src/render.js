@@ -7,6 +7,7 @@ export function renderWorld(ctx, canvas, entities, camera) {
   for (const e of entities) {
     if (e.type === 'enemy') _drawEnemy(ctx, e)
     else if (e.type === 'projectile' && e.active) _drawProjectile(ctx, e)
+    else if (e.type === 'pickup') _drawPickup(ctx, e)
   }
 
   const player = entities.find(e => e.type === 'player')
@@ -20,11 +21,28 @@ function _drawPlayer(ctx, player) {
   ctx.save()
   ctx.shadowBlur = 20
   ctx.shadowColor = '#00ffc8'
-  // Flash transparent during iframes
   ctx.fillStyle = player.iframes > 0 ? 'rgba(0,255,200,0.3)' : '#00ffc8'
   ctx.beginPath()
   ctx.arc(x, y, 12, 0, Math.PI * 2)
   ctx.fill()
+
+  // Whip arc overlay
+  for (const weapon of player.weapons) {
+    if (weapon.type === 'whip' && weapon.active) {
+      const angle = Math.atan2(player.facing.y, player.facing.x)
+      ctx.save()
+      ctx.strokeStyle = '#ffd700'
+      ctx.lineWidth = 3
+      ctx.shadowBlur = 15
+      ctx.shadowColor = '#ffd700'
+      ctx.globalAlpha = weapon.activeTimer / weapon.activeDuration
+      ctx.beginPath()
+      ctx.arc(x, y, weapon.range, angle - Math.PI / 2, angle + Math.PI / 2)
+      ctx.stroke()
+      ctx.restore()
+    }
+  }
+
   ctx.restore()
 }
 
@@ -37,7 +55,6 @@ function _drawEnemy(ctx, enemy) {
   ctx.beginPath()
   ctx.arc(x, y, enemy.radius, 0, Math.PI * 2)
   ctx.fill()
-  // HP bar above enemy (only when damaged)
   if (enemy.hp < enemy.maxHp) {
     const bw = enemy.radius * 2
     ctx.shadowBlur = 0
@@ -58,7 +75,6 @@ function _drawProjectile(ctx, proj) {
   ctx.beginPath()
   ctx.arc(x, y, proj.radius, 0, Math.PI * 2)
   ctx.fill()
-  // Motion trail (3 fading dots behind)
   const speed = Math.hypot(proj.vel.x, proj.vel.y)
   if (speed > 0) {
     const nx = proj.vel.x / speed
@@ -72,5 +88,24 @@ function _drawProjectile(ctx, proj) {
     ctx.arc(x - nx * 16, y - ny * 16, proj.radius * 0.4, 0, Math.PI * 2)
     ctx.fill()
   }
+  ctx.restore()
+}
+
+function _drawPickup(ctx, pickup) {
+  const color = pickup.weaponType === 'whip' ? '#ffd700' : '#00ffc8'
+  const yOff = Math.sin(pickup.bobTimer * 3) * 4
+  const { x, y } = pickup.pos
+  ctx.save()
+  ctx.shadowBlur = 16
+  ctx.shadowColor = color
+  ctx.fillStyle = color
+  ctx.beginPath()
+  ctx.arc(x, y + yOff, pickup.radius, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.globalAlpha = 0.5
+  ctx.fillStyle = '#ffffff'
+  ctx.beginPath()
+  ctx.arc(x - 3, y + yOff - 3, pickup.radius * 0.35, 0, Math.PI * 2)
+  ctx.fill()
   ctx.restore()
 }
