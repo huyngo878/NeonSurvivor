@@ -67,7 +67,7 @@ describe('createWeapon', () => {
     expect(weapon.type).toBe('wand')
     expect(weapon.projectileSpeed).toBe(400)
     expect(weapon.bounce).toBe(0)
-    expect(weapon.forkOnHit).toBe(false)
+    expect(weapon.forkCount).toBe(0)
   })
 
   it('creates whip with swing state and crit defaults', () => {
