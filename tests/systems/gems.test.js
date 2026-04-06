@@ -59,4 +59,18 @@ describe('updateGems', () => {
     expect(player.level).toBe(3)
     expect(chests.length).toBe(player.level - 1)
   })
+
+  it('stops spawning a chest on every level after level 5', () => {
+    const player = createPlayer()
+    player.pos = { x: 100, y: 100 }
+    player.level = 5
+    player.xp = 44
+    player.xpToNext = 45
+    const gem = createGem(80, 6, '#00ff88', 105, 100)
+    const entities = [player, gem]
+    updateGems(entities, player, 0.016, { state: 'playing' })
+    const chests = entities.filter(entity => entity.type === 'pickup' && entity.pickupType === 'chest')
+    expect(player.level).toBeGreaterThanOrEqual(6)
+    expect(chests.length).toBe(1)
+  })
 })

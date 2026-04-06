@@ -48,11 +48,16 @@ export function updateSpawner(entities, state, dt, gameTime, gameState) {
     if (state.timers[i] > 0) continue
 
     const densityScale = getDensityMultiplier(wave)
-    const interval = Math.max(0.2, waveDef.interval * state.intervalMult / densityScale)
+    let interval = Math.max(0.2, waveDef.interval * state.intervalMult / densityScale)
     state.timers[i] = interval
 
     let count = Math.max(1, Math.round(waveDef.count * densityScale))
     if (waveDef.enemyType === 'speedster' && wave < 8) count = Math.max(1, Math.floor(count * 0.5))
+    if (waveDef.enemyType === 'speedster' && wave >= 8) {
+      count = Math.max(2, Math.round(count * 1.6))
+      interval = Math.max(0.2, interval * 0.8)
+      state.timers[i] = interval
+    }
     const enemyOverrides = _enemyOverrides(wave, waveDef.enemyType)
 
     for (let j = 0; j < count; j++) {

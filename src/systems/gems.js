@@ -56,6 +56,12 @@ function _levelUp(player, entities) {
     player.xp -= player.xpToNext
     player.level++
     player.xpToNext = Math.floor(20 * Math.pow(player.level, 1.2))
-    entities.push(createChest(player.pos.x, player.pos.y))
+    if (_shouldSpawnLevelChest(player.level)) {
+      entities.push(createChest(player.pos.x, player.pos.y))
+    }
   }
+}
+
+function _shouldSpawnLevelChest(level) {
+  return level <= 5 || level % 2 === 0
 }

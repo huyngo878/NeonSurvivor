@@ -91,6 +91,7 @@ export const CARDS = [
     rarity: 'rare',
     requires: 'wand',
     icon: '2',
+    available: player => player.level >= 4,
     apply: player => { _weapon(player, 'wand').shots += 1 },
   },
   {
@@ -100,6 +101,7 @@ export const CARDS = [
     rarity: 'epic',
     requires: 'wand',
     icon: 'B',
+    available: player => player.level >= 6,
     apply: player => {
       const weapon = _weapon(player, 'wand')
       weapon.bounce = Math.min(5, weapon.bounce + 1)
@@ -112,7 +114,7 @@ export const CARDS = [
     rarity: 'legendary',
     requires: 'wand',
     icon: 'Y',
-    available: player => _weapon(player, 'wand').forkCount < 3,
+    available: player => player.level >= 10 && _weapon(player, 'wand').forkCount < 3,
     apply: player => {
       const weapon = _weapon(player, 'wand')
       weapon.forkCount = Math.min(3, weapon.forkCount + 1)

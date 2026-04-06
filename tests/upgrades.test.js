@@ -48,8 +48,25 @@ describe('pickChestCards', () => {
   it('includes the wand +1 projectile card in wand chest rolls', () => {
     const player = createPlayer()
     player.weapons = [createWeapon('wand')]
+    player.level = 4
     const picks = pickChestCards(player, 100)
     expect(picks.some(card => card.id === 'wand_shots')).toBe(true)
+  })
+
+  it('gates wand spike cards behind later levels', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    player.level = 1
+    const earlyPicks = pickChestCards(player, 100)
+    expect(earlyPicks.some(card => card.id === 'wand_shots')).toBe(false)
+    expect(earlyPicks.some(card => card.id === 'wand_bounce')).toBe(false)
+    expect(earlyPicks.some(card => card.id === 'wand_fork')).toBe(false)
+
+    player.level = 10
+    const latePicks = pickChestCards(player, 100)
+    expect(latePicks.some(card => card.id === 'wand_shots')).toBe(true)
+    expect(latePicks.some(card => card.id === 'wand_bounce')).toBe(true)
+    expect(latePicks.some(card => card.id === 'wand_fork')).toBe(true)
   })
 
   it('does not return duplicate cards in one roll', () => {
