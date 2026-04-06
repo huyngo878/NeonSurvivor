@@ -50,6 +50,7 @@ function initGame() {
   entities     = [player, ...pool]
   gameState    = { state: 'playing', time: 0, kills: 0 }
   spawnerState = createSpawnerState()
+  camera       = { x: 0, y: 0 }
 }
 
 initGame()
@@ -77,7 +78,7 @@ function loop(timestamp) {
     updateWeapons(entities, dt)
     updateCollision(entities, gameState)
     updateSpawner(entities, spawnerState, dt, gameState.time)
-    updateCamera(player)
+    if (player) updateCamera(player)
 
     if (player && player.hp <= 0) {
       player.hp = 0
