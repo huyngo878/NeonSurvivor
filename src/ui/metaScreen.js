@@ -10,9 +10,9 @@ const TABS = [
 const CARD_W = 180, CARD_H = 100, CARD_GAP = 12
 
 export function drawMetaScreen(ctx, canvas, gameState) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight)
 
-  const cx = canvas.width / 2
+  const cx = canvas.clientWidth / 2
 
   // Header
   ctx.save()
@@ -32,7 +32,7 @@ export function drawMetaScreen(ctx, canvas, gameState) {
   ctx.fillStyle = '#ffd700'
   ctx.shadowBlur = 8
   ctx.shadowColor = '#ffd700'
-  ctx.fillText(`⬡ ${prestige}`, canvas.width - 20, 44)
+  ctx.fillText(`⬡ ${prestige}`, canvas.clientWidth - 20, 44)
   ctx.restore()
 
   // Tabs
@@ -130,7 +130,7 @@ export function drawMetaScreen(ctx, canvas, gameState) {
   ctx.font = '10px monospace'
   ctx.textAlign = 'center'
   ctx.fillStyle = '#333'
-  ctx.fillText('[ESC] or [M] — Back to Menu', cx, canvas.height - 16)
+  ctx.fillText('[ESC] or [M] — Back to Menu', cx, canvas.clientHeight - 16)
   ctx.restore()
 }
 

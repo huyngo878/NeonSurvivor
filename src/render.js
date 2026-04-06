@@ -1,5 +1,5 @@
 export function renderWorld(ctx, canvas, entities, camera) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight)
 
   ctx.save()
   ctx.translate(-camera.x, -camera.y)

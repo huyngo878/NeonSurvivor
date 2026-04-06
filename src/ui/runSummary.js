@@ -3,21 +3,21 @@ export function drawRunSummary(ctx, canvas, gameState) {
   const best = gameState.prevBest
   if (!run) return
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight)
 
-  const cx = canvas.width / 2
+  const cx = canvas.clientWidth / 2
 
   // Background tint
   ctx.save()
   ctx.fillStyle = 'rgba(0,0,0,0.85)'
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
+  ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight)
   ctx.restore()
 
   // Layout — vertically centered
   // Total block height: title(42) + gap(8) + subtitle(12) + gap(20) + grid(52) + gap(16)
   //   + weapons(18) + upgrades(16) + gap(12) + prestige box(56) + gap(16) + badges(20) + gap(12) + buttons(34)
   const totalContentH = 42 + 8 + 12 + 20 + 52 + 16 + 18 + 16 + 12 + 56 + 16 + 20 + 12 + 34
-  let y = Math.max(20, (canvas.height - totalContentH) / 2) + 36
+  let y = Math.max(20, (canvas.clientHeight - totalContentH) / 2) + 36
 
   // Header
   ctx.save()

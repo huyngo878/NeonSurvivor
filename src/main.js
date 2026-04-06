@@ -193,8 +193,8 @@ function initGame(selectedWeapon) {
 
 // --- Camera ---
 function updateCamera(player) {
-  camera.x = Math.max(0, Math.min(player.pos.x - canvas.width  / 2, WORLD_W - canvas.width))
-  camera.y = Math.max(0, Math.min(player.pos.y - canvas.height / 2, WORLD_H - canvas.height))
+  camera.x = Math.max(0, Math.min(player.pos.x - canvas.clientWidth  / 2, WORLD_W - canvas.clientWidth))
+  camera.y = Math.max(0, Math.min(player.pos.y - canvas.clientHeight / 2, WORLD_H - canvas.clientHeight))
 }
 
 // --- Build run data on death ---

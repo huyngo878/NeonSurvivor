@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(C:/Users/huyng/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/brainstorming/scripts/start-server.sh --project-dir \"C:/Users/huyng/Desktop/ClaudeProjects/ClaudeGame\")",
+      "Bash(cat \"C:/Users/huyng/Desktop/ClaudeProjects/ClaudeGame/.superpowers/brainstorm/\"*/state/server-info)",
+      "Bash(npm install:*)",
+      "Bash(npm audit:*)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('vitest version:', d.get\\('packages',{}\\).get\\('node_modules/vitest',{}\\).get\\('version','not found'\\)\\)\")",
+      "Bash(node -e \"const d=require\\('./package-lock.json'\\); console.log\\('vitest:', d.packages?.['node_modules/vitest']?.version || 'not found'\\)\")",
+      "Bash(npm test:*)",
+      "Bash(node --input-type=module)",
+      "Bash(node -e ':*)",
+      "Bash(npx --yes serve . --listen 3000)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(npx serve:*)",
+      "Bash(gh auth:*)",
+      "Bash(git --version)",
+      "mcp__github__get_me",
+      "mcp__github__create_repository",
+      "Bash(bash \"C:/Users/huyng/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/brainstorming/scripts/start-server.sh\" --project-dir \"c:/Users/huyng/Desktop/ClaudeProjects/ClaudeGame\")",
+      "Bash(npx vitest:*)",
+      "Bash(npx --yes serve -l 3001)"
+    ]
+  }
+}

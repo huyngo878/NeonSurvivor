@@ -9,11 +9,11 @@ export function drawLevelUpScreen(ctx, canvas, player, gameState) {
   // Dark overlay
   ctx.save()
   ctx.fillStyle = 'rgba(0,0,0,0.75)'
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
+  ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight)
   ctx.restore()
 
-  const cx = canvas.width / 2
-  const cy = canvas.height / 2
+  const cx = canvas.clientWidth / 2
+  const cy = canvas.clientHeight / 2
 
   // Title
   ctx.save()

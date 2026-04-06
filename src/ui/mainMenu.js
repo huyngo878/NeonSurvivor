@@ -8,9 +8,9 @@ const MENU_ITEMS = [
 ]
 
 export function drawMainMenu(ctx, canvas, gameState) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight)
 
-  const cx = canvas.width / 2
+  const cx = canvas.clientWidth / 2
   const best = loadBest()
   const runs = loadRuns()
 
@@ -18,7 +18,7 @@ export function drawMainMenu(ctx, canvas, gameState) {
   // Total block height: title(48) + gap(8) + subtitle(12) + gap(20) + strip(50) + gap(20) + 4 buttons(38*4+10*3) + optional last run(30)
   const btnH = 38, btnGap = 10
   const totalContentH = 48 + 8 + 12 + 20 + 50 + 20 + (MENU_ITEMS.length * btnH + (MENU_ITEMS.length - 1) * btnGap) + (runs.length > 0 ? 30 : 0)
-  let y = Math.max(20, (canvas.height - totalContentH) / 2) + 36  // +36 to convert top-of-title to baseline
+  let y = Math.max(20, (canvas.clientHeight - totalContentH) / 2) + 36  // +36 to convert top-of-title to baseline
 
   // Title
   ctx.save()
@@ -119,7 +119,7 @@ export function drawMainMenu(ctx, canvas, gameState) {
   ctx.font = '9px monospace'
   ctx.textAlign = 'right'
   ctx.fillStyle = '#222'
-  ctx.fillText('v0.1.0', canvas.width - 12, canvas.height - 10)
+  ctx.fillText('v0.1.0', canvas.clientWidth - 12, canvas.clientHeight - 10)
   ctx.restore()
 }
 

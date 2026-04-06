@@ -1,8 +1,8 @@
 export function drawStartScreen(ctx, canvas, gameState) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight)
 
-  const cx = canvas.width / 2
-  const cy = canvas.height / 2
+  const cx = canvas.clientWidth / 2
+  const cy = canvas.clientHeight / 2
 
   // Title
   ctx.save()
