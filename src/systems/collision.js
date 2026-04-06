@@ -1,4 +1,7 @@
 import { CELL_SIZE } from '../constants.js'
+import { ENEMY_TYPES } from '../entities.js'
+
+const MAX_ENEMY_RADIUS = Math.max(...Object.values(ENEMY_TYPES).map(e => e.radius))
 
 // --- Spatial Hash ---
 
@@ -41,7 +44,7 @@ export function updateCollision(entities, gameState) {
 
   // Projectile vs Enemy
   for (const proj of projectiles) {
-    const candidates = shQuery(hash, proj.pos.x, proj.pos.y, proj.radius + 14)
+    const candidates = shQuery(hash, proj.pos.x, proj.pos.y, proj.radius + MAX_ENEMY_RADIUS)
     for (const enemy of candidates) {
       const dist = Math.hypot(proj.pos.x - enemy.pos.x, proj.pos.y - enemy.pos.y)
       if (dist < proj.radius + enemy.radius) {
@@ -58,7 +61,7 @@ export function updateCollision(entities, gameState) {
 
   // Enemy vs Player (skip if iframes active)
   if (player && player.iframes <= 0) {
-    const nearby = shQuery(hash, player.pos.x, player.pos.y, 14 + player.radius)
+    const nearby = shQuery(hash, player.pos.x, player.pos.y, MAX_ENEMY_RADIUS + player.radius)
     for (const enemy of nearby) {
       const dist = Math.hypot(player.pos.x - enemy.pos.x, player.pos.y - enemy.pos.y)
       if (dist < enemy.radius + player.radius) {

@@ -23,8 +23,8 @@ export function updateSpawner(entities, state, dt, gameTime) {
   state.difficultyTimer += dt
   if (state.difficultyTimer >= DIFFICULTY_INTERVAL) {
     state.difficultyTimer -= DIFFICULTY_INTERVAL
-    state.countMult    *= 1.2
-    state.intervalMult *= 0.85
+    state.countMult    = Math.min(state.countMult * 1.2, 10.0)
+    state.intervalMult = Math.max(state.intervalMult * 0.85, 0.25)
   }
 
   for (let i = 0; i < WAVES.length; i++) {
