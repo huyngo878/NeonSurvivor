@@ -2,12 +2,12 @@ export function drawHud(ctx, canvas, player, gameState) {
   if (!player) return
 
   // HP bar — top-left
-  const barW = 160, barH = 12, barX = 16, barY = 16
+  const barW = 320, barH = 24, barX = 24, barY = 24
   ctx.fillStyle = '#111'
   ctx.fillRect(barX, barY, barW, barH)
   const hpRatio = Math.max(0, player.hp / player.maxHp)
   ctx.save()
-  ctx.shadowBlur = 8
+  ctx.shadowBlur = 12
   ctx.shadowColor = '#00ffc8'
   ctx.fillStyle = '#00ffc8'
   ctx.fillRect(barX, barY, barW * hpRatio, barH)
@@ -17,72 +17,69 @@ export function drawHud(ctx, canvas, player, gameState) {
   ctx.strokeRect(barX, barY, barW, barH)
   // HP text below bar
   ctx.save()
-  ctx.font = '9px monospace'
+  ctx.font = '18px monospace'
   ctx.textAlign = 'left'
   ctx.fillStyle = 'rgba(0,255,200,0.5)'
-  ctx.fillText(`${Math.ceil(player.hp)} / ${player.maxHp}`, barX, barY + barH + 11)
+  ctx.fillText(`${Math.ceil(player.hp)} / ${player.maxHp}`, barX, barY + barH + 18)
   ctx.restore()
 
-  // Timer — top-center (below HP bar row)
+  // Timer — top-center
   const mm = String(Math.floor(gameState.time / 60)).padStart(2, '0')
   const ss = String(Math.floor(gameState.time % 60)).padStart(2, '0')
   ctx.save()
-  ctx.font = 'bold 18px monospace'
+  ctx.font = 'bold 36px monospace'
   ctx.textAlign = 'center'
-  ctx.shadowBlur = 10
+  ctx.shadowBlur = 14
   ctx.shadowColor = '#00ffc8'
   ctx.fillStyle = '#00ffc8'
-  ctx.fillText(`${mm}:${ss}`, canvas.clientWidth / 2, 26)
+  ctx.fillText(`${mm}:${ss}`, canvas.clientWidth / 2, 48)
   ctx.restore()
 
   // Kill count — top-right
   ctx.save()
-  ctx.font = '16px monospace'
+  ctx.font = '28px monospace'
   ctx.textAlign = 'right'
-  ctx.shadowBlur = 8
+  ctx.shadowBlur = 10
   ctx.shadowColor = '#ff0080'
   ctx.fillStyle = '#ff0080'
-  ctx.fillText(`KILLS: ${gameState.kills}`, canvas.clientWidth - 16, 26)
+  ctx.fillText(`KILLS: ${gameState.kills}`, canvas.clientWidth - 24, 48)
   ctx.restore()
 
-  // XP bar — bottom (full width, with LVL badge and weapon list above it)
+  // XP bar — bottom (full width)
   if (gameState.state === 'playing' || gameState.state === 'paused') {
-    const xpBarH = 6
-    const xpBarX = 16
-    const xpBarW = canvas.clientWidth - 32
-    const xpBarY = canvas.clientHeight - 10
+    const xpBarH = 12
+    const xpBarX = 24
+    const xpBarW = canvas.clientWidth - 48
+    const xpBarY = canvas.clientHeight - 16
     const xpRatio = Math.max(0, Math.min(1, player.xp / player.xpToNext))
 
     ctx.save()
-    // Bar background
     ctx.fillStyle = '#111'
     ctx.fillRect(xpBarX, xpBarY, xpBarW, xpBarH)
-    // Bar fill
-    ctx.shadowBlur = 8
+    ctx.shadowBlur = 10
     ctx.shadowColor = '#ffd700'
     ctx.fillStyle = '#ffd700'
     ctx.fillRect(xpBarX, xpBarY, xpBarW * xpRatio, xpBarH)
-    // Level label above the bar
-    ctx.font = 'bold 11px monospace'
-    ctx.textAlign = 'center'
     ctx.shadowBlur = 0
-    ctx.fillStyle = 'rgba(255,215,0,0.8)'
-    ctx.fillText(`LVL ${player.level}`, canvas.clientWidth / 2, xpBarY - 4)
+    ctx.font = 'bold 18px monospace'
+    ctx.textAlign = 'center'
+    ctx.fillStyle = 'rgba(255,215,0,0.85)'
+    ctx.fillText(`LVL ${player.level}`, canvas.clientWidth / 2, xpBarY - 6)
     ctx.restore()
   }
 
   // Weapon inventory — bottom-left, above XP bar
   if (player.weapons.length > 0) {
     ctx.save()
-    ctx.font = '13px monospace'
+    ctx.font = '22px monospace'
     ctx.textAlign = 'left'
     player.weapons.forEach((weapon, i) => {
       const color = weapon.type === 'whip' ? '#ffd700' : '#00ffc8'
       const label = weapon.type === 'whip' ? 'WHIP' : 'WAND'
-      ctx.shadowBlur = 8
+      ctx.shadowBlur = 10
       ctx.shadowColor = color
       ctx.fillStyle = color
-      ctx.fillText(label, 16, canvas.clientHeight - 32 - i * 20)
+      ctx.fillText(label, 24, canvas.clientHeight - 48 - i * 32)
     })
     ctx.restore()
   }
@@ -92,13 +89,12 @@ export function drawHud(ctx, canvas, player, gameState) {
     ctx.save()
     ctx.fillStyle = 'rgba(0,0,0,0.55)'
     ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight)
-    ctx.font = 'bold 36px monospace'
+    ctx.font = 'bold 72px monospace'
     ctx.textAlign = 'center'
-    ctx.shadowBlur = 15
+    ctx.shadowBlur = 20
     ctx.shadowColor = '#00ffc8'
     ctx.fillStyle = '#00ffc8'
     ctx.fillText('PAUSED', canvas.clientWidth / 2, canvas.clientHeight / 2)
     ctx.restore()
   }
-
 }
