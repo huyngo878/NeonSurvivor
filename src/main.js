@@ -10,6 +10,11 @@ import { renderWorld } from './render.js'
 import { drawHud } from './ui/hud.js'
 import { drawStartScreen } from './ui/startScreen.js'
 import { drawLevelUpScreen } from './ui/levelUpScreen.js'
+import { drawMainMenu, MENU_ITEMS } from './ui/mainMenu.js'
+import { drawRunSummary } from './ui/runSummary.js'
+import { drawMetaScreen, handleMetaClick } from './ui/metaScreen.js'
+import { saveRun, loadBest, calcPrestige, applyMetaUpgrades } from './meta.js'
+import { META_UPGRADES } from './metaUpgrades.js'
 
 // --- Canvas ---
 const canvas = document.getElementById('game')
@@ -34,17 +39,23 @@ const keyMap = {
 document.addEventListener('keydown', e => {
   if (keyMap[e.code]) { input[keyMap[e.code]] = true; e.preventDefault() }
 
-  // Start screen navigation
-  if (gameState.state === 'start') {
-    if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
-      gameState.selectedWeapon = gameState.selectedWeapon === 'whip' ? 'wand' : 'whip'
-    }
-    if (e.code === 'ArrowRight' || e.code === 'KeyD') {
-      gameState.selectedWeapon = gameState.selectedWeapon === 'wand' ? 'whip' : 'wand'
-    }
+  // Main menu navigation
+  if (gameState.state === 'menu') {
+    if (e.code === 'ArrowUp')   gameState.menuIndex = Math.max(0, (gameState.menuIndex || 0) - 1)
+    if (e.code === 'ArrowDown') gameState.menuIndex = Math.min(MENU_ITEMS.length - 1, (gameState.menuIndex || 0) + 1)
     if (e.code === 'Enter' || e.code === 'Space') {
-      initGame(gameState.selectedWeapon)
+      const item = MENU_ITEMS[gameState.menuIndex || 0]
+      if (item && !item.disabled) _navigateMenu(item.state)
     }
+    return
+  }
+
+  // Weapon select screen
+  if (gameState.state === 'start') {
+    if (e.code === 'ArrowLeft'  || e.code === 'KeyA') gameState.selectedWeapon = gameState.selectedWeapon === 'whip' ? 'wand' : 'whip'
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') gameState.selectedWeapon = gameState.selectedWeapon === 'wand' ? 'whip' : 'wand'
+    if (e.code === 'Enter' || e.code === 'Space') initGame(gameState.selectedWeapon)
+    if (e.code === 'Escape') gameState.state = 'menu'
     return
   }
 
@@ -59,13 +70,26 @@ document.addEventListener('keydown', e => {
     return
   }
 
+  // Run summary
+  if (gameState.state === 'summary') {
+    if (e.code === 'KeyR') initGame(gameState.selectedWeapon)
+    if (e.code === 'KeyM') gameState.state = 'menu'
+    return
+  }
+
+  // Meta screen
+  if (gameState.state === 'upgrades') {
+    if (e.code === 'Escape' || e.code === 'KeyM') gameState.state = 'menu'
+    if (e.code === 'Digit1') gameState.metaTab = 0
+    if (e.code === 'Digit2') gameState.metaTab = 1
+    if (e.code === 'Digit3') gameState.metaTab = 2
+    return
+  }
+
+  // Playing / paused
   if (e.code === 'KeyP') {
     if (gameState.state === 'playing') gameState.state = 'paused'
     else if (gameState.state === 'paused') gameState.state = 'playing'
-  }
-  if (e.code === 'KeyR' && gameState.state === 'dead') {
-    gameState.state = 'start'
-    gameState.selectedWeapon = 'wand'
   }
 })
 
@@ -74,22 +98,48 @@ document.addEventListener('keyup', e => {
 })
 
 canvas.addEventListener('click', e => {
-  if (gameState.state !== 'levelup') return
-  const rects = gameState.cardRects || []
-  const choices = gameState.upgradeChoices || []
-  for (let i = 0; i < rects.length; i++) {
-    const r = rects[i]
-    if (e.clientX >= r.x && e.clientX <= r.x + r.w &&
-        e.clientY >= r.y && e.clientY <= r.y + r.h) {
-      if (choices[i]) _applyUpgrade(choices[i])
-      break
+  if (gameState.state === 'levelup') {
+    const rects = gameState.cardRects || []
+    const choices = gameState.upgradeChoices || []
+    for (let i = 0; i < rects.length; i++) {
+      const r = rects[i]
+      if (e.clientX >= r.x && e.clientX <= r.x + r.w && e.clientY >= r.y && e.clientY <= r.y + r.h) {
+        if (choices[i]) _applyUpgrade(choices[i])
+        break
+      }
     }
+    return
+  }
+
+  if (gameState.state === 'menu') {
+    for (const rect of (gameState.menuRects || [])) {
+      if (!rect.disabled &&
+          e.clientX >= rect.x && e.clientX <= rect.x + rect.w &&
+          e.clientY >= rect.y && e.clientY <= rect.y + rect.h) {
+        _navigateMenu(rect.state)
+        break
+      }
+    }
+    return
+  }
+
+  if (gameState.state === 'upgrades') {
+    handleMetaClick(e, gameState)
+    return
   }
 })
+
+function _navigateMenu(state) {
+  if (state === 'start' || state === 'upgrades') {
+    gameState.state = state
+  }
+  // 'leaderboard' and 'settings' are stubs — do nothing for now
+}
 
 function _applyUpgrade(upgrade) {
   const player = entities.find(e => e.type === 'player')
   if (player) upgrade.apply(player)
+  gameState.upgradesTaken = [...(gameState.upgradesTaken || []), upgrade.id]
   gameState.upgradeChoices = null
   gameState.cardRects = null
   gameState.state = 'playing'
@@ -97,17 +147,22 @@ function _applyUpgrade(upgrade) {
 
 // --- Game state ---
 let entities = []
-let gameState = { state: 'start', selectedWeapon: 'wand', time: 0, kills: 0 }
+let gameState = { state: 'menu', selectedWeapon: 'wand', menuIndex: 0, metaTab: 0, time: 0, kills: 0 }
 let spawnerState = {}
 let camera = { x: 0, y: 0 }
 
 function initGame(selectedWeapon) {
   const player = createPlayer()
+  applyMetaUpgrades(player, META_UPGRADES)
   player.weapons = [createWeapon(selectedWeapon)]
   const pool = initProjectilePool()
   entities     = [player, ...pool]
-  gameState    = { state: 'playing', selectedWeapon, time: 0, kills: 0 }
-  spawnerState = createSpawnerState()
+  gameState    = {
+    state: 'playing', selectedWeapon,
+    menuIndex: 0, metaTab: 0,
+    time: 0, kills: 0, upgradesTaken: [],
+  }
+  spawnerState = createSpawnerState(player.spawnDelayBonus || 0)
   camera       = { x: 0, y: 0 }
 }
 
@@ -115,6 +170,19 @@ function initGame(selectedWeapon) {
 function updateCamera(player) {
   camera.x = Math.max(0, Math.min(player.pos.x - canvas.width  / 2, WORLD_W - canvas.width))
   camera.y = Math.max(0, Math.min(player.pos.y - canvas.height / 2, WORLD_H - canvas.height))
+}
+
+// --- Build run data on death ---
+function _buildRunData(player) {
+  const prestige = calcPrestige(gameState.kills, gameState.time, player.level)
+  return {
+    timeSecs:  Math.floor(gameState.time),
+    kills:     gameState.kills,
+    level:     player.level,
+    weapons:   player.weapons.map(w => w.type),
+    upgrades:  gameState.upgradesTaken || [],
+    prestige,
+  }
 }
 
 // --- Game Loop ---
@@ -126,8 +194,23 @@ function loop(timestamp) {
   const dt = lastTime === null ? 0 : Math.min((timestamp - lastTime) / 1000, 0.05)
   lastTime = timestamp
 
+  if (gameState.state === 'menu') {
+    drawMainMenu(ctx, canvas, gameState)
+    return
+  }
+
   if (gameState.state === 'start') {
     drawStartScreen(ctx, canvas, gameState)
+    return
+  }
+
+  if (gameState.state === 'summary') {
+    drawRunSummary(ctx, canvas, gameState)
+    return
+  }
+
+  if (gameState.state === 'upgrades') {
+    drawMetaScreen(ctx, canvas, gameState)
     return
   }
 
@@ -158,13 +241,20 @@ function loop(timestamp) {
 
     if (player && player.hp <= 0) {
       player.hp = 0
-      gameState.state = 'dead'
+      const prevBest = loadBest()
+      const runData  = _buildRunData(player)
+      saveRun(runData)
+      gameState.lastRun  = runData
+      gameState.prevBest = prevBest
+      gameState.state    = 'summary'
     }
   }
 
-  const player = entities.find(e => e.type === 'player')
-  renderWorld(ctx, canvas, entities, camera)
-  drawHud(ctx, canvas, player, gameState)
+  if (gameState.state === 'paused' || gameState.state === 'playing') {
+    const player = entities.find(e => e.type === 'player')
+    renderWorld(ctx, canvas, entities, camera)
+    drawHud(ctx, canvas, player, gameState)
+  }
 }
 
 requestAnimationFrame(loop)
