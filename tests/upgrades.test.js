@@ -1,96 +1,70 @@
 import { describe, it, expect } from 'vitest'
-import { pickUpgrades, UPGRADES } from '../src/upgrades.js'
+import { pickChestCards, CARDS } from '../src/upgrades.js'
 import { createPlayer, createWeapon } from '../src/entities.js'
 
-describe('UPGRADES', () => {
-  it('every upgrade has required fields', () => {
-    for (const u of UPGRADES) {
-      expect(typeof u.id).toBe('string')
-      expect(typeof u.label).toBe('string')
-      expect(typeof u.desc).toBe('string')
-      expect(['common', 'rare', 'epic']).toContain(u.rarity)
-      expect(typeof u.icon).toBe('string')
-      expect(typeof u.apply).toBe('function')
+describe('CARDS', () => {
+  it('every card has required fields', () => {
+    for (const card of CARDS) {
+      expect(typeof card.id).toBe('string')
+      expect(typeof card.label).toBe('string')
+      expect(typeof card.desc).toBe('string')
+      expect(['common', 'rare', 'epic', 'legendary']).toContain(card.rarity)
+      expect(typeof card.icon).toBe('string')
+      expect(typeof card.apply).toBe('function')
     }
   })
 
-  it('all upgrade ids are unique', () => {
-    const ids = UPGRADES.map(u => u.id)
+  it('all card ids are unique', () => {
+    const ids = CARDS.map(card => card.id)
     expect(new Set(ids).size).toBe(ids.length)
   })
 })
 
-describe('pickUpgrades', () => {
-  it('returns at most n upgrades', () => {
+describe('pickChestCards', () => {
+  it('returns at most n cards', () => {
     const player = createPlayer()
-    player.weapons = [createWeapon('wand'), createWeapon('whip')]
-    const picks = pickUpgrades(player, 3)
+    player.weapons = [createWeapon('wand')]
+    const picks = pickChestCards(player, 3)
     expect(picks.length).toBeLessThanOrEqual(3)
   })
 
-  it('filters out requires-gated upgrades when weapon not owned', () => {
+  it('filters out weapon-specific cards when weapon not owned', () => {
     const player = createPlayer()
-    // player has no weapons — wand/whip specific upgrades should not appear
-    const picks = pickUpgrades(player, 100)
-    for (const p of picks) {
-      expect(p.requires).toBeUndefined()
+    const picks = pickChestCards(player, 100)
+    for (const pick of picks) {
+      expect(pick.requires).toBeUndefined()
     }
   })
 
-  it('filters out excludes-gated upgrades when weapon already owned', () => {
+  it('does not return duplicate cards in one roll', () => {
     const player = createPlayer()
-    player.weapons = [createWeapon('wand'), createWeapon('whip')]
-    const picks = pickUpgrades(player, 100)
-    for (const p of picks) {
-      if (p.excludes === 'wand') throw new Error('get_wand should not appear when wand is owned')
-      if (p.excludes === 'whip') throw new Error('get_whip should not appear when whip is owned')
-    }
-  })
-
-  it('returns full eligible pool when pool is smaller than n', () => {
-    const player = createPlayer()
-    const picks = pickUpgrades(player, 100)
-    expect(picks.length).toBeGreaterThan(0)
-    expect(picks.length).toBeLessThanOrEqual(UPGRADES.length)
-  })
-
-  it('does not return duplicate upgrades', () => {
-    const player = createPlayer()
-    player.weapons = [createWeapon('wand'), createWeapon('whip')]
-    const picks = pickUpgrades(player, 3)
-    const ids = picks.map(p => p.id)
+    player.weapons = [createWeapon('wand'), createWeapon('rocket')]
+    const picks = pickChestCards(player, 4)
+    const ids = picks.map(card => card.id)
     expect(new Set(ids).size).toBe(ids.length)
   })
 
-  it('applies speed upgrade correctly', () => {
-    const player = createPlayer()
-    const speedUpgrade = UPGRADES.find(u => u.id === 'speed_1')
-    const before = player.speed
-    speedUpgrade.apply(player)
-    expect(player.speed).toBeCloseTo(before * 1.15, 5)
-  })
-
-  it('applies hp_up upgrade correctly', () => {
+  it('applies heal card correctly', () => {
     const player = createPlayer()
     player.hp = 50
-    const hpUpgrade = UPGRADES.find(u => u.id === 'hp_up')
-    hpUpgrade.apply(player)
-    expect(player.maxHp).toBe(125)
+    const card = CARDS.find(entry => entry.id === 'heal_25')
+    card.apply(player)
     expect(player.hp).toBe(75)
   })
 
-  it('applies wand_dmg upgrade correctly', () => {
+  it('applies rocket multi card correctly', () => {
     const player = createPlayer()
-    player.weapons = [createWeapon('wand')]
-    const upgrade = UPGRADES.find(u => u.id === 'wand_dmg')
-    upgrade.apply(player)
-    expect(player.weapons[0].damage).toBe(32)
+    player.weapons = [createWeapon('rocket')]
+    const card = CARDS.find(entry => entry.id === 'rocket_multi')
+    card.apply(player)
+    expect(player.weapons[0].shots).toBe(2)
   })
 
-  it('applies get_wand upgrade and adds wand weapon', () => {
+  it('legendary unique card is unavailable once taken', () => {
     const player = createPlayer()
-    const upgrade = UPGRADES.find(u => u.id === 'get_wand')
-    upgrade.apply(player)
-    expect(player.weapons.some(w => w.type === 'wand')).toBe(true)
+    player.weapons = [createWeapon('wand')]
+    player.cardHistory = ['wand_fork']
+    const picks = pickChestCards(player, 100)
+    expect(picks.some(card => card.id === 'wand_fork')).toBe(false)
   })
 })

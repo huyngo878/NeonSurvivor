@@ -4,4 +4,4 @@ export const PROJ_SPEED = 400
 export const POOL_SIZE = 500
 export const CELL_SIZE = 64
 export const SPAWN_RADIUS = 600
-export const DIFFICULTY_INTERVAL = 30
+export const WAVE_DURATION = 20

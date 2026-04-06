@@ -1,110 +1,196 @@
-import { createWeapon } from './entities.js'
+const WEIGHTS = { common: 55, rare: 25, epic: 10, legendary: 10 }
 
-const WEIGHTS = { common: 60, rare: 30, epic: 10 }
-
-export const UPGRADES = [
-  // Player stats
+export const CARDS = [
   {
-    id: 'speed_1', label: 'SPEED BOOST', desc: '+15% move speed',
-    rarity: 'common', icon: '⚡',
-    apply: (p) => { p.speed *= 1.15 },
+    id: 'heal_25',
+    label: 'FIELD DRESSING',
+    desc: 'Recover 25 HP instantly',
+    rarity: 'common',
+    icon: '+',
+    apply: player => { player.hp = Math.min(player.maxHp, player.hp + 25) },
   },
   {
-    id: 'hp_up', label: 'HP BOOST', desc: '+25 max HP, heal +25',
-    rarity: 'common', icon: '❤️',
-    apply: (p) => { p.maxHp += 25; p.hp = Math.min(p.hp + 25, p.maxHp) },
+    id: 'armor_plating',
+    label: 'ARMOR PLATING',
+    desc: 'Reduce incoming damage by 2',
+    rarity: 'rare',
+    icon: '#',
+    apply: player => { player.armor += 2 },
   },
   {
-    id: 'hp_regen', label: 'REGEN', desc: '+1 HP/sec regen',
-    rarity: 'rare', icon: '💚',
-    apply: (p) => { p.regenRate += 1 },
-  },
-
-  // Wand upgrades
-  {
-    id: 'wand_dmg', label: 'WAND POWER', desc: '+10 wand damage',
-    rarity: 'common', icon: '🔮', requires: 'wand',
-    apply: (p) => { p.weapons.find(w => w.type === 'wand').damage += 10 },
-  },
-  {
-    id: 'wand_cd', label: 'RAPID FIRE', desc: 'Wand fires 20% faster',
-    rarity: 'rare', icon: '💨', requires: 'wand',
-    apply: (p) => {
-      const w = p.weapons.find(w => w.type === 'wand')
-      w.cooldown = Math.max(0.2, w.cooldown * 0.8)
+    id: 'max_hp',
+    label: 'REINFORCED FRAME',
+    desc: '+20 max HP and heal 20',
+    rarity: 'common',
+    icon: 'H',
+    apply: player => {
+      player.maxHp += 20
+      player.hp = Math.min(player.maxHp, player.hp + 20)
     },
   },
   {
-    id: 'wand_shots', label: 'MULTISHOT', desc: '+1 wand projectile',
-    rarity: 'rare', icon: '✦', requires: 'wand',
-    apply: (p) => { p.weapons.find(w => w.type === 'wand').shots += 1 },
+    id: 'speed_boost',
+    label: 'OVERDRIVE',
+    desc: '+10% move speed',
+    rarity: 'common',
+    icon: '>',
+    apply: player => { player.speed *= 1.1 },
   },
 
-  // Whip upgrades
   {
-    id: 'whip_dmg', label: 'WHIP POWER', desc: '+8 whip damage',
-    rarity: 'common', icon: '🌀', requires: 'whip',
-    apply: (p) => { p.weapons.find(w => w.type === 'whip').damage += 8 },
+    id: 'wand_damage',
+    label: 'ARCANE CHARGE',
+    desc: 'Wand damage +10',
+    rarity: 'common',
+    requires: 'wand',
+    icon: 'W',
+    apply: player => { _weapon(player, 'wand').damage += 10 },
   },
   {
-    id: 'whip_cd', label: 'WHIP SPEED', desc: 'Whip swings 20% faster',
-    rarity: 'rare', icon: '⚔️', requires: 'whip',
-    apply: (p) => {
-      const w = p.weapons.find(w => w.type === 'whip')
-      w.cooldown = Math.max(0.15, w.cooldown * 0.8)
+    id: 'wand_speed',
+    label: 'QUICKSILVER ORBS',
+    desc: 'Wand projectiles travel faster',
+    rarity: 'common',
+    requires: 'wand',
+    icon: '>',
+    apply: player => { _weapon(player, 'wand').projectileSpeed += 120 },
+  },
+  {
+    id: 'wand_bounce',
+    label: 'RICOCHET MATRIX',
+    desc: 'Wand projectiles bounce to the nearest target',
+    rarity: 'epic',
+    requires: 'wand',
+    icon: 'B',
+    apply: player => { _weapon(player, 'wand').bounce += 1 },
+  },
+  {
+    id: 'wand_fork',
+    label: 'SPLIT LATTICE',
+    desc: 'Projectiles fork on first hit',
+    rarity: 'legendary',
+    requires: 'wand',
+    unique: true,
+    icon: 'Y',
+    available: player => !_weapon(player, 'wand').forkOnHit,
+    apply: player => { _weapon(player, 'wand').forkOnHit = true },
+  },
+
+  {
+    id: 'whip_knockback',
+    label: 'CHAIN SNAP',
+    desc: 'Increase whip knockback',
+    rarity: 'common',
+    requires: 'whip',
+    icon: 'K',
+    apply: player => { _weapon(player, 'whip').knockback += 12 },
+  },
+  {
+    id: 'whip_area',
+    label: 'WIDE ARC',
+    desc: 'Larger whip attack area',
+    rarity: 'rare',
+    requires: 'whip',
+    icon: 'A',
+    apply: player => {
+      const weapon = _weapon(player, 'whip')
+      weapon.sweepAngle = Math.min(2 * Math.PI, weapon.sweepAngle + Math.PI / 5)
+      weapon.range += 18
     },
   },
   {
-    id: 'whip_arc', label: 'WIDER ARC', desc: '+30° whip sweep',
-    rarity: 'rare', icon: '🔱', requires: 'whip',
-    apply: (p) => {
-      const w = p.weapons.find(w => w.type === 'whip')
-      w.sweepAngle = Math.min(2 * Math.PI, w.sweepAngle + Math.PI / 6)
-    },
-  },
-
-  // New weapons
-  {
-    id: 'get_wand', label: 'MAGIC WAND', desc: 'Add the wand weapon',
-    rarity: 'epic', icon: '✨', excludes: 'wand',
-    apply: (p) => { p.weapons.push(createWeapon('wand')) },
-  },
-  {
-    id: 'get_whip', label: 'WHIP', desc: 'Add the whip weapon',
-    rarity: 'epic', icon: '🔱', excludes: 'whip',
-    apply: (p) => { p.weapons.push(createWeapon('whip')) },
-  },
-
-  // Rocket upgrades
-  {
-    id: 'rocket_dmg', label: 'ROCKET POWER', desc: '+15 rocket damage',
-    rarity: 'common', icon: '💥', requires: 'rocket',
-    apply: (p) => { p.weapons.find(w => w.type === 'rocket').damage += 15 },
-  },
-  {
-    id: 'rocket_aoe', label: 'BIGGER BLAST', desc: '+20 explosion radius',
-    rarity: 'rare', icon: '🔥', requires: 'rocket',
-    apply: (p) => { p.weapons.find(w => w.type === 'rocket').aoeRadius += 20 },
-  },
-  {
-    id: 'rocket_cd', label: 'RAPID ROCKETS', desc: 'Rocket fires 15% faster',
-    rarity: 'rare', icon: '🚀', requires: 'rocket',
-    apply: (p) => {
-      const w = p.weapons.find(w => w.type === 'rocket')
-      w.cooldown = Math.max(0.8, w.cooldown * 0.85)
+    id: 'whip_speed',
+    label: 'BACKSWING',
+    desc: 'Whip attacks faster',
+    rarity: 'rare',
+    requires: 'whip',
+    icon: 'S',
+    apply: player => {
+      const weapon = _weapon(player, 'whip')
+      weapon.cooldown = Math.max(0.25, weapon.cooldown * 0.82)
     },
   },
   {
-    id: 'get_rocket', label: 'ROCKET LAUNCHER', desc: 'Add the rocket weapon',
-    rarity: 'epic', icon: '🚀', excludes: 'rocket',
-    apply: (p) => { p.weapons.push(createWeapon('rocket')) },
+    id: 'whip_damage',
+    label: 'BARBED TIP',
+    desc: 'Whip damage +8',
+    rarity: 'common',
+    requires: 'whip',
+    icon: 'D',
+    apply: player => { _weapon(player, 'whip').damage += 8 },
+  },
+  {
+    id: 'whip_crit',
+    label: 'BLOODLINE',
+    desc: 'Small chance to deal double damage',
+    rarity: 'epic',
+    requires: 'whip',
+    icon: '!',
+    apply: player => { _weapon(player, 'whip').critChance += 0.12 },
+  },
+
+  {
+    id: 'rocket_multi',
+    label: 'SALVO BAY',
+    desc: '+1 rocket per volley',
+    rarity: 'rare',
+    requires: 'rocket',
+    icon: '2',
+    apply: player => { _weapon(player, 'rocket').shots += 1 },
+  },
+  {
+    id: 'rocket_radius',
+    label: 'PRESSURE WAVE',
+    desc: 'Increase blast radius',
+    rarity: 'common',
+    requires: 'rocket',
+    icon: 'O',
+    apply: player => { _weapon(player, 'rocket').aoeRadius += 20 },
+  },
+  {
+    id: 'rocket_damage',
+    label: 'HIGH EXPLOSIVE',
+    desc: 'Rocket damage +20',
+    rarity: 'common',
+    requires: 'rocket',
+    icon: 'X',
+    apply: player => { _weapon(player, 'rocket').damage += 20 },
+  },
+  {
+    id: 'rocket_double',
+    label: 'AFTERSHOCK',
+    desc: 'Double explosion on impact',
+    rarity: 'epic',
+    requires: 'rocket',
+    icon: '*',
+    apply: player => { _weapon(player, 'rocket').explosionCount = 2 },
+  },
+  {
+    id: 'rocket_knockback',
+    label: 'CONCUSSIVE PAYLOAD',
+    desc: 'Explosion knocks enemies back',
+    rarity: 'rare',
+    requires: 'rocket',
+    icon: '~',
+    apply: player => { _weapon(player, 'rocket').knockback += 60 },
+  },
+  {
+    id: 'rocket_fragments',
+    label: 'CLUSTER CORE',
+    desc: 'Chance to spawn explosive fragments on impact',
+    rarity: 'legendary',
+    requires: 'rocket',
+    unique: true,
+    icon: '%',
+    apply: player => { _weapon(player, 'rocket').fragmentChance = 0.45 },
   },
 ]
 
-export function pickUpgrades(player, n) {
-  const eligible = UPGRADES.filter(u => {
-    if (u.requires && !player.weapons.some(w => w.type === u.requires)) return false
-    if (u.excludes && player.weapons.some(w => w.type === u.excludes)) return false
+export function pickChestCards(player, n) {
+  const eligible = CARDS.filter(card => {
+    if (card.requires && !_weapon(player, card.requires)) return false
+    if (card.unique && player.cardHistory?.includes(card.id)) return false
+    if (card.available && !card.available(player)) return false
     return true
   })
   return _weightedSample(eligible, n)
@@ -114,7 +200,7 @@ function _weightedSample(pool, n) {
   const result = []
   const remaining = [...pool]
   while (result.length < n && remaining.length > 0) {
-    const totalWeight = remaining.reduce((sum, u) => sum + WEIGHTS[u.rarity], 0)
+    const totalWeight = remaining.reduce((sum, card) => sum + WEIGHTS[card.rarity], 0)
     let r = Math.random() * totalWeight
     for (let i = 0; i < remaining.length; i++) {
       r -= WEIGHTS[remaining[i].rarity]
@@ -126,4 +212,8 @@ function _weightedSample(pool, n) {
     }
   }
   return result
+}
+
+function _weapon(player, type) {
+  return player.weapons.find(weapon => weapon.type === type)
 }

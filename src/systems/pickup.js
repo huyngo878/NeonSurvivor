@@ -1,7 +1,7 @@
 import { createSpatialHash, shInsert, shQuery } from './collision.js'
-import { createWeapon } from '../entities.js'
+import { pickChestCards } from '../upgrades.js'
 
-export function updatePickup(entities, player, dt) {
+export function updatePickup(entities, player, dt, gameState) {
   if (!player) return
 
   // Advance bob timers
@@ -28,25 +28,9 @@ export function updatePickup(entities, player, dt) {
       for (const e of entities) {
         if (e.type === 'gem') e.attracted = true
       }
-    } else if (pickup.pickupType === 'weapon') {
-      const existing = player.weapons.find(w => w.type === pickup.weaponType)
-      if (existing) {
-        _upgradeWeapon(existing)
-      } else {
-        player.weapons.push(createWeapon(pickup.weaponType))
-      }
+    } else if (pickup.pickupType === 'chest') {
+      gameState.upgradeChoices = pickChestCards(player, 3 + (player.extraChoices || 0))
+      gameState.state = 'chest'
     }
-  }
-}
-
-function _upgradeWeapon(weapon) {
-  if (weapon.type === 'wand') {
-    weapon.shots += 1
-  } else if (weapon.type === 'whip') {
-    weapon.cooldown = Math.max(0.2, weapon.cooldown * 0.85)
-    weapon.damage += 5
-    weapon.sweepAngle = Math.min(2 * Math.PI, weapon.sweepAngle + Math.PI / 6)
-  } else if (weapon.type === 'rocket') {
-    weapon.shots += 1
   }
 }

@@ -7,8 +7,10 @@ export function renderWorld(ctx, canvas, entities, camera) {
   for (const e of entities) {
     if (e.type === 'enemy') _drawEnemy(ctx, e)
     else if (e.type === 'projectile' && e.active) _drawProjectile(ctx, e)
+    else if (e.type === 'enemyProjectile') _drawEnemyProjectile(ctx, e)
     else if (e.type === 'pickup') _drawPickup(ctx, e)
     else if (e.type === 'gem') _drawGem(ctx, e)
+    else if (e.type === 'shockwave') _drawShockwave(ctx, e)
   }
 
   const player = entities.find(e => e.type === 'player')
@@ -50,12 +52,17 @@ function _drawPlayer(ctx, player) {
 function _drawEnemy(ctx, enemy) {
   const { x, y } = enemy.pos
   ctx.save()
-  ctx.shadowBlur = 15
+  ctx.shadowBlur = enemy.enemyType === 'boss' ? 24 : 15
   ctx.shadowColor = enemy.color
   ctx.fillStyle = enemy.color
   ctx.beginPath()
   ctx.arc(x, y, enemy.radius, 0, Math.PI * 2)
   ctx.fill()
+  if (enemy.enemyType === 'boss') {
+    ctx.lineWidth = 3
+    ctx.strokeStyle = '#ffffff'
+    ctx.stroke()
+  }
   if (enemy.hp < enemy.maxHp) {
     const bw = enemy.radius * 2
     ctx.shadowBlur = 0
@@ -94,14 +101,23 @@ function _drawProjectile(ctx, proj) {
   ctx.restore()
 }
 
+function _drawEnemyProjectile(ctx, proj) {
+  ctx.save()
+  ctx.shadowBlur = 12
+  ctx.shadowColor = '#ff3355'
+  ctx.fillStyle = '#ff3355'
+  ctx.beginPath()
+  ctx.arc(proj.pos.x, proj.pos.y, proj.radius, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.restore()
+}
+
 function _drawPickup(ctx, pickup) {
   let color
   if (pickup.pickupType === 'magnet') {
     color = '#cc00ff'
-  } else if (pickup.weaponType === 'whip') {
-    color = '#ffd700'
-  } else if (pickup.weaponType === 'rocket') {
-    color = '#ff6600'
+  } else if (pickup.pickupType === 'chest') {
+    color = '#ffb347'
   } else {
     color = '#00ffc8'
   }
@@ -119,6 +135,20 @@ function _drawPickup(ctx, pickup) {
   ctx.beginPath()
   ctx.arc(x - 3, y + yOff - 3, pickup.radius * 0.35, 0, Math.PI * 2)
   ctx.fill()
+  ctx.restore()
+}
+
+function _drawShockwave(ctx, shockwave) {
+  const alpha = 1 - shockwave.age / shockwave.lifetime
+  ctx.save()
+  ctx.globalAlpha = Math.max(0, alpha)
+  ctx.strokeStyle = shockwave.color
+  ctx.lineWidth = 6
+  ctx.shadowBlur = 18
+  ctx.shadowColor = shockwave.color
+  ctx.beginPath()
+  ctx.arc(shockwave.pos.x, shockwave.pos.y, shockwave.radius, 0, Math.PI * 2)
+  ctx.stroke()
   ctx.restore()
 }
 

@@ -18,11 +18,11 @@ export const META_UPGRADES = [
     },
   },
   {
-    id: 'start_regen', label: 'REGEN', desc: '+0.5 HP/sec per tier',
+    id: 'start_armor', label: 'ARMOR', desc: '+1 armor per tier',
     category: 'player',
     tiers: [80, 160, 300],
     apply: (player, tier) => {
-      player.regenRate += tier * 0.5
+      player.armor += tier
     },
   },
 
@@ -62,7 +62,7 @@ export const META_UPGRADES = [
     },
   },
   {
-    id: 'drop_rate', label: 'LUCKY', desc: '+3% weapon drop chance per tier',
+    id: 'drop_rate', label: 'LUCKY', desc: '+3% chest drop chance per tier',
     category: 'modifier',
     tiers: [60, 120, 200],
     apply: (player, tier) => {

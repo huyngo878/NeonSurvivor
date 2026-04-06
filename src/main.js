@@ -60,20 +60,27 @@ document.addEventListener('keydown', e => {
 
   // Weapon select screen
   if (gameState.state === 'start') {
-    if (e.code === 'ArrowLeft'  || e.code === 'KeyA') gameState.selectedWeapon = gameState.selectedWeapon === 'whip' ? 'wand' : 'whip'
-    if (e.code === 'ArrowRight' || e.code === 'KeyD') gameState.selectedWeapon = gameState.selectedWeapon === 'wand' ? 'whip' : 'wand'
+    const weapons = ['wand', 'whip', 'rocket']
+    const selectedIndex = weapons.indexOf(gameState.selectedWeapon)
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+      gameState.selectedWeapon = weapons[(selectedIndex - 1 + weapons.length) % weapons.length]
+    }
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+      gameState.selectedWeapon = weapons[(selectedIndex + 1) % weapons.length]
+    }
     if (e.code === 'Enter' || e.code === 'Space') initGame(gameState.selectedWeapon)
     if (e.code === 'Escape') gameState.state = 'menu'
     return
   }
 
   // Level-up card selection
-  if (gameState.state === 'levelup') {
+  if (gameState.state === 'chest') {
     const choices = gameState.upgradeChoices || []
     let picked = null
     if (e.code === 'Digit1' && choices[0]) picked = choices[0]
     if (e.code === 'Digit2' && choices[1]) picked = choices[1]
     if (e.code === 'Digit3' && choices[2]) picked = choices[2]
+    if (e.code === 'Digit4' && choices[3]) picked = choices[3]
     if (picked) _applyUpgrade(picked)
     return
   }
@@ -98,6 +105,16 @@ document.addEventListener('keydown', e => {
   if (e.code === 'KeyP' || e.code === 'Escape') {
     if (gameState.state === 'playing') gameState.state = 'paused'
     else if (gameState.state === 'paused') gameState.state = 'playing'
+    gameState.pauseIndex = 0
+  }
+
+  if (gameState.state === 'paused') {
+    if (e.code === 'ArrowUp' || e.code === 'KeyW') gameState.pauseIndex = Math.max(0, (gameState.pauseIndex || 0) - 1)
+    if (e.code === 'ArrowDown' || e.code === 'KeyS') gameState.pauseIndex = Math.min(1, (gameState.pauseIndex || 0) + 1)
+    if (e.code === 'Enter' || e.code === 'Space') {
+      if ((gameState.pauseIndex || 0) === 0) gameState.state = 'playing'
+      else _finishRun('paused')
+    }
   }
 })
 
@@ -108,7 +125,7 @@ document.addEventListener('keyup', e => {
 function _handlePointer(mx, my) {
   function hit(r) { return mx >= r.x && mx <= r.x + r.w && my >= r.y && my <= r.y + r.h }
 
-  if (gameState.state === 'levelup') {
+  if (gameState.state === 'chest') {
     const rects = gameState.cardRects || []
     const choices = gameState.upgradeChoices || []
     for (let i = 0; i < rects.length; i++) {
@@ -145,6 +162,16 @@ function _handlePointer(mx, my) {
         else gameState.state = 'menu'
         break
       }
+    }
+    return
+  }
+
+  if (gameState.state === 'paused') {
+    for (const btn of (gameState.pauseRects || [])) {
+      if (!hit(btn)) continue
+      if (btn.action === 'resume') gameState.state = 'playing'
+      if (btn.action === 'finish') _finishRun('paused')
+      break
     }
     return
   }
@@ -192,6 +219,7 @@ function _navigateMenu(state) {
 function _applyUpgrade(upgrade) {
   const player = entities.find(e => e.type === 'player')
   if (player) upgrade.apply(player)
+  if (player) player.cardHistory = [...(player.cardHistory || []), upgrade.id]
   gameState.upgradesTaken = [...(gameState.upgradesTaken || []), upgrade.id]
   gameState.upgradeChoices = null
   gameState.cardRects = null
@@ -200,7 +228,7 @@ function _applyUpgrade(upgrade) {
 
 // --- Game state ---
 let entities = []
-let gameState = { state: 'menu', selectedWeapon: 'wand', menuIndex: 0, metaTab: 0, time: 0, kills: 0 }
+let gameState = { state: 'menu', selectedWeapon: 'wand', menuIndex: 0, metaTab: 0, time: 0, kills: 0, wave: 1, pauseIndex: 0 }
 let spawnerState = {}
 let camera = { x: 0, y: 0 }
 
@@ -214,6 +242,7 @@ function initGame(selectedWeapon) {
     state: 'playing', selectedWeapon,
     menuIndex: 0, metaTab: 0,
     time: 0, kills: 0, upgradesTaken: [],
+    wave: 1, pauseIndex: 0,
   }
   spawnerState = createSpawnerState(player.spawnDelayBonus || 0)
   camera       = { x: 0, y: 0 }
@@ -236,6 +265,18 @@ function _buildRunData(player) {
     upgrades:  gameState.upgradesTaken || [],
     prestige,
   }
+}
+
+function _finishRun(reason = 'ended') {
+  const player = entities.find(e => e.type === 'player')
+  if (!player) return
+  const prevBest = loadBest()
+  const runData = _buildRunData(player)
+  runData.endReason = reason
+  saveRun(runData)
+  gameState.lastRun = runData
+  gameState.prevBest = prevBest
+  gameState.state = 'summary'
 }
 
 // --- Game Loop ---
@@ -267,7 +308,7 @@ function loop(timestamp) {
     return
   }
 
-  if (gameState.state === 'levelup') {
+  if (gameState.state === 'chest') {
     const player = entities.find(e => e.type === 'player')
     renderWorld(ctx, canvas, entities, camera)
     drawHud(ctx, canvas, player, gameState)
@@ -283,24 +324,16 @@ function loop(timestamp) {
     updateMovement(entities, dt, effectiveInput)
     updateWeapons(entities, dt)
     updateCollision(entities, gameState)
-    updateSpawner(entities, spawnerState, dt, gameState.time)
+    updateSpawner(entities, spawnerState, dt, gameState.time, gameState)
     if (player) {
-      updatePickup(entities, player, dt)
+      updatePickup(entities, player, dt, gameState)
       updateGems(entities, player, dt, gameState)
-      if (player.regenRate > 0) {
-        player.hp = Math.min(player.maxHp, player.hp + player.regenRate * dt)
-      }
       updateCamera(player)
     }
 
     if (player && player.hp <= 0) {
       player.hp = 0
-      const prevBest = loadBest()
-      const runData  = _buildRunData(player)
-      saveRun(runData)
-      gameState.lastRun  = runData
-      gameState.prevBest = prevBest
-      gameState.state    = 'summary'
+      _finishRun('death')
     }
   }
 

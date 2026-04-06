@@ -1,5 +1,3 @@
-import { PROJ_SPEED } from '../constants.js'
-
 const ROCKET_SPEED = 300
 
 export function updateWeapons(entities, dt) {
@@ -39,8 +37,8 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
     proj.active = true
     proj.pos.x = player.pos.x
     proj.pos.y = player.pos.y
-    proj.vel.x = (dx / dist) * PROJ_SPEED
-    proj.vel.y = (dy / dist) * PROJ_SPEED
+    proj.vel.x = (dx / dist) * weapon.projectileSpeed
+    proj.vel.y = (dy / dist) * weapon.projectileSpeed
     proj.age = 0
     proj.damage = weapon.damage
     proj.radius = 4
@@ -48,6 +46,9 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
     proj.aoeRadius = 0
     proj.weaponType = 'wand'
     proj.explode = false
+    proj.bouncesRemaining = weapon.bounce
+    proj.forkOnHit = weapon.forkOnHit
+    proj.forked = false
   }
 }
 
@@ -110,5 +111,8 @@ function _tickRocket(weapon, dt, player, enemies, projectiles) {
     proj.aoeRadius = weapon.aoeRadius
     proj.weaponType = 'rocket'
     proj.explode = false
+    proj.explosionCount = weapon.explosionCount
+    proj.knockback = weapon.knockback
+    proj.fragmentChance = weapon.fragmentChance
   }
 }

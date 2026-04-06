@@ -1,5 +1,4 @@
 import { createSpatialHash, shInsert, shQuery } from './collision.js'
-import { pickUpgrades } from '../upgrades.js'
 
 const MAGNET_SPEED = 400  // px/s
 
@@ -25,9 +24,7 @@ export function updateGems(entities, player, dt, gameState) {
     if (dist <= collectRadius) {
       entities.splice(i, 1)
       player.xp += Math.floor(gem.value * (player.xpMult || 1))
-      if (player.xp >= player.xpToNext && gameState.state !== 'levelup') {
-        _levelUp(player, gameState)
-      }
+      _levelUp(player)
     } else {
       gem.pos.x += (dx / dist) * MAGNET_SPEED * dt
       gem.pos.y += (dy / dist) * MAGNET_SPEED * dt
@@ -49,17 +46,14 @@ export function updateGems(entities, player, dt, gameState) {
     const idx = entities.indexOf(gem)
     if (idx !== -1) entities.splice(idx, 1)
     player.xp += Math.floor(gem.value * (player.xpMult || 1))
-    if (player.xp >= player.xpToNext && gameState.state !== 'levelup') {
-      _levelUp(player, gameState)
-    }
+    _levelUp(player)
   }
 }
 
-function _levelUp(player, gameState) {
-  player.xp -= player.xpToNext
-  player.level++
-  player.xpToNext = Math.floor(50 * Math.pow(player.level, 1.2))
-  const cardCount = 3 + (player.extraChoices || 0)
-  gameState.upgradeChoices = pickUpgrades(player, cardCount)
-  gameState.state = 'levelup'
+function _levelUp(player) {
+  while (player.xp >= player.xpToNext) {
+    player.xp -= player.xpToNext
+    player.level++
+    player.xpToNext = Math.floor(50 * Math.pow(player.level, 1.2))
+  }
 }

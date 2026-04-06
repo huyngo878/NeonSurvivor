@@ -10,6 +10,10 @@ export function updateMovement(entities, dt, input) {
       if (player) _chasePlayer(e, dt, player)
     } else if (e.type === 'projectile' && e.active) {
       _moveProjectile(e, dt)
+    } else if (e.type === 'enemyProjectile') {
+      _moveEnemyProjectile(e, dt)
+    } else if (e.type === 'shockwave') {
+      _moveShockwave(e, dt)
     }
   }
 }
@@ -33,6 +37,9 @@ function _movePlayer(player, dt, input) {
 }
 
 function _chasePlayer(enemy, dt, player) {
+  if (enemy.enemyType === 'boss' && enemy.bossTimer !== undefined) {
+    enemy.bossTimer = Math.max(0, enemy.bossTimer - dt)
+  }
   const dx = player.pos.x - enemy.pos.x
   const dy = player.pos.y - enemy.pos.y
   const dist = Math.hypot(dx, dy)
@@ -40,6 +47,26 @@ function _chasePlayer(enemy, dt, player) {
     enemy.pos.x += (dx / dist) * enemy.speed * dt
     enemy.pos.y += (dy / dist) * enemy.speed * dt
   }
+}
+
+function _moveEnemyProjectile(proj, dt) {
+  proj.pos.x += proj.vel.x * dt
+  proj.pos.y += proj.vel.y * dt
+  proj.age += dt
+  if (
+    proj.age >= proj.lifetime ||
+    proj.pos.x < 0 || proj.pos.x > WORLD_W ||
+    proj.pos.y < 0 || proj.pos.y > WORLD_H
+  ) {
+    proj.dead = true
+  }
+}
+
+function _moveShockwave(shockwave, dt) {
+  shockwave.age += dt
+  const t = Math.min(1, shockwave.age / shockwave.lifetime)
+  shockwave.radius = shockwave.maxRadius * t
+  if (t >= 1) shockwave.dead = true
 }
 
 function _moveProjectile(proj, dt) {

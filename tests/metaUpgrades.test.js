@@ -50,11 +50,11 @@ describe('META_UPGRADES', () => {
     expect(player.speed).toBeCloseTo(200 * 1.15, 5)
   })
 
-  it('start_regen tier 2 adds 1 HP/sec regen', () => {
+  it('start_armor tier 2 adds 2 armor', () => {
     const player = createPlayer()
-    const upgrade = META_UPGRADES.find(u => u.id === 'start_regen')
+    const upgrade = META_UPGRADES.find(u => u.id === 'start_armor')
     upgrade.apply(player, 2)
-    expect(player.regenRate).toBeCloseTo(1.0, 5)
+    expect(player.armor).toBe(2)
   })
 
   it('xp_mult tier 1 sets xpMult to 1.15', () => {
