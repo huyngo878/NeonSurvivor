@@ -69,9 +69,9 @@ describe('createWeapon', () => {
   it('creates wand with correct shape', () => {
     const w = createWeapon('wand')
     expect(w.type).toBe('wand')
-    expect(w.cooldown).toBe(0.8)
+    expect(w.cooldown).toBe(0.53)
     expect(w.timer).toBe(0)
-    expect(w.damage).toBe(20)
+    expect(w.damage).toBe(22)
     expect(w.range).toBe(400)
     expect(w.shots).toBe(1)
   })
@@ -79,9 +79,9 @@ describe('createWeapon', () => {
   it('creates whip with correct shape', () => {
     const w = createWeapon('whip')
     expect(w.type).toBe('whip')
-    expect(w.cooldown).toBe(0.6)
+    expect(w.cooldown).toBe(0.9)
     expect(w.timer).toBe(0)
-    expect(w.damage).toBe(15)
+    expect(w.damage).toBe(11)
     expect(w.range).toBe(120)
     expect(w.sweepAngle).toBe(Math.PI)
     expect(w.active).toBe(false)

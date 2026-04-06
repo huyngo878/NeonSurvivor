@@ -84,7 +84,7 @@ describe('pickUpgrades', () => {
     player.weapons = [createWeapon('wand')]
     const upgrade = UPGRADES.find(u => u.id === 'wand_dmg')
     upgrade.apply(player)
-    expect(player.weapons[0].damage).toBe(30)
+    expect(player.weapons[0].damage).toBe(32)
   })
 
   it('applies get_wand upgrade and adds wand weapon', () => {

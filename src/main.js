@@ -80,7 +80,7 @@ document.addEventListener('keydown', e => {
 
   // Run summary
   if (gameState.state === 'summary') {
-    if (e.code === 'KeyR') initGame(gameState.selectedWeapon)
+    if (e.code === 'KeyR') gameState.state = 'start'
     if (e.code === 'KeyM') gameState.state = 'menu'
     return
   }
@@ -95,7 +95,7 @@ document.addEventListener('keydown', e => {
   }
 
   // Playing / paused
-  if (e.code === 'KeyP') {
+  if (e.code === 'KeyP' || e.code === 'Escape') {
     if (gameState.state === 'playing') gameState.state = 'paused'
     else if (gameState.state === 'paused') gameState.state = 'playing'
   }
@@ -141,7 +141,7 @@ function _handlePointer(mx, my) {
   if (gameState.state === 'summary') {
     for (const btn of (gameState.summaryBtnRects || [])) {
       if (hit(btn)) {
-        if (btn.action === 'replay') initGame(gameState.selectedWeapon)
+        if (btn.action === 'replay') gameState.state = 'start'
         else gameState.state = 'menu'
         break
       }
