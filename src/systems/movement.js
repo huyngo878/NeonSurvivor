@@ -26,6 +26,8 @@ function _movePlayer(player, dt, input) {
     player.pos.y += (dy / len) * player.speed * dt
     player.pos.x = Math.max(0, Math.min(WORLD_W, player.pos.x))
     player.pos.y = Math.max(0, Math.min(WORLD_H, player.pos.y))
+    player.facing.x = dx / len
+    player.facing.y = dy / len
   }
   if (player.iframes > 0) player.iframes = Math.max(0, player.iframes - dt)
 }

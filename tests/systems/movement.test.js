@@ -124,3 +124,29 @@ describe('updateMovement — projectile', () => {
     expect(proj.pos.x).toBe(100) // unchanged
   })
 })
+
+describe('updateMovement — player facing', () => {
+  it('updates facing when moving right', () => {
+    const player = createPlayer()
+    updateMovement([player], 0.1, { ...noInput, right: true })
+    expect(player.facing.x).toBeCloseTo(1, 5)
+    expect(player.facing.y).toBeCloseTo(0, 5)
+  })
+
+  it('updates facing when moving down-left (diagonal)', () => {
+    const player = createPlayer()
+    updateMovement([player], 0.1, { up: false, down: true, left: true, right: false })
+    const len = Math.hypot(player.facing.x, player.facing.y)
+    expect(len).toBeCloseTo(1, 5)
+    expect(player.facing.x).toBeLessThan(0)
+    expect(player.facing.y).toBeGreaterThan(0)
+  })
+
+  it('does not update facing when stationary', () => {
+    const player = createPlayer()
+    player.facing = { x: 0.5, y: 0.5 }
+    updateMovement([player], 0.1, noInput)
+    expect(player.facing.x).toBe(0.5)
+    expect(player.facing.y).toBe(0.5)
+  })
+})
