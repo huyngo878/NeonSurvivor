@@ -19,7 +19,7 @@ export function updateGems(entities, player, dt, gameState) {
 
   for (const gem of nearby) {
     const dist = Math.hypot(gem.pos.x - player.pos.x, gem.pos.y - player.pos.y)
-    if (dist > player.radius + gem.radius) continue
+    if (dist > player.radius + gem.radius + (player.magnetBonus || 0)) continue
     const idx = entities.indexOf(gem)
     if (idx !== -1) entities.splice(idx, 1)
     player.xp += Math.floor(gem.value * (player.xpMult || 1))
