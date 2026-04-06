@@ -1,8 +1,8 @@
 import { WORLD_W, WORLD_H, POOL_SIZE } from './constants.js'
 
 export const ENEMY_TYPES = {
-  chaser: { speed: 120, hp: 30,  maxHp: 30,  radius: 8,  color: '#ff0080', damage: 10 },
-  tank:   { speed: 55,  hp: 120, maxHp: 120, radius: 14, color: '#ff4400', damage: 20 },
+  chaser: { speed: 120, hp: 30,  maxHp: 30,  radius: 8,  color: '#ff0080', damage: 10, gemValue: 1, gemRadius: 6, gemColor: '#00ff88' },
+  tank:   { speed: 55,  hp: 120, maxHp: 120, radius: 14, color: '#ff4400', damage: 20, gemValue: 3, gemRadius: 8, gemColor: '#ffd700' },
 }
 
 const WEAPON_CONFIGS = {
@@ -39,6 +39,18 @@ export function createPickup(weaponType, x, y) {
   }
 }
 
+export function createGem(value, radius, color, x, y) {
+  return {
+    id: nextId++,
+    type: 'gem',
+    value,
+    radius,
+    color,
+    pos: { x, y },
+    bobTimer: 0,
+  }
+}
+
 export function createPlayer() {
   return {
     id: nextId++,
@@ -52,6 +64,10 @@ export function createPlayer() {
     radius: 12,
     facing: { x: 1, y: 0 },
     weapons: [],
+    xp: 0,
+    level: 1,
+    xpToNext: 50,
+    regenRate: 0,
   }
 }
 

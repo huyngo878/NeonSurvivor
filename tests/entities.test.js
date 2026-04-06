@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createPlayer, createEnemy, createWeapon, createPickup, initProjectilePool, ENEMY_TYPES } from '../src/entities.js'
+import { createPlayer, createEnemy, createWeapon, createPickup, createGem, initProjectilePool, ENEMY_TYPES } from '../src/entities.js'
 import { POOL_SIZE, WORLD_W, WORLD_H } from '../src/constants.js'
 
 describe('createPlayer', () => {
@@ -105,5 +105,42 @@ describe('createPickup', () => {
     expect(p.pos).toEqual({ x: 100, y: 200 })
     expect(p.radius).toBe(10)
     expect(p.bobTimer).toBe(0)
+  })
+})
+
+describe('createGem', () => {
+  it('creates a gem with correct shape', () => {
+    const g = createGem(1, 6, '#00ff88', 100, 200)
+    expect(g.type).toBe('gem')
+    expect(g.value).toBe(1)
+    expect(g.radius).toBe(6)
+    expect(g.color).toBe('#00ff88')
+    expect(g.pos).toEqual({ x: 100, y: 200 })
+    expect(g.bobTimer).toBe(0)
+    expect(typeof g.id).toBe('number')
+  })
+})
+
+describe('createPlayer — XP fields', () => {
+  it('starts with xp=0, level=1, xpToNext=50, regenRate=0', () => {
+    const p = createPlayer()
+    expect(p.xp).toBe(0)
+    expect(p.level).toBe(1)
+    expect(p.xpToNext).toBe(50)
+    expect(p.regenRate).toBe(0)
+  })
+})
+
+describe('ENEMY_TYPES — gem data', () => {
+  it('chaser has gemValue=1, gemRadius=6, gemColor=#00ff88', () => {
+    expect(ENEMY_TYPES.chaser.gemValue).toBe(1)
+    expect(ENEMY_TYPES.chaser.gemRadius).toBe(6)
+    expect(ENEMY_TYPES.chaser.gemColor).toBe('#00ff88')
+  })
+
+  it('tank has gemValue=3, gemRadius=8, gemColor=#ffd700', () => {
+    expect(ENEMY_TYPES.tank.gemValue).toBe(3)
+    expect(ENEMY_TYPES.tank.gemRadius).toBe(8)
+    expect(ENEMY_TYPES.tank.gemColor).toBe('#ffd700')
   })
 })
