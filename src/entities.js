@@ -17,6 +17,7 @@ export function createPlayer() {
     maxHp: 100,
     speed: 200,
     iframes: 0,
+    radius: 12,
     weapons: [{ type: 'wand', cooldown: 0.8, timer: 0, damage: 20, range: 400 }],
   }
 }

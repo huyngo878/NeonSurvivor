@@ -36,3 +36,69 @@ describe('spatial hash', () => {
     expect(results).toContain(b)
   })
 })
+
+import { updateCollision } from '../../src/systems/collision.js'
+import { createPlayer, createEnemy, initProjectilePool } from '../../src/entities.js'
+
+describe('updateCollision — projectile vs enemy', () => {
+  it('damages enemy when projectile overlaps', () => {
+    const player = createPlayer()
+    const enemy = createEnemy('chaser', 200, 200)
+    const pool = initProjectilePool()
+    const proj = pool[0]
+    proj.active = true; proj.pos = { x: 200, y: 200 }; proj.vel = { x: 0, y: 0 }
+    proj.damage = 20; proj.radius = 4
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision([player, enemy, ...pool], gameState)
+    expect(enemy.hp).toBe(10)    // 30 - 20
+    expect(proj.active).toBe(false)
+  })
+
+  it('increments kill count and removes enemy when hp reaches 0', () => {
+    const player = createPlayer()
+    const enemy = createEnemy('chaser', 200, 200)
+    const pool = initProjectilePool()
+    const proj = pool[0]
+    proj.active = true; proj.pos = { x: 200, y: 200 }; proj.damage = 999; proj.radius = 4
+    const entities = [player, enemy, ...pool]
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision(entities, gameState)
+    expect(gameState.kills).toBe(1)
+    expect(entities.find(e => e === enemy)).toBeUndefined()
+  })
+
+  it('does not damage enemy when projectile is out of range', () => {
+    const player = createPlayer()
+    const enemy = createEnemy('chaser', 200, 200)
+    const pool = initProjectilePool()
+    const proj = pool[0]
+    proj.active = true; proj.pos = { x: 500, y: 500 }; proj.damage = 999; proj.radius = 4
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision([player, enemy, ...pool], gameState)
+    expect(enemy.hp).toBe(30)
+  })
+})
+
+describe('updateCollision — enemy vs player', () => {
+  it('damages player when enemy overlaps and iframes are 0', () => {
+    const player = createPlayer()
+    player.pos = { x: 200, y: 200 }; player.iframes = 0
+    // chaser radius=8, player radius=12, overlap at dist 5 (< 20)
+    const enemy = createEnemy('chaser', 205, 200)
+    const pool = initProjectilePool()
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision([player, enemy, ...pool], gameState)
+    expect(player.hp).toBe(90)
+    expect(player.iframes).toBe(0.5)
+  })
+
+  it('does not damage player during iframes', () => {
+    const player = createPlayer()
+    player.pos = { x: 200, y: 200 }; player.iframes = 0.3
+    const enemy = createEnemy('chaser', 205, 200)
+    const pool = initProjectilePool()
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision([player, enemy, ...pool], gameState)
+    expect(player.hp).toBe(100)
+  })
+})
