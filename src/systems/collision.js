@@ -148,7 +148,7 @@ function _dropGem(enemy, entities) {
 
 function _rollPickupDrop(enemy, entities, player) {
   const bonus = player ? (player.dropRateBonus || 0) : 0
-  const chestRate = 0.05 + bonus
+  const chestRate = 0.10 + bonus
   const magnetRate = 0.005
 
   if (Math.random() < chestRate) {
