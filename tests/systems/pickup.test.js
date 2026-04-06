@@ -1,8 +1,29 @@
 import { describe, it, expect } from 'vitest'
 import { updatePickup } from '../../src/systems/pickup.js'
-import { createPlayer, createChest, createMagnet, createGem } from '../../src/entities.js'
+import { createPlayer, createChest, createPickup, createMagnet, createGem, createWeapon } from '../../src/entities.js'
 
 describe('updatePickup', () => {
+  it('adds weapon to player when pickup is within range', () => {
+    const player = createPlayer()
+    player.pos = { x: 100, y: 100 }
+    const pickup = createPickup('wand', 105, 100)
+    const entities = [player, pickup]
+    updatePickup(entities, player, 0.016, { state: 'playing' })
+    expect(player.weapons).toHaveLength(1)
+    expect(player.weapons[0].type).toBe('wand')
+  })
+
+  it('upgrades an owned weapon when duplicate pickup is collected', () => {
+    const player = createPlayer()
+    player.pos = { x: 100, y: 100 }
+    player.weapons = [createWeapon('rocket')]
+    const pickup = createPickup('rocket', 105, 100)
+    const entities = [player, pickup]
+    updatePickup(entities, player, 0.016, { state: 'playing' })
+    expect(player.weapons).toHaveLength(1)
+    expect(player.weapons[0].shots).toBe(2)
+  })
+
   it('opens a chest and pauses into chest choice state', () => {
     const player = createPlayer()
     player.weapons = []

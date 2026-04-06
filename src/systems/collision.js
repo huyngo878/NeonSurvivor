@@ -1,5 +1,5 @@
 import { CELL_SIZE } from '../constants.js'
-import { ENEMY_TYPES, createChest, createGem, createMagnet, createShockwave, createEnemyProjectile } from '../entities.js'
+import { ENEMY_TYPES, createChest, createPickup, createGem, createMagnet, createShockwave, createEnemyProjectile } from '../entities.js'
 
 const MAX_ENEMY_RADIUS = Math.max(...Object.values(ENEMY_TYPES).map(e => e.radius))
 
@@ -55,6 +55,7 @@ export function updateCollision(entities, gameState) {
   for (const proj of projectiles) {
     const candidates = shQuery(hash, proj.pos.x, proj.pos.y, proj.radius + MAX_ENEMY_RADIUS)
     for (const enemy of candidates) {
+      if (proj.lastHitEnemyId === enemy.id) continue
       const dist = Math.hypot(proj.pos.x - enemy.pos.x, proj.pos.y - enemy.pos.y)
       if (dist < proj.radius + enemy.radius) {
         enemy.hp -= proj.damage
@@ -146,8 +147,16 @@ function _dropGem(enemy, entities) {
 }
 
 function _rollPickupDrop(enemy, entities, player) {
-  const chestRate = 0.02 + (player ? (player.dropRateBonus || 0) : 0)
+  const bonus = player ? (player.dropRateBonus || 0) : 0
+  const chestRate = 0.05 + bonus
+  const weaponRate = 0.05 + bonus
   const magnetRate = 0.005
+
+  if (Math.random() < weaponRate) {
+    const weapons = ['wand', 'whip', 'rocket']
+    const dropType = weapons[Math.floor(Math.random() * weapons.length)]
+    entities.push(createPickup(dropType, enemy.pos.x, enemy.pos.y))
+  }
 
   if (Math.random() < chestRate) {
     entities.push(createChest(enemy.pos.x, enemy.pos.y))
@@ -224,6 +233,9 @@ function _retargetProjectile(proj, hitEnemy, enemies) {
   const dy = target.enemy.pos.y - proj.pos.y
   const dist = Math.hypot(dx, dy) || 1
   const speed = Math.hypot(proj.vel.x, proj.vel.y) || 400
+  proj.lastHitEnemyId = hitEnemy.id
+  proj.pos.x = hitEnemy.pos.x + (dx / dist) * (hitEnemy.radius + proj.radius + 2)
+  proj.pos.y = hitEnemy.pos.y + (dy / dist) * (hitEnemy.radius + proj.radius + 2)
   proj.vel.x = (dx / dist) * speed
   proj.vel.y = (dy / dist) * speed
   return true
@@ -258,6 +270,7 @@ function _forkProjectile(proj, hitEnemy, enemies, entities) {
     fork.bouncesRemaining = proj.bouncesRemaining
     fork.forkOnHit = false
     fork.forked = true
+    fork.lastHitEnemyId = hitEnemy.id
   }
 }
 

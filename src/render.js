@@ -118,6 +118,10 @@ function _drawPickup(ctx, pickup) {
     color = '#cc00ff'
   } else if (pickup.pickupType === 'chest') {
     color = '#ffb347'
+  } else if (pickup.weaponType === 'whip') {
+    color = '#ffd700'
+  } else if (pickup.weaponType === 'rocket') {
+    color = '#ff6600'
   } else {
     color = '#00ffc8'
   }

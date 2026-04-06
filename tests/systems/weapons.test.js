@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { updateWeapons } from '../../src/systems/weapons.js'
 import { createPlayer, createEnemy, initProjectilePool, createWeapon } from '../../src/entities.js'
+import { updateCollision } from '../../src/systems/collision.js'
 
 describe('updateWeapons - wand', () => {
   it('ticks weapon timer down by dt', () => {
@@ -46,6 +47,26 @@ describe('updateWeapons - wand', () => {
     const fired = pool.find(projectile => projectile.active)
     expect(fired.bouncesRemaining).toBe(2)
     expect(fired.forkOnHit).toBe(true)
+  })
+
+  it('bounce retargets to a new enemy instead of the one just hit', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    const weapon = player.weapons[0]
+    weapon.timer = 0
+    weapon.bounce = 1
+    const near = createEnemy('chaser', player.pos.x + 100, player.pos.y)
+    const next = createEnemy('chaser', player.pos.x + 160, player.pos.y + 20)
+    const pool = initProjectilePool()
+    const entities = [player, near, next, ...pool]
+    updateWeapons(entities, 0.016)
+    const projectile = pool.find(entry => entry.active)
+    projectile.pos.x = near.pos.x
+    projectile.pos.y = near.pos.y
+    updateCollision(entities, { kills: 0, state: 'playing', time: 0 })
+    expect(projectile.active).toBe(true)
+    expect(projectile.lastHitEnemyId).toBe(near.id)
+    expect(Math.hypot(projectile.pos.x - near.pos.x, projectile.pos.y - near.pos.y)).toBeGreaterThan(near.radius)
   })
 })
 

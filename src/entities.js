@@ -49,6 +49,18 @@ export function createChest(x, y) {
   }
 }
 
+export function createPickup(weaponType, x, y) {
+  return {
+    id: nextId++,
+    type: 'pickup',
+    pickupType: 'weapon',
+    weaponType,
+    pos: { x, y },
+    radius: 10,
+    bobTimer: 0,
+  }
+}
+
 export function createMagnet(x, y) {
   return {
     id: nextId++,
@@ -166,6 +178,7 @@ export function initProjectilePool() {
       explosionCount: 1,
       knockback: 0,
       fragmentChance: 0,
+      lastHitEnemyId: null,
     })
   }
   return pool
