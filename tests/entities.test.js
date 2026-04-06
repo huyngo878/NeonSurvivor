@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createPlayer, createEnemy, createWeapon, createPickup, createGem, initProjectilePool, ENEMY_TYPES } from '../src/entities.js'
+import { createPlayer, createEnemy, createWeapon, createPickup, createGem, createMagnet, initProjectilePool, ENEMY_TYPES } from '../src/entities.js'
 import { POOL_SIZE, WORLD_W, WORLD_H } from '../src/constants.js'
 
 describe('createPlayer', () => {
@@ -146,6 +146,17 @@ describe('createPlayer — XP fields', () => {
     expect(p.level).toBe(1)
     expect(p.xpToNext).toBe(50)
     expect(p.regenRate).toBe(0)
+  })
+})
+
+describe('createMagnet', () => {
+  it('returns a pickup entity with pickupType magnet', () => {
+    const m = createMagnet(100, 200)
+    expect(m.type).toBe('pickup')
+    expect(m.pickupType).toBe('magnet')
+    expect(m.pos).toEqual({ x: 100, y: 200 })
+    expect(m.radius).toBe(10)
+    expect(m.bobTimer).toBe(0)
   })
 })
 

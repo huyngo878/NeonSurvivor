@@ -1,5 +1,5 @@
 import { CELL_SIZE } from '../constants.js'
-import { ENEMY_TYPES, createPickup, createGem } from '../entities.js'
+import { ENEMY_TYPES, createPickup, createGem, createMagnet } from '../entities.js'
 
 const MAX_ENEMY_RADIUS = Math.max(...Object.values(ENEMY_TYPES).map(e => e.radius))
 
@@ -54,7 +54,7 @@ export function updateCollision(entities, gameState) {
           gameState.kills++
           enemy.dead = true
           _dropGem(enemy, entities)
-          _rollWeaponDrop(enemy, entities, player)
+          _rollPickupDrop(enemy, entities, player)
         }
         break
       }
@@ -82,7 +82,7 @@ export function updateCollision(entities, gameState) {
           gameState.kills++
           enemy.dead = true
           _dropGem(enemy, entities)
-          _rollWeaponDrop(enemy, entities, player)
+          _rollPickupDrop(enemy, entities, player)
         }
       }
     }
@@ -113,9 +113,18 @@ function _dropGem(enemy, entities) {
   entities.push(createGem(cfg.gemValue, cfg.gemRadius, cfg.gemColor, enemy.pos.x, enemy.pos.y))
 }
 
-function _rollWeaponDrop(enemy, entities, player) {
+function _rollPickupDrop(enemy, entities, player) {
   const baseRate = 0.05 + (player ? (player.dropRateBonus || 0) : 0)
-  if (Math.random() >= baseRate) return
-  const dropType = Math.random() < 0.5 ? 'wand' : 'whip'
-  entities.push(createPickup(dropType, enemy.pos.x, enemy.pos.y))
+
+  // Weapon drop
+  if (Math.random() < baseRate) {
+    const weapons = ['wand', 'whip', 'rocket']
+    const dropType = weapons[Math.floor(Math.random() * weapons.length)]
+    entities.push(createPickup(dropType, enemy.pos.x, enemy.pos.y))
+  }
+
+  // Magnet drop (rare, independent roll)
+  if (Math.random() < baseRate) {
+    entities.push(createMagnet(enemy.pos.x, enemy.pos.y))
+  }
 }

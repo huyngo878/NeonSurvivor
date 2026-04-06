@@ -41,6 +41,17 @@ export function createPickup(weaponType, x, y) {
   }
 }
 
+export function createMagnet(x, y) {
+  return {
+    id: nextId++,
+    type: 'pickup',
+    pickupType: 'magnet',
+    pos: { x, y },
+    radius: 10,
+    bobTimer: 0,
+  }
+}
+
 export function createGem(value, radius, color, x, y) {
   return {
     id: nextId++,

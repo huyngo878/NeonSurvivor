@@ -20,11 +20,15 @@ export function updatePickup(entities, player, dt) {
   for (const pickup of nearby) {
     const dist = Math.hypot(pickup.pos.x - player.pos.x, pickup.pos.y - player.pos.y)
     if (dist > player.radius + pickup.radius) continue
-    // Remove pickup
     const idx = entities.indexOf(pickup)
     if (idx !== -1) entities.splice(idx, 1)
-    // Upgrade existing or add new
-    if (pickup.pickupType === 'weapon') {
+
+    if (pickup.pickupType === 'magnet') {
+      // Attract all gems
+      for (const e of entities) {
+        if (e.type === 'gem') e.attracted = true
+      }
+    } else if (pickup.pickupType === 'weapon') {
       const existing = player.weapons.find(w => w.type === pickup.weaponType)
       if (existing) {
         _upgradeWeapon(existing)
@@ -42,5 +46,7 @@ function _upgradeWeapon(weapon) {
     weapon.cooldown = Math.max(0.2, weapon.cooldown * 0.85)
     weapon.damage += 5
     weapon.sweepAngle = Math.min(2 * Math.PI, weapon.sweepAngle + Math.PI / 6)
+  } else if (weapon.type === 'rocket') {
+    weapon.shots += 1
   }
 }

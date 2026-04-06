@@ -1,6 +1,8 @@
 import { createSpatialHash, shInsert, shQuery } from './collision.js'
 import { pickUpgrades } from '../upgrades.js'
 
+const MAGNET_SPEED = 400  // px/s
+
 export function updateGems(entities, player, dt, gameState) {
   if (!player) return
 
@@ -12,8 +14,32 @@ export function updateGems(entities, player, dt, gameState) {
   const gems = entities.filter(e => e.type === 'gem')
   if (gems.length === 0) return
 
+  // Attracted gems — move toward player, collect on arrival
+  const collectRadius = player.radius + 10 + (player.magnetBonus || 0)
+  for (let i = entities.length - 1; i >= 0; i--) {
+    const gem = entities[i]
+    if (gem.type !== 'gem' || !gem.attracted) continue
+    const dx = player.pos.x - gem.pos.x
+    const dy = player.pos.y - gem.pos.y
+    const dist = Math.hypot(dx, dy)
+    if (dist <= collectRadius) {
+      entities.splice(i, 1)
+      player.xp += Math.floor(gem.value * (player.xpMult || 1))
+      if (player.xp >= player.xpToNext && gameState.state !== 'levelup') {
+        _levelUp(player, gameState)
+      }
+    } else {
+      gem.pos.x += (dx / dist) * MAGNET_SPEED * dt
+      gem.pos.y += (dy / dist) * MAGNET_SPEED * dt
+    }
+  }
+
+  // Normal gems — spatial hash pickup
+  const normalGems = entities.filter(e => e.type === 'gem' && !e.attracted)
+  if (normalGems.length === 0) return
+
   const hash = createSpatialHash()
-  for (const g of gems) shInsert(hash, g)
+  for (const g of normalGems) shInsert(hash, g)
 
   const nearby = shQuery(hash, player.pos.x, player.pos.y, player.radius + 10 + (player.magnetBonus || 0))
 

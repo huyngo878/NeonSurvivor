@@ -109,4 +109,31 @@ describe('updateGems', () => {
     expect(player.level).toBe(2)
     expect(gameState.state).toBe('levelup')
   })
+
+  it('moves attracted gem toward player each frame', () => {
+    const player = createPlayer()
+    player.pos = { x: 100, y: 100 }
+    const gem = createGem(1, 6, '#00ff88', 500, 100)
+    gem.attracted = true
+    const entities = [player, gem]
+    const gameState = { state: 'playing', kills: 0, time: 0 }
+    updateGems(entities, player, 0.1, gameState)
+    // Gem should have moved toward player (x decreased)
+    expect(gem.pos.x).toBeLessThan(500)
+    expect(gem.pos.y).toBeCloseTo(100, 0)
+    // Gem is still in entities (not yet collected — it's still far away)
+    expect(entities.find(e => e === gem)).toBeDefined()
+  })
+
+  it('collects attracted gem when it reaches player', () => {
+    const player = createPlayer()
+    player.pos = { x: 100, y: 100 }
+    const gem = createGem(2, 6, '#00ff88', 110, 100)
+    gem.attracted = true
+    const entities = [player, gem]
+    const gameState = { state: 'playing', kills: 0, time: 0 }
+    updateGems(entities, player, 0.016, gameState)
+    expect(player.xp).toBe(2)
+    expect(entities.find(e => e === gem)).toBeUndefined()
+  })
 })

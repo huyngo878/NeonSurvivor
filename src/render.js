@@ -93,7 +93,16 @@ function _drawProjectile(ctx, proj) {
 }
 
 function _drawPickup(ctx, pickup) {
-  const color = pickup.weaponType === 'whip' ? '#ffd700' : '#00ffc8'
+  let color
+  if (pickup.pickupType === 'magnet') {
+    color = '#cc00ff'
+  } else if (pickup.weaponType === 'whip') {
+    color = '#ffd700'
+  } else if (pickup.weaponType === 'rocket') {
+    color = '#ff6600'
+  } else {
+    color = '#00ffc8'
+  }
   const yOff = Math.sin(pickup.bobTimer * 3) * 4
   const { x, y } = pickup.pos
   ctx.save()
