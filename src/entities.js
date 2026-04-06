@@ -5,7 +5,39 @@ export const ENEMY_TYPES = {
   tank:   { speed: 55,  hp: 120, maxHp: 120, radius: 14, color: '#ff4400', damage: 20 },
 }
 
+const WEAPON_CONFIGS = {
+  wand: { type: 'wand', cooldown: 0.8, damage: 20, range: 400 },
+  whip: {
+    type: 'whip', cooldown: 0.6, damage: 15, range: 120,
+    sweepAngle: Math.PI, activeDuration: 0.12,
+  },
+}
+
 let nextId = 1
+
+export function createWeapon(type) {
+  const cfg = WEAPON_CONFIGS[type]
+  if (!cfg) throw new Error(`Unknown weapon type: ${type}`)
+  const base = { ...cfg, timer: 0 }
+  if (type === 'whip') {
+    base.active = false
+    base.activeTimer = 0
+    base.hitIds = new Set()
+  }
+  return base
+}
+
+export function createPickup(weaponType, x, y) {
+  return {
+    id: nextId++,
+    type: 'pickup',
+    pickupType: 'weapon',
+    weaponType,
+    pos: { x, y },
+    radius: 10,
+    bobTimer: 0,
+  }
+}
 
 export function createPlayer() {
   return {
@@ -18,7 +50,8 @@ export function createPlayer() {
     speed: 200,
     iframes: 0,
     radius: 12,
-    weapons: [{ type: 'wand', cooldown: 0.8, timer: 0, damage: 20, range: 400 }],
+    facing: { x: 1, y: 0 },
+    weapons: [],
   }
 }
 

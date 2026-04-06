@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createPlayer, createEnemy, initProjectilePool, ENEMY_TYPES } from '../src/entities.js'
+import { createPlayer, createEnemy, createWeapon, createPickup, initProjectilePool, ENEMY_TYPES } from '../src/entities.js'
 import { POOL_SIZE, WORLD_W, WORLD_H } from '../src/constants.js'
 
 describe('createPlayer', () => {
@@ -14,14 +14,10 @@ describe('createPlayer', () => {
     expect(p.iframes).toBe(0)
   })
 
-  it('has exactly one wand weapon with correct config', () => {
+  it('starts with empty weapons array and default facing right', () => {
     const p = createPlayer()
-    expect(p.weapons).toHaveLength(1)
-    expect(p.weapons[0].type).toBe('wand')
-    expect(p.weapons[0].cooldown).toBe(0.8)
-    expect(p.weapons[0].damage).toBe(20)
-    expect(p.weapons[0].range).toBe(400)
-    expect(p.weapons[0].timer).toBe(0)
+    expect(p.weapons).toHaveLength(0)
+    expect(p.facing).toEqual({ x: 1, y: 0 })
   })
 })
 
@@ -66,5 +62,46 @@ describe('initProjectilePool', () => {
       expect(p.lifetime).toBe(2.0)
       expect(p.age).toBe(0)
     }
+  })
+})
+
+describe('createWeapon', () => {
+  it('creates wand with correct shape', () => {
+    const w = createWeapon('wand')
+    expect(w.type).toBe('wand')
+    expect(w.cooldown).toBe(0.8)
+    expect(w.timer).toBe(0)
+    expect(w.damage).toBe(20)
+    expect(w.range).toBe(400)
+  })
+
+  it('creates whip with correct shape', () => {
+    const w = createWeapon('whip')
+    expect(w.type).toBe('whip')
+    expect(w.cooldown).toBe(0.6)
+    expect(w.timer).toBe(0)
+    expect(w.damage).toBe(15)
+    expect(w.range).toBe(120)
+    expect(w.sweepAngle).toBe(Math.PI)
+    expect(w.active).toBe(false)
+    expect(w.activeTimer).toBe(0)
+    expect(w.activeDuration).toBe(0.12)
+    expect(w.hitIds).toBeInstanceOf(Set)
+  })
+
+  it('throws on unknown weapon type', () => {
+    expect(() => createWeapon('laser')).toThrow('Unknown weapon type: laser')
+  })
+})
+
+describe('createPickup', () => {
+  it('creates a weapon pickup with correct shape', () => {
+    const p = createPickup('wand', 100, 200)
+    expect(p.type).toBe('pickup')
+    expect(p.pickupType).toBe('weapon')
+    expect(p.weaponType).toBe('wand')
+    expect(p.pos).toEqual({ x: 100, y: 200 })
+    expect(p.radius).toBe(10)
+    expect(p.bobTimer).toBe(0)
   })
 })
