@@ -2,10 +2,10 @@ import { SPAWN_RADIUS, WAVE_DURATION } from '../constants.js'
 import { createEnemy, ENEMY_TYPES } from '../entities.js'
 
 const BASE_WAVES = [
-  { enemyType: 'chaser', count: 2, interval: 9.0, minWave: 1 },
-  { enemyType: 'tank', count: 1, interval: 18.0, minWave: 2 },
-  { enemyType: 'speedster', count: 2, interval: 10.0, minWave: 11 },
-  { enemyType: 'brute', count: 1, interval: 26.0, minWave: 7 },
+  { enemyType: 'chaser',    count: 2, interval: 9.0,  minWave: 1  },
+  { enemyType: 'tank',      count: 1, interval: 18.0, minWave: 2  },
+  { enemyType: 'speedster', count: 1, interval: 14.0, minWave: 11 },
+  { enemyType: 'brute',     count: 1, interval: 26.0, minWave: 7  },
 ]
 
 const BOSS_PATTERNS = ['spiral', 'ring', 'cross']
@@ -52,12 +52,7 @@ export function updateSpawner(entities, state, dt, gameTime, gameState) {
     state.timers[i] = interval
 
     let count = Math.max(1, Math.round(waveDef.count * densityScale))
-    if (waveDef.enemyType === 'speedster' && wave < 8) count = Math.max(1, Math.floor(count * 0.5))
-    if (waveDef.enemyType === 'speedster' && wave >= 8) {
-      count = Math.max(2, Math.round(count * 1.6))
-      interval = Math.max(0.2, interval * 0.8)
-      state.timers[i] = interval
-    }
+    if (waveDef.enemyType === 'speedster') count = Math.max(1, Math.floor(count * 0.6))
     const enemyOverrides = _enemyOverrides(wave, waveDef.enemyType)
 
     for (let j = 0; j < count; j++) {
@@ -67,11 +62,11 @@ export function updateSpawner(entities, state, dt, gameTime, gameState) {
 }
 
 export function getDensityMultiplier(wave) {
-  return _piecewiseScale(wave, 0.22, 1.8)
+  return _piecewiseScale(wave, 0.12, 1.25)
 }
 
 export function getHealthMultiplier(wave) {
-  return _piecewiseScale(wave, 0.18, 1.6)
+  return _piecewiseScale(wave, 0.10, 1.25)
 }
 
 function _piecewiseScale(wave, linearStep, spikeMult) {

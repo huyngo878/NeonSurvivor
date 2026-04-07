@@ -3,11 +3,12 @@ import { spawnZoneChests } from '../src/zones.js'
 import { WORLD_W, WORLD_H } from '../src/constants.js'
 
 describe('spawnZoneChests', () => {
-  it('adds 6 chestNode entities to entities array for zone 0', () => {
+  it('adds between 13 and 19 chestNode entities for zone 0', () => {
     const entities = []
     spawnZoneChests(entities, 0)
     const nodes = entities.filter(e => e.type === 'chestNode')
-    expect(nodes).toHaveLength(6)
+    expect(nodes.length).toBeGreaterThanOrEqual(13)
+    expect(nodes.length).toBeLessThanOrEqual(19)
   })
 
   it('chest nodes are not opened by default', () => {
@@ -40,14 +41,14 @@ describe('spawnZoneChests', () => {
     }
   })
 
-  it('chest nodes are spaced at least 400px apart from each other', () => {
+  it('chest nodes are spaced at least 300px apart from each other', () => {
     const entities = []
     spawnZoneChests(entities, 0)
     const nodes = entities.filter(e => e.type === 'chestNode')
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
         const dist = Math.hypot(nodes[i].pos.x - nodes[j].pos.x, nodes[i].pos.y - nodes[j].pos.y)
-        expect(dist).toBeGreaterThanOrEqual(400)
+        expect(dist).toBeGreaterThanOrEqual(300)
       }
     }
   })

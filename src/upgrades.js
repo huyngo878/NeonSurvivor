@@ -137,7 +137,7 @@ export const CARDS = [
     id: 'wand_shots',
     label: 'TWIN CAST',
     desc: '+1 wand projectile per attack',
-    rarity: 'rare',
+    rarity: 'uncommon',
     requires: 'wand',
     icon: '2',
     available: player => player.level >= 4,
