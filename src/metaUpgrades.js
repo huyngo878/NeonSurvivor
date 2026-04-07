@@ -65,8 +65,7 @@ export const META_UPGRADES = [
     id: 'drop_rate', label: 'LUCKY', desc: '+3% chest drop chance per tier',
     category: 'modifier',
     tiers: [60, 120, 200],
-    apply: (player, tier) => {
-      player.dropRateBonus = tier * 0.03
+    apply: (_player, _tier) => {
     },
   },
 ]

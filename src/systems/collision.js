@@ -148,7 +148,7 @@ function _dropGem(enemy, entities) {
   entities.push(createGem(cfg.gemValue, cfg.gemRadius, cfg.gemColor, enemy.pos.x, enemy.pos.y))
 }
 
-function _rollPickupDrop(enemy, entities, player) {
+function _rollPickupDrop(enemy, entities) {
   const magnetRate = 0.005
 
   if (Math.random() < magnetRate) {
@@ -206,7 +206,7 @@ function _killEnemy(enemy, entities, player, gameState) {
   gameState.kills++
   enemy.dead = true
   _dropGem(enemy, entities)
-  _rollPickupDrop(enemy, entities, player)
+  _rollPickupDrop(enemy, entities)
   if (player) {
     const cfg = ENEMY_TYPES[enemy.enemyType]
     if (cfg) player.money = (player.money || 0) + cfg.moneyValue
