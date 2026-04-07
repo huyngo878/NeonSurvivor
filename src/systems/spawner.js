@@ -102,8 +102,8 @@ function _bossOverrides(wave) {
   const healthMult = getHealthMultiplier(wave) * 4
   const damageMult = getDensityMultiplier(wave)
   return {
-    hp: Math.round(2500 * healthMult),
-    maxHp: Math.round(2500 * healthMult),
+    hp: Math.round(625 * healthMult),
+    maxHp: Math.round(625 * healthMult),
     damage: Math.round(40 * damageMult),
     speed: 70 + tier * 5,
     bossPattern: BOSS_PATTERNS[(tier - 1) % BOSS_PATTERNS.length],

@@ -63,5 +63,5 @@ function _levelUp(player, entities) {
 }
 
 function _shouldSpawnLevelChest(level) {
-  return level <= 5 || level % 2 === 0
+  return true
 }

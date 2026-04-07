@@ -1,6 +1,6 @@
 import { createWeapon } from './entities.js'
 
-const WEIGHTS = { common: 50, uncommon: 30, rare: 15, epic: 5, legendary: 3 }
+const WEIGHTS = { common: 32, uncommon: 28, rare: 22, epic: 12, legendary: 6 }
 
 export const CARDS = [
   {
