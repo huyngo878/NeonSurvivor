@@ -50,6 +50,7 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
     proj.lastHitEnemyId = null
     proj.hitEnemyIds = new Set()
     proj.piercesRemaining = weapon.pierceCount || 0
+    proj.slow = weapon.slowOnHit || false
   }
 }
 

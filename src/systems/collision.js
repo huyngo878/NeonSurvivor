@@ -62,6 +62,7 @@ export function updateCollision(entities, gameState) {
         proj.hitEnemyIds.add(enemy.id)
         enemy.hp -= proj.damage
         _applyHitImpulse(enemy, proj)
+        if (proj.slow) enemy.slowTimer = 1.5
         if (enemy.hp <= 0) {
           _killEnemy(enemy, entities, player, gameState)
         }
@@ -105,6 +106,7 @@ export function updateCollision(entities, gameState) {
         enemy.hp -= damage
         _pushEnemy(enemy, player.pos.x, player.pos.y, weapon.knockback || 0)
         weapon.hitIds.add(enemy.id)
+        if (weapon.slowOnHit) enemy.slowTimer = 1.5
         if (enemy.hp <= 0) {
           _killEnemy(enemy, entities, player, gameState)
         }

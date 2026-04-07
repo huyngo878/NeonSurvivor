@@ -238,3 +238,33 @@ describe('updateCollision — pierce', () => {
     expect(proj.active).toBe(false)
   })
 })
+
+describe('updateCollision — slow on hit', () => {
+  it('projectile with slow=true sets enemy.slowTimer on hit', () => {
+    const player = createPlayer()
+    const enemy = createEnemy('chaser', 200, 200)
+    const pool = initProjectilePool()
+    const proj = pool[0]
+    proj.active = true; proj.pos = { x: 200, y: 200 }; proj.vel = { x: 0, y: 0 }
+    proj.damage = 5; proj.radius = 4; proj.aoe = false; proj.weaponType = 'wand'
+    proj.slow = true; proj.piercesRemaining = 0; proj.bouncesRemaining = 0
+    proj.hitEnemyIds = new Set()
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision([player, enemy, ...pool], gameState)
+    expect(enemy.slowTimer).toBeGreaterThan(0)
+  })
+
+  it('projectile with slow=false does not set enemy.slowTimer', () => {
+    const player = createPlayer()
+    const enemy = createEnemy('chaser', 200, 200)
+    const pool = initProjectilePool()
+    const proj = pool[0]
+    proj.active = true; proj.pos = { x: 200, y: 200 }; proj.vel = { x: 0, y: 0 }
+    proj.damage = 5; proj.radius = 4; proj.aoe = false; proj.weaponType = 'wand'
+    proj.slow = false; proj.piercesRemaining = 0; proj.bouncesRemaining = 0
+    proj.hitEnemyIds = new Set()
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision([player, enemy, ...pool], gameState)
+    expect(enemy.slowTimer || 0).toBe(0)
+  })
+})

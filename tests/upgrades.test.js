@@ -160,6 +160,21 @@ describe('rocket stat cards', () => {
 })
 
 describe('new stat cards', () => {
+  it('wand_slow sets weapon.slowOnHit to true', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    expect(player.weapons[0].slowOnHit).toBe(false)
+    CARDS.find(c => c.id === 'wand_slow').apply(player)
+    expect(player.weapons[0].slowOnHit).toBe(true)
+  })
+
+  it('whip_slow sets weapon.slowOnHit to true', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('whip')]
+    CARDS.find(c => c.id === 'whip_slow').apply(player)
+    expect(player.weapons[0].slowOnHit).toBe(true)
+  })
+
   it('wand_firerate reduces wand cooldown', () => {
     const player = createPlayer()
     player.weapons = [createWeapon('wand')]

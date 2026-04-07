@@ -11,12 +11,12 @@ export const ENEMY_TYPES = {
 const WEAPON_CONFIGS = {
   wand: {
     type: 'wand', cooldown: 0.53, damage: 22, range: 400, shots: 1, projectileSpeed: 400,
-    bounce: 0, forkCount: 0, pierceCount: 0,
+    bounce: 0, forkCount: 0, pierceCount: 0, slowOnHit: false,
   },
   whip: {
     type: 'whip', cooldown: 0.9, damage: 11, range: 120,
     sweepAngle: Math.PI, activeDuration: 0.12, aimAngle: 0,
-    knockback: 18, critChance: 0,
+    knockback: 18, critChance: 0, slowOnHit: false,
   },
   rocket: {
     type: 'rocket', cooldown: 2.0, damage: 60, range: 500, shots: 1, aoeRadius: 80,
@@ -136,6 +136,7 @@ export function createEnemy(enemyType, x, y, overrides = {}) {
     color: cfg.color,
     damage: cfg.damage,
     speed: cfg.speed,
+    slowTimer: 0,
     ...overrides,
   }
 }
@@ -194,6 +195,7 @@ export function initProjectilePool() {
       lastHitEnemyId: null,
       hitEnemyIds: new Set(),
       piercesRemaining: 0,
+      slow: false,
     })
   }
   return pool

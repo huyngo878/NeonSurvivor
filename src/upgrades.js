@@ -124,6 +124,16 @@ export const CARDS = [
     apply: player => { _weapon(player, 'wand').pierceCount += 1 },
   },
   {
+    id: 'wand_slow',
+    label: 'CRYO ORBS',
+    desc: 'Wand projectiles slow enemies for 1.5s',
+    rarity: 'uncommon',
+    requires: 'wand',
+    icon: '*',
+    unique: true,
+    apply: player => { _weapon(player, 'wand').slowOnHit = true },
+  },
+  {
     id: 'wand_shots',
     label: 'TWIN CAST',
     desc: '+1 wand projectile per attack',
@@ -213,6 +223,16 @@ export const CARDS = [
     apply: player => { _weapon(player, 'whip').critChance += 0.12 },
   },
 
+  {
+    id: 'whip_slow',
+    label: 'WEIGHTED CHAIN',
+    desc: 'Whip slows enemies for 1.5s on hit',
+    rarity: 'uncommon',
+    requires: 'whip',
+    icon: '*',
+    unique: true,
+    apply: player => { _weapon(player, 'whip').slowOnHit = true },
+  },
   {
     id: 'rocket_multi',
     label: 'SALVO BAY',

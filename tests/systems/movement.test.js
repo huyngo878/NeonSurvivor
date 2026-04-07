@@ -125,6 +125,36 @@ describe('updateMovement — projectile', () => {
   })
 })
 
+describe('updateMovement — slow', () => {
+  it('slowed enemy moves slower than normal enemy', () => {
+    const player = createPlayer()
+    player.pos = { x: 500, y: 500 }
+
+    const normal = createEnemy('chaser', 100, 100)
+    const slowed = createEnemy('chaser', 100, 100)
+    slowed.slowTimer = 1.0
+
+    const entitiesNormal = [player, normal]
+    const entitiesSlowed = [player, slowed]
+
+    updateMovement(entitiesNormal, 0.1, {})
+    updateMovement(entitiesSlowed, 0.1, {})
+
+    const normalDist = Math.hypot(normal.pos.x - 100, normal.pos.y - 100)
+    const slowedDist = Math.hypot(slowed.pos.x - 100, slowed.pos.y - 100)
+    expect(slowedDist).toBeLessThan(normalDist)
+  })
+
+  it('slowTimer decrements over time', () => {
+    const player = createPlayer()
+    player.pos = { x: 500, y: 500 }
+    const enemy = createEnemy('chaser', 100, 100)
+    enemy.slowTimer = 1.0
+    updateMovement([player, enemy], 0.5, {})
+    expect(enemy.slowTimer).toBeCloseTo(0.5)
+  })
+})
+
 describe('updateMovement — player facing', () => {
   it('updates facing when moving right', () => {
     const player = createPlayer()

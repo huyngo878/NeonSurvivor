@@ -37,6 +37,7 @@ function _movePlayer(player, dt, input) {
 }
 
 function _chasePlayer(enemy, dt, player) {
+  if (enemy.slowTimer > 0) enemy.slowTimer = Math.max(0, enemy.slowTimer - dt)
   if (enemy.enemyType === 'boss' && enemy.bossTimer !== undefined) {
     enemy.bossTimer = Math.max(0, enemy.bossTimer - dt)
   }
@@ -44,8 +45,9 @@ function _chasePlayer(enemy, dt, player) {
   const dy = player.pos.y - enemy.pos.y
   const dist = Math.hypot(dx, dy)
   if (dist > 0) {
-    enemy.pos.x += (dx / dist) * enemy.speed * dt
-    enemy.pos.y += (dy / dist) * enemy.speed * dt
+    const effectiveSpeed = enemy.slowTimer > 0 ? enemy.speed * 0.4 : enemy.speed
+    enemy.pos.x += (dx / dist) * effectiveSpeed * dt
+    enemy.pos.y += (dy / dist) * effectiveSpeed * dt
   }
 }
 
