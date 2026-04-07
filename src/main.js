@@ -4,7 +4,9 @@ import { updateMovement } from './systems/movement.js'
 import { updateCollision } from './systems/collision.js'
 import { updateWeapons } from './systems/weapons.js'
 import { updateSpawner, createSpawnerState } from './systems/spawner.js'
-import { updatePickup } from './systems/pickup.js'
+import { updatePickup, updateChestNodes } from './systems/pickup.js'
+import { spawnZoneChests } from './zones.js'
+import { pickChestCards } from './upgrades.js'
 import { updateGems } from './systems/gems.js'
 import { renderWorld } from './render.js'
 import { drawHud } from './ui/hud.js'
@@ -114,6 +116,19 @@ document.addEventListener('keydown', e => {
     gameState.pauseIndex = 0
   }
 
+  if (e.code === 'KeyE' && gameState.state === 'playing') {
+    const nc = gameState.nearestChest
+    const player = entities.find(ent => ent.type === 'player')
+    if (nc && player && player.money >= nc.cost) {
+      player.money -= nc.cost
+      gameState.chestsOpened = (gameState.chestsOpened || 0) + 1
+      nc.node.opened = true
+      gameState.nearestChest = null
+      gameState.upgradeChoices = pickChestCards(player, 3 + (player.extraChoices || 0))
+      gameState.state = 'chest'
+    }
+  }
+
   if (gameState.state === 'paused') {
     if (e.code === 'ArrowUp' || e.code === 'KeyW') gameState.pauseIndex = Math.max(0, (gameState.pauseIndex || 0) - 1)
     if (e.code === 'ArrowDown' || e.code === 'KeyS') gameState.pauseIndex = Math.min(1, (gameState.pauseIndex || 0) + 1)
@@ -205,6 +220,19 @@ if (isMobile) {
     if (gameState.state === 'playing' && inJoystickZone) {
       joystickTouchStart(t)
     } else {
+      if (gameState.state === 'playing' && !inJoystickZone) {
+        const nc = gameState.nearestChest
+        const player = entities.find(ent => ent.type === 'player')
+        if (nc && player && player.money >= nc.cost) {
+          player.money -= nc.cost
+          gameState.chestsOpened = (gameState.chestsOpened || 0) + 1
+          nc.node.opened = true
+          gameState.nearestChest = null
+          gameState.upgradeChoices = pickChestCards(player, 3 + (player.extraChoices || 0))
+          gameState.state = 'chest'
+          return
+        }
+      }
       _handlePointer(t.clientX, t.clientY)
     }
   }, { passive: false })
@@ -258,7 +286,10 @@ function initGame(selectedWeapon) {
     time: 0, kills: 0, upgradesTaken: [],
     wave: 1, pauseIndex: 0,
     zoom: gameState.zoom, zoomLabel: gameState.zoomLabel, showZoomControl: isIOS,
+    chestsOpened: 0,
+    nearestChest: null,
   }
+  spawnZoneChests(entities, 0)
   spawnerState = createSpawnerState(player.spawnDelayBonus || 0)
   camera       = { x: 0, y: 0 }
 }
@@ -356,8 +387,10 @@ function loop(timestamp) {
     updateSpawner(entities, spawnerState, dt, gameState.time, gameState)
     if (player) {
       updatePickup(entities, player, dt, gameState)
+      updateChestNodes(entities, player, gameState)
       updateGems(entities, player, dt, gameState)
       updateCamera(player)
+      gameState.camera = camera
     }
 
     if (player && player.hp <= 0) {
