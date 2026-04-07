@@ -49,6 +49,7 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
     proj.forked = false
     proj.lastHitEnemyId = null
     proj.hitEnemyIds = new Set()
+    proj.piercesRemaining = weapon.pierceCount || 0
   }
 }
 

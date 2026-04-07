@@ -11,7 +11,7 @@ export const ENEMY_TYPES = {
 const WEAPON_CONFIGS = {
   wand: {
     type: 'wand', cooldown: 0.53, damage: 22, range: 400, shots: 1, projectileSpeed: 400,
-    bounce: 0, forkCount: 0,
+    bounce: 0, forkCount: 0, pierceCount: 0,
   },
   whip: {
     type: 'whip', cooldown: 0.9, damage: 11, range: 120,
@@ -193,6 +193,7 @@ export function initProjectilePool() {
       centerDamageBonus: 0,
       lastHitEnemyId: null,
       hitEnemyIds: new Set(),
+      piercesRemaining: 0,
     })
   }
   return pool

@@ -115,6 +115,15 @@ export const CARDS = [
     apply: player => { _weapon(player, 'wand').projectileSpeed += 120 },
   },
   {
+    id: 'wand_pierce',
+    label: 'PHASE SHOT',
+    desc: 'Wand projectiles pierce 1 additional enemy',
+    rarity: 'uncommon',
+    requires: 'wand',
+    icon: '→',
+    apply: player => { _weapon(player, 'wand').pierceCount += 1 },
+  },
+  {
     id: 'wand_shots',
     label: 'TWIN CAST',
     desc: '+1 wand projectile per attack',

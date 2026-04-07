@@ -184,4 +184,12 @@ describe('new stat cards', () => {
     CARDS.find(c => c.id === 'whip_range').apply(player)
     expect(player.weapons[0].range).toBeGreaterThan(before)
   })
+
+  it('wand_pierce adds 1 to pierceCount', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    expect(player.weapons[0].pierceCount).toBe(0)
+    CARDS.find(c => c.id === 'wand_pierce').apply(player)
+    expect(player.weapons[0].pierceCount).toBe(1)
+  })
 })

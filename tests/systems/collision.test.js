@@ -205,3 +205,36 @@ describe('updateCollision — money on kill', () => {
     expect(() => updateCollision([player, enemy, ...pool], gameState)).not.toThrow()
   })
 })
+
+describe('updateCollision — pierce', () => {
+  it('projectile with piercesRemaining > 0 stays active after hitting enemy', () => {
+    const player = createPlayer()
+    const enemy = createEnemy('chaser', 200, 200)
+    const pool = initProjectilePool()
+    const proj = pool[0]
+    proj.active = true; proj.pos = { x: 200, y: 200 }; proj.vel = { x: 0, y: 0 }
+    proj.damage = 5; proj.radius = 4; proj.aoe = false
+    proj.weaponType = 'wand'; proj.bouncesRemaining = 0
+    proj.piercesRemaining = 1
+    proj.hitEnemyIds = new Set()
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision([player, enemy, ...pool], gameState)
+    expect(proj.active).toBe(true)
+    expect(proj.piercesRemaining).toBe(0)
+  })
+
+  it('projectile with piercesRemaining 0 deactivates after hit', () => {
+    const player = createPlayer()
+    const enemy = createEnemy('chaser', 200, 200)
+    const pool = initProjectilePool()
+    const proj = pool[0]
+    proj.active = true; proj.pos = { x: 200, y: 200 }; proj.vel = { x: 0, y: 0 }
+    proj.damage = 5; proj.radius = 4; proj.aoe = false
+    proj.weaponType = 'wand'; proj.bouncesRemaining = 0
+    proj.piercesRemaining = 0
+    proj.hitEnemyIds = new Set()
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision([player, enemy, ...pool], gameState)
+    expect(proj.active).toBe(false)
+  })
+})

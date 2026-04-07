@@ -71,12 +71,17 @@ export function updateCollision(entities, gameState) {
         if (proj.aoe) {
           _triggerRocketExplosions(proj, enemies, entities, player, gameState, enemy)
           proj.active = false
+          break
         } else if (proj.bouncesRemaining > 0 && _retargetProjectile(proj, enemy, enemies)) {
           proj.bouncesRemaining -= 1
+          break
+        } else if (proj.piercesRemaining > 0) {
+          proj.piercesRemaining -= 1
+          // no break — continue through remaining candidates in this frame
         } else {
           proj.active = false
+          break
         }
-        break
       }
     }
   }
