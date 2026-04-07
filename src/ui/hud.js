@@ -25,6 +25,16 @@ export function drawHud(ctx, canvas, player, gameState) {
   ctx.fillText(`${Math.ceil(player.hp)} / ${player.maxHp}`, barX, barY + barH + 18)
   ctx.restore()
 
+  // Money display — below HP text
+  ctx.save()
+  ctx.font = '18px monospace'
+  ctx.textAlign = 'left'
+  ctx.fillStyle = '#ffd700'
+  ctx.shadowBlur = 8
+  ctx.shadowColor = '#ffd700'
+  ctx.fillText(`💰 ${player.money || 0}$`, barX, barY + barH + 40)
+  ctx.restore()
+
   const mm = String(Math.floor(gameState.time / 60)).padStart(2, '0')
   const ss = String(Math.floor(gameState.time % 60)).padStart(2, '0')
   ctx.save()
@@ -136,6 +146,32 @@ export function drawHud(ctx, canvas, player, gameState) {
       ctx.fillStyle = selected ? '#ffd700' : '#ffffff'
       ctx.fillText(label.toUpperCase(), canvas.clientWidth / 2, y + 29)
     })
+    ctx.restore()
+  }
+
+  // Chest proximity label — drawn in screen space using camera offset from gameState
+  if (gameState.nearestChest && gameState.camera) {
+    const { node, cost } = gameState.nearestChest
+    const zoom = gameState.zoom || 1
+    const screenX = (node.pos.x - gameState.camera.x) * zoom
+    const screenY = (node.pos.y - gameState.camera.y) * zoom - 28
+
+    const canAfford = (player.money || 0) >= cost
+    const labelColor = canAfford ? '#00ff88' : '#ff4444'
+    const text = `💰 ${cost}$  E to open`
+
+    ctx.save()
+    ctx.font = '14px monospace'
+    ctx.textAlign = 'center'
+    const textW = ctx.measureText(text).width
+    ctx.fillStyle = 'rgba(0,0,0,0.75)'
+    ctx.beginPath()
+    ctx.roundRect(screenX - textW / 2 - 8, screenY - 16, textW + 16, 22, 4)
+    ctx.fill()
+    ctx.fillStyle = labelColor
+    ctx.shadowBlur = 6
+    ctx.shadowColor = labelColor
+    ctx.fillText(text, screenX, screenY)
     ctx.restore()
   }
 }
