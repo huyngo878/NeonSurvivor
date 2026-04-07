@@ -299,4 +299,18 @@ describe('updateCollision — bleed DoT', () => {
     expect(enemy.hp).toBeCloseTo(25)
     expect(enemy.bleedTimer).toBeCloseTo(2.5)
   })
+
+  it('bleed only deals damage proportional to remaining bleedTimer on final tick', () => {
+    const player = createPlayer()
+    const enemy = createEnemy('chaser', 200, 200)
+    enemy.bleedTimer = 0.1
+    enemy.bleedDps = 100   // 100 dps × 0.1s remaining = 10 damage max
+    const pool = initProjectilePool()
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision([player, enemy, ...pool], gameState, 0.5)  // dt > bleedTimer
+    // Should take at most 10 damage (0.1s * 100 dps), not 50 (0.5s * 100 dps)
+    expect(enemy.hp).toBeGreaterThanOrEqual(20)   // 30 - 10 = 20
+    expect(enemy.bleedTimer).toBe(0)
+    expect(enemy.bleedDps).toBe(0)   // reset after expiry
+  })
 })

@@ -47,8 +47,10 @@ export function updateCollision(entities, gameState, dt = 0) {
   for (const e of enemies) {
     if (e.dead) continue
     if (e.bleedTimer > 0) {
+      const elapsed = Math.min(e.bleedTimer, dt)
       e.bleedTimer = Math.max(0, e.bleedTimer - dt)
-      e.hp -= e.bleedDps * dt
+      e.hp -= e.bleedDps * elapsed
+      if (e.bleedTimer === 0) e.bleedDps = 0
       if (e.hp <= 0 && !e.dead) {
         _killEnemy(e, entities, player, gameState)
       }
