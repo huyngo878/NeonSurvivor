@@ -1,5 +1,3 @@
-const ROCKET_SPEED = 300
-
 export function updateWeapons(entities, dt) {
   const player = entities.find(e => e.type === 'player')
   if (!player) return
@@ -104,8 +102,8 @@ function _tickRocket(weapon, dt, player, enemies, projectiles) {
     proj.active = true
     proj.pos.x = player.pos.x
     proj.pos.y = player.pos.y
-    proj.vel.x = (dx / dist) * ROCKET_SPEED
-    proj.vel.y = (dy / dist) * ROCKET_SPEED
+    proj.vel.x = (dx / dist) * weapon.projectileSpeed
+    proj.vel.y = (dy / dist) * weapon.projectileSpeed
     proj.age = 0
     proj.damage = weapon.damage
     proj.radius = 7
@@ -116,6 +114,7 @@ function _tickRocket(weapon, dt, player, enemies, projectiles) {
     proj.explosionCount = weapon.explosionCount
     proj.knockback = weapon.knockback
     proj.fragmentChance = weapon.fragmentChance
+    proj.centerDamageBonus = weapon.centerDamageBonus || 0
     proj.lastHitEnemyId = null
     proj.hitEnemyIds = new Set()
   }

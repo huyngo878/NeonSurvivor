@@ -1,7 +1,7 @@
 import { WORLD_W, WORLD_H, POOL_SIZE } from './constants.js'
 
 export const ENEMY_TYPES = {
-  chaser:    { speed: 120, hp: 30,   maxHp: 30,   radius: 8,  color: '#ff0080', damage: 10, gemValue: 1,  gemRadius: 6,  gemColor: '#00ff88', moneyValue: 1  },
+  chaser:    { speed: 120, hp: 30,   maxHp: 30,   radius: 8,  color: '#ff0080', damage: 10, gemValue: 2,  gemRadius: 6,  gemColor: '#00ff88', moneyValue: 1  },
   tank:      { speed: 55,  hp: 120,  maxHp: 120,  radius: 14, color: '#ff4400', damage: 20, gemValue: 3,  gemRadius: 8,  gemColor: '#ffd700', moneyValue: 3  },
   speedster: { speed: 220, hp: 18,   maxHp: 18,   radius: 6,  color: '#ff44ff', damage: 8,  gemValue: 1,  gemRadius: 6,  gemColor: '#00ffff', moneyValue: 2  },
   brute:     { speed: 35,  hp: 280,  maxHp: 280,  radius: 18, color: '#aa00ff', damage: 35, gemValue: 6,  gemRadius: 10, gemColor: '#cc88ff', moneyValue: 5  },
@@ -21,6 +21,7 @@ const WEAPON_CONFIGS = {
   rocket: {
     type: 'rocket', cooldown: 2.0, damage: 60, range: 500, shots: 1, aoeRadius: 80,
     explosionCount: 1, knockback: 0, fragmentChance: 0,
+    projectileSpeed: 300, centerDamageBonus: 0,
   },
 }
 
@@ -189,6 +190,7 @@ export function initProjectilePool() {
       explosionCount: 1,
       knockback: 0,
       fragmentChance: 0,
+      centerDamageBonus: 0,
       lastHitEnemyId: null,
       hitEnemyIds: new Set(),
     })

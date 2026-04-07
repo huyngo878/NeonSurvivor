@@ -156,13 +156,14 @@ function _rollPickupDrop(enemy, entities) {
   }
 }
 
-function _aoeExplosion(cx, cy, radius, damage, enemies, entities, player, gameState, skipEnemy) {
+function _aoeExplosion(cx, cy, radius, damage, enemies, entities, player, gameState, skipEnemy, centerBonus = 0) {
   entities.push(createShockwave(cx, cy, radius))
   for (const enemy of enemies) {
     if (enemy === skipEnemy || enemy.dead) continue
     const dist = Math.hypot(enemy.pos.x - cx, enemy.pos.y - cy)
     if (dist <= radius + enemy.radius) {
-      enemy.hp -= damage
+      const effectiveDamage = dist < radius * 0.3 ? damage * (1 + centerBonus) : damage
+      enemy.hp -= effectiveDamage
       _pushEnemy(enemy, cx, cy, player?.weapons.find(w => w.type === 'rocket')?.knockback || 0)
       if (enemy.hp <= 0) {
         _killEnemy(enemy, entities, player, gameState)
@@ -176,7 +177,8 @@ function _triggerRocketExplosions(proj, enemies, entities, player, gameState, sk
   for (let i = 0; i < count; i++) {
     const radius = proj.aoeRadius + i * 24
     const damage = proj.damage * (i === 0 ? 0.5 : 0.35)
-    _aoeExplosion(proj.pos.x, proj.pos.y, radius, damage, enemies, entities, player, gameState, skipEnemy)
+    const centerBonus = i === 0 ? (proj.centerDamageBonus || 0) : 0
+    _aoeExplosion(proj.pos.x, proj.pos.y, radius, damage, enemies, entities, player, gameState, skipEnemy, centerBonus)
   }
   if (proj.fragmentChance && Math.random() < proj.fragmentChance) {
     for (let i = 0; i < 6; i++) {

@@ -259,6 +259,36 @@ export const CARDS = [
     icon: '%',
     apply: player => { _weapon(player, 'rocket').fragmentChance = 0.45 },
   },
+  {
+    id: 'rocket_firerate',
+    label: 'RAPID RELOAD',
+    desc: 'Rocket fires 15% faster',
+    rarity: 'common',
+    requires: 'rocket',
+    icon: '↑',
+    apply: player => {
+      const w = _weapon(player, 'rocket')
+      w.cooldown = Math.max(0.5, w.cooldown * 0.85)
+    },
+  },
+  {
+    id: 'rocket_speed',
+    label: 'AFTERBURNER',
+    desc: 'Rockets travel faster',
+    rarity: 'common',
+    requires: 'rocket',
+    icon: '→',
+    apply: player => { _weapon(player, 'rocket').projectileSpeed += 60 },
+  },
+  {
+    id: 'rocket_center',
+    label: 'SHAPED CHARGE',
+    desc: 'Direct hits deal 50% bonus damage',
+    rarity: 'uncommon',
+    requires: 'rocket',
+    icon: '◎',
+    apply: player => { _weapon(player, 'rocket').centerDamageBonus += 0.5 },
+  },
 ]
 
 export function pickChestCards(player, n) {

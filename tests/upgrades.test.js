@@ -133,6 +133,32 @@ describe('pickChestCards', () => {
   })
 })
 
+describe('rocket stat cards', () => {
+  it('rocket_firerate reduces rocket cooldown', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('rocket')]
+    const before = player.weapons[0].cooldown
+    CARDS.find(c => c.id === 'rocket_firerate').apply(player)
+    expect(player.weapons[0].cooldown).toBeLessThan(before)
+  })
+
+  it('rocket_speed increases rocket projectileSpeed', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('rocket')]
+    const before = player.weapons[0].projectileSpeed
+    CARDS.find(c => c.id === 'rocket_speed').apply(player)
+    expect(player.weapons[0].projectileSpeed).toBeGreaterThan(before)
+  })
+
+  it('rocket_center increases centerDamageBonus', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('rocket')]
+    expect(player.weapons[0].centerDamageBonus).toBe(0)
+    CARDS.find(c => c.id === 'rocket_center').apply(player)
+    expect(player.weapons[0].centerDamageBonus).toBeGreaterThan(0)
+  })
+})
+
 describe('new stat cards', () => {
   it('wand_firerate reduces wand cooldown', () => {
     const player = createPlayer()
