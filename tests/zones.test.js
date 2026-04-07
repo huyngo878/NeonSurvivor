@@ -1,22 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { ZONE_LAYOUTS, spawnZoneChests } from '../src/zones.js'
-
-describe('ZONE_LAYOUTS', () => {
-  it('has at least one zone', () => {
-    expect(ZONE_LAYOUTS.length).toBeGreaterThanOrEqual(1)
-  })
-
-  it('zone 1 has 6 chest positions', () => {
-    expect(ZONE_LAYOUTS[0].chests).toHaveLength(6)
-  })
-
-  it('each chest position has x and y', () => {
-    for (const chest of ZONE_LAYOUTS[0].chests) {
-      expect(typeof chest.x).toBe('number')
-      expect(typeof chest.y).toBe('number')
-    }
-  })
-})
+import { spawnZoneChests } from '../src/zones.js'
+import { WORLD_W, WORLD_H } from '../src/constants.js'
 
 describe('spawnZoneChests', () => {
   it('adds 6 chestNode entities to entities array for zone 0', () => {
@@ -34,14 +18,37 @@ describe('spawnZoneChests', () => {
     }
   })
 
-  it('chest node positions match zone layout', () => {
+  it('chest nodes are placed within map bounds', () => {
+    const entities = []
+    spawnZoneChests(entities, 0)
+    for (const node of entities.filter(e => e.type === 'chestNode')) {
+      expect(node.pos.x).toBeGreaterThan(0)
+      expect(node.pos.x).toBeLessThan(WORLD_W)
+      expect(node.pos.y).toBeGreaterThan(0)
+      expect(node.pos.y).toBeLessThan(WORLD_H)
+    }
+  })
+
+  it('chest nodes are at least 600px from player start', () => {
+    const entities = []
+    const px = WORLD_W / 2
+    const py = WORLD_H / 2
+    spawnZoneChests(entities, 0, px, py)
+    for (const node of entities.filter(e => e.type === 'chestNode')) {
+      const dist = Math.hypot(node.pos.x - px, node.pos.y - py)
+      expect(dist).toBeGreaterThanOrEqual(600)
+    }
+  })
+
+  it('chest nodes are spaced at least 400px apart from each other', () => {
     const entities = []
     spawnZoneChests(entities, 0)
     const nodes = entities.filter(e => e.type === 'chestNode')
-    const layout = ZONE_LAYOUTS[0]
-    for (let i = 0; i < layout.chests.length; i++) {
-      expect(nodes[i].pos.x).toBe(layout.chests[i].x)
-      expect(nodes[i].pos.y).toBe(layout.chests[i].y)
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dist = Math.hypot(nodes[i].pos.x - nodes[j].pos.x, nodes[i].pos.y - nodes[j].pos.y)
+        expect(dist).toBeGreaterThanOrEqual(400)
+      }
     }
   })
 })
