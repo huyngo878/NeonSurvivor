@@ -6,6 +6,7 @@ const BASE_WAVES = [
   { enemyType: 'tank',      count: 1, interval: 16.2, minWave: 2  },
   { enemyType: 'speedster', count: 1, interval: 12.6, minWave: 11 },
   { enemyType: 'brute',     count: 1, interval: 23.4, minWave: 7  },
+  { enemyType: 'speedster', count: 1, interval: 22.0, minWave: 20 },
 ]
 
 const BOSS_PATTERNS = ['spiral', 'ring', 'cross']
@@ -73,11 +74,15 @@ export function updateSpawner(entities, state, dt, gameTime, gameState) {
 }
 
 export function getDensityMultiplier(wave) {
-  return _piecewiseScale(wave, 0.12, 1.25)
+  const base = _piecewiseScale(wave, 0.12, 1.25)
+  if (wave < 20) return base
+  return base * (1 + (wave - 20) * 0.04)
 }
 
 export function getHealthMultiplier(wave) {
-  return _piecewiseScale(wave, 0.10, 1.25)
+  const base = _piecewiseScale(wave, 0.10, 1.25)
+  if (wave < 20) return base
+  return base * (1 + (wave - 20) * 0.04)
 }
 
 function _piecewiseScale(wave, linearStep, spikeMult) {
