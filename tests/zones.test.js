@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest'
 import { ZONE_LAYOUTS, spawnZoneChests } from '../src/zones.js'
-import { createChestNode } from '../src/entities.js'
 
 describe('ZONE_LAYOUTS', () => {
   it('has at least one zone', () => {
