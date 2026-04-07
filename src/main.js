@@ -362,7 +362,7 @@ function loop(timestamp) {
 
   if (gameState.state === 'chest') {
     const player = entities.find(e => e.type === 'player')
-    renderWorld(ctx, canvas, entities, camera, gameState.zoom)
+    renderWorld(ctx, canvas, entities, camera, gameState.zoom, gameState)
     drawHud(ctx, canvas, player, gameState)
     drawLevelUpScreen(ctx, canvas, player, gameState)
     return
@@ -393,7 +393,7 @@ function loop(timestamp) {
 
   if (gameState.state === 'paused' || gameState.state === 'playing') {
     const player = entities.find(e => e.type === 'player')
-    renderWorld(ctx, canvas, entities, camera, gameState.zoom)
+    renderWorld(ctx, canvas, entities, camera, gameState.zoom, gameState)
     drawHud(ctx, canvas, player, gameState)
     if (isMobile) drawJoystick(ctx, canvas)
   }

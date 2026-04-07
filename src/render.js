@@ -1,4 +1,4 @@
-export function renderWorld(ctx, canvas, entities, camera, zoom = 1) {
+export function renderWorld(ctx, canvas, entities, camera, zoom = 1, gameState = {}) {
   ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight)
 
   ctx.save()
@@ -9,6 +9,7 @@ export function renderWorld(ctx, canvas, entities, camera, zoom = 1) {
     if (e.type === 'pickup') _drawPickup(ctx, e)
     else if (e.type === 'gem') _drawGem(ctx, e)
     else if (e.type === 'shockwave') _drawShockwave(ctx, e)
+    else if (e.type === 'chestNode') _drawChestNode(ctx, e, gameState)
   }
 
   for (const e of entities) {
@@ -147,6 +148,39 @@ function _drawPickup(ctx, pickup) {
   ctx.arc(x - 3, y + yOff - 3, pickup.radius * 0.35, 0, Math.PI * 2)
   ctx.fill()
   ctx.restore()
+}
+
+function _drawChestNode(ctx, node, gameState) {
+  const { x, y } = node.pos
+  const yOff = Math.sin(node.bobTimer * 2) * 3
+  const isNear = gameState.nearestChest?.node === node
+
+  ctx.save()
+
+  if (node.opened) {
+    // Opened — dark, no glow
+    ctx.fillStyle = '#333'
+    ctx.strokeStyle = '#555'
+    ctx.lineWidth = 1
+    ctx.fillRect(x - 10, y + yOff - 8, 20, 14)
+    ctx.strokeRect(x - 10, y + yOff - 8, 20, 14)
+  } else {
+    // Unopened — gold with glow, brighter when nearby
+    ctx.shadowBlur = isNear ? 28 : 14
+    ctx.shadowColor = '#ffd700'
+    // Lid
+    ctx.fillStyle = '#ffaa00'
+    ctx.fillRect(x - 10, y + yOff - 13, 20, 7)
+    // Body
+    ctx.fillStyle = '#ffd700'
+    ctx.fillRect(x - 10, y + yOff - 7, 20, 14)
+    // Latch
+    ctx.fillStyle = '#ffaa00'
+    ctx.fillRect(x - 3, y + yOff - 5, 6, 5)
+  }
+
+  ctx.restore()
+  node.bobTimer += 0.016  // approximate dt — actual dt not passed to render functions
 }
 
 function _drawShockwave(ctx, shockwave) {
