@@ -62,10 +62,11 @@ export const META_UPGRADES = [
     },
   },
   {
-    id: 'drop_rate', label: 'LUCKY', desc: '+3% chest drop chance per tier',
+    id: 'drop_rate', label: 'HEADSTART', desc: '+10 starting gold per tier',
     category: 'modifier',
     tiers: [60, 120, 200],
-    apply: (_player, _tier) => {
+    apply: (player, tier) => {
+      player.money = (player.money || 0) + tier * 10
     },
   },
 ]
