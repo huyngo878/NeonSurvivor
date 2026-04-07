@@ -2,10 +2,10 @@ import { SPAWN_RADIUS, WAVE_DURATION } from '../constants.js'
 import { createEnemy, ENEMY_TYPES } from '../entities.js'
 
 const BASE_WAVES = [
-  { enemyType: 'chaser',    count: 2, interval: 9.0,  minWave: 1  },
-  { enemyType: 'tank',      count: 1, interval: 18.0, minWave: 2  },
-  { enemyType: 'speedster', count: 1, interval: 14.0, minWave: 11 },
-  { enemyType: 'brute',     count: 1, interval: 26.0, minWave: 7  },
+  { enemyType: 'chaser',    count: 2, interval: 8.1,  minWave: 1  },
+  { enemyType: 'tank',      count: 1, interval: 16.2, minWave: 2  },
+  { enemyType: 'speedster', count: 1, interval: 12.6, minWave: 11 },
+  { enemyType: 'brute',     count: 1, interval: 23.4, minWave: 7  },
 ]
 
 const BOSS_PATTERNS = ['spiral', 'ring', 'cross']
@@ -18,6 +18,7 @@ export function createSpawnerState(spawnDelayBonus = 0) {
     intervalMult: 1.0 + spawnDelayBonus,
     currentWave: 1,
     bossWaveSpawned: 0,
+    lastBurstWave: 0,
   }
 }
 
@@ -38,6 +39,16 @@ export function updateSpawner(entities, state, dt, gameTime, gameState) {
       entities.push(_spawnEnemy('boss', player, _bossOverrides(wave)))
     }
     return
+  }
+
+  // Odd-wave burst: extra chasers when a new odd wave begins
+  if (wave % 2 === 1 && wave > 1 && state.lastBurstWave !== wave) {
+    state.lastBurstWave = wave
+    const burstCount = 2 + Math.floor(wave / 6)
+    const overrides = _enemyOverrides(wave, 'chaser')
+    for (let b = 0; b < burstCount; b++) {
+      entities.push(_spawnEnemy('chaser', player, overrides))
+    }
   }
 
   for (let i = 0; i < BASE_WAVES.length; i++) {
@@ -102,8 +113,8 @@ function _bossOverrides(wave) {
   const healthMult = getHealthMultiplier(wave) * 4
   const damageMult = getDensityMultiplier(wave)
   return {
-    hp: Math.round(625 * healthMult),
-    maxHp: Math.round(625 * healthMult),
+    hp: Math.round(450 * healthMult),
+    maxHp: Math.round(450 * healthMult),
     damage: Math.round(40 * damageMult),
     speed: 70 + tier * 5,
     bossPattern: BOSS_PATTERNS[(tier - 1) % BOSS_PATTERNS.length],

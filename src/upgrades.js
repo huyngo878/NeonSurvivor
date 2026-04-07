@@ -137,10 +137,9 @@ export const CARDS = [
     id: 'wand_shots',
     label: 'TWIN CAST',
     desc: '+1 wand projectile per attack',
-    rarity: 'uncommon',
+    rarity: 'common',
     requires: 'wand',
     icon: '2',
-    available: player => player.level >= 4,
     apply: player => { _weapon(player, 'wand').shots += 1 },
   },
   {
@@ -150,7 +149,7 @@ export const CARDS = [
     rarity: 'epic',
     requires: 'wand',
     icon: 'B',
-    available: player => player.level >= 6,
+    available: player => _weapon(player, 'wand').bounce < 5,
     apply: player => {
       const weapon = _weapon(player, 'wand')
       weapon.bounce = Math.min(5, weapon.bounce + 1)
@@ -163,7 +162,7 @@ export const CARDS = [
     rarity: 'legendary',
     requires: 'wand',
     icon: 'Y',
-    available: player => player.level >= 10 && _weapon(player, 'wand').forkCount < 3,
+    available: player => _weapon(player, 'wand').forkCount < 3,
     apply: player => {
       const weapon = _weapon(player, 'wand')
       weapon.forkCount = Math.min(3, weapon.forkCount + 1)
@@ -180,15 +179,14 @@ export const CARDS = [
     apply: player => { _weapon(player, 'wand').homing = 2 },
   },
   {
-    id: 'wand_strong_homing',
-    label: 'LOCKED ON',
-    desc: 'Wand projectiles track enemies relentlessly',
-    rarity: 'epic',
+    id: 'wand_multicast',
+    label: 'ECHO SHOT',
+    desc: '30% chance each wand shot fires a bonus free projectile',
+    rarity: 'rare',
     requires: 'wand',
-    icon: '⊕',
+    icon: '«',
     unique: true,
-    available: player => (_weapon(player, 'wand')?.homing || 0) > 0 && player.level >= 6,
-    apply: player => { _weapon(player, 'wand').homing = 8 },
+    apply: player => { _weapon(player, 'wand').multicastChance = 0.3 },
   },
 
   {
@@ -272,7 +270,6 @@ export const CARDS = [
     requires: 'whip',
     icon: '↺',
     unique: true,
-    available: player => player.level >= 8,
     apply: player => {
       const w = _weapon(player, 'whip')
       w.sweepAngle = Math.PI * 2
@@ -300,7 +297,6 @@ export const CARDS = [
     requires: 'wand',
     icon: '*',
     unique: true,
-    available: player => player.level >= 7,
     apply: player => {
       const w = _weapon(player, 'wand')
       w.explodeOnImpact = true
