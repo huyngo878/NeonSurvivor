@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createPlayer, createEnemy, createWeapon, createChest, createPickup, createGem, createMagnet, initProjectilePool, ENEMY_TYPES } from '../src/entities.js'
+import { createPlayer, createEnemy, createWeapon, createChest, createPickup, createGem, createMagnet, createChestNode, initProjectilePool, ENEMY_TYPES } from '../src/entities.js'
 import { POOL_SIZE, WORLD_W, WORLD_H } from '../src/constants.js'
 
 describe('createPlayer', () => {
@@ -127,5 +127,17 @@ describe('createMagnet', () => {
     expect(magnet.type).toBe('pickup')
     expect(magnet.pickupType).toBe('magnet')
     expect(magnet.pos).toEqual({ x: 100, y: 200 })
+  })
+})
+
+describe('createChestNode', () => {
+  it('returns a chestNode entity with correct shape', () => {
+    const node = createChestNode(750, 400)
+    expect(node.type).toBe('chestNode')
+    expect(node.pos).toEqual({ x: 750, y: 400 })
+    expect(node.radius).toBe(14)
+    expect(node.opened).toBe(false)
+    expect(node.bobTimer).toBe(0)
+    expect(typeof node.id).toBe('number')
   })
 })

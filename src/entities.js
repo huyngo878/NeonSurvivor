@@ -72,6 +72,17 @@ export function createMagnet(x, y) {
   }
 }
 
+export function createChestNode(x, y) {
+  return {
+    id: nextId++,
+    type: 'chestNode',
+    pos: { x, y },
+    radius: 14,
+    opened: false,
+    bobTimer: 0,
+  }
+}
+
 export function createGem(value, radius, color, x, y) {
   return {
     id: nextId++,
