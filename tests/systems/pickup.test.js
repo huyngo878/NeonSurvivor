@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { updatePickup, updateChestNodes, chestCost } from '../../src/systems/pickup.js'
-import { createPlayer, createChest, createPickup, createWeapon, createMagnet, createGem, createChestNode, initProjectilePool } from '../../src/entities.js'
+import { createPlayer, createChest, createPickup, createWeapon, createMagnet, createGem, createChestNode } from '../../src/entities.js'
 
 describe('updatePickup', () => {
   it('adds weapon to player when pickup is within range', () => {
