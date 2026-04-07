@@ -164,6 +164,27 @@ function _drawChestNode(ctx, node, gameState) {
     ctx.lineWidth = 1
     ctx.fillRect(x - 10, y + yOff - 8, 20, 14)
     ctx.strokeRect(x - 10, y + yOff - 8, 20, 14)
+  } else if (node.sparkly) {
+    // Sparkly chest — purple/pink with animated sparkle glow
+    const pulse = 0.7 + 0.3 * Math.sin(node.bobTimer * 5)
+    ctx.shadowBlur = (isNear ? 36 : 20) * pulse
+    ctx.shadowColor = '#dd00ff'
+    // Lid
+    ctx.fillStyle = '#aa00cc'
+    ctx.fillRect(x - 11, y + yOff - 14, 22, 8)
+    // Body
+    ctx.fillStyle = '#cc44ff'
+    ctx.fillRect(x - 11, y + yOff - 7, 22, 15)
+    // Latch
+    ctx.fillStyle = '#ff88ff'
+    ctx.fillRect(x - 3, y + yOff - 5, 6, 5)
+    // Star sparkles
+    ctx.fillStyle = `rgba(255,220,255,${0.5 + 0.5 * Math.sin(node.bobTimer * 7)})`
+    ctx.beginPath()
+    ctx.arc(x - 8, y + yOff - 16, 2, 0, Math.PI * 2)
+    ctx.arc(x + 9, y + yOff - 15, 1.5, 0, Math.PI * 2)
+    ctx.arc(x + 2, y + yOff - 20, 1.5, 0, Math.PI * 2)
+    ctx.fill()
   } else {
     // Unopened — gold with glow, brighter when nearby
     ctx.shadowBlur = isNear ? 28 : 14

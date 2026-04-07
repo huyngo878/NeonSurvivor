@@ -3,12 +3,15 @@ import { spawnZoneChests } from '../src/zones.js'
 import { WORLD_W, WORLD_H } from '../src/constants.js'
 
 describe('spawnZoneChests', () => {
-  it('adds between 13 and 19 chestNode entities for zone 0', () => {
+  it('adds between 16 and 24 chestNode entities for zone 0 (13-19 regular + 3-5 sparkly)', () => {
     const entities = []
     spawnZoneChests(entities, 0)
     const nodes = entities.filter(e => e.type === 'chestNode')
-    expect(nodes.length).toBeGreaterThanOrEqual(13)
-    expect(nodes.length).toBeLessThanOrEqual(19)
+    expect(nodes.length).toBeGreaterThanOrEqual(16)
+    expect(nodes.length).toBeLessThanOrEqual(24)
+    const sparkly = nodes.filter(n => n.sparkly)
+    expect(sparkly.length).toBeGreaterThanOrEqual(3)
+    expect(sparkly.length).toBeLessThanOrEqual(5)
   })
 
   it('chest nodes are not opened by default', () => {

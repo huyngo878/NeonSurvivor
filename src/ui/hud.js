@@ -157,8 +157,8 @@ export function drawHud(ctx, canvas, player, gameState) {
     const screenY = (node.pos.y - gameState.camera.y) * zoom - 28
 
     const canAfford = (player.money ?? 0) >= cost
-    const labelColor = canAfford ? '#00ff88' : '#ff4444'
-    const text = `💰 ${cost}$  E to open`
+    const labelColor = node.sparkly ? '#dd00ff' : (canAfford ? '#00ff88' : '#ff4444')
+    const text = node.sparkly ? `✨ FREE  E to open` : `💰 ${cost}$  E to open`
 
     ctx.save()
     ctx.font = '14px monospace'

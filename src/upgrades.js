@@ -394,6 +394,20 @@ export const CARDS = [
   },
 ]
 
+const SPARKLY_WEIGHTS = { epic: 70, legendary: 30 }
+
+export function pickSparklyCards(player, n) {
+  const eligible = CARDS.filter(card => {
+    if (card.rarity !== 'epic' && card.rarity !== 'legendary') return false
+    if (card.requires && !_weapon(player, card.requires)) return false
+    if (card.excludes && _weapon(player, card.excludes)) return false
+    if (card.unique && player.cardHistory?.includes(card.id)) return false
+    if (card.available && !card.available(player)) return false
+    return true
+  })
+  return _weightedSample(eligible, n, SPARKLY_WEIGHTS)
+}
+
 export function pickChestCards(player, n) {
   const eligible = CARDS.filter(card => {
     if (card.requires && !_weapon(player, card.requires)) return false
@@ -405,14 +419,14 @@ export function pickChestCards(player, n) {
   return _weightedSample(eligible, n)
 }
 
-function _weightedSample(pool, n) {
+function _weightedSample(pool, n, weights = WEIGHTS) {
   const result = []
   const remaining = [...pool]
   while (result.length < n && remaining.length > 0) {
-    const totalWeight = remaining.reduce((sum, card) => sum + WEIGHTS[card.rarity], 0)
+    const totalWeight = remaining.reduce((sum, card) => sum + weights[card.rarity], 0)
     let r = Math.random() * totalWeight
     for (let i = 0; i < remaining.length; i++) {
-      r -= WEIGHTS[remaining[i].rarity]
+      r -= weights[remaining[i].rarity]
       if (r <= 0) {
         result.push(remaining[i])
         remaining.splice(i, 1)

@@ -65,7 +65,7 @@ export function updateChestNodes(entities, player, gameState, dt = 0) {
   }
 
   gameState.nearestChest = nearest
-    ? { node: nearest, cost: chestCost(gameState.chestsOpened || 0) }
+    ? { node: nearest, cost: nearest.sparkly ? 0 : chestCost(gameState.chestsOpened || 0) }
     : null
 }
 

@@ -56,7 +56,7 @@ describe('updateGems', () => {
     const entities = [player, gem]
     updateGems(entities, player, 0.016, { state: 'playing' })
     const chests = entities.filter(entity => entity.type === 'pickup' && entity.pickupType === 'chest')
-    expect(player.level).toBe(3)
+    expect(player.level).toBe(4)
     expect(chests.length).toBe(player.level - 1)
   })
 

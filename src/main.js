@@ -6,7 +6,7 @@ import { updateWeapons } from './systems/weapons.js'
 import { updateSpawner, createSpawnerState } from './systems/spawner.js'
 import { updatePickup, updateChestNodes } from './systems/pickup.js'
 import { spawnZoneChests } from './zones.js'
-import { pickChestCards } from './upgrades.js'
+import { pickChestCards, pickSparklyCards } from './upgrades.js'
 import { updateGems } from './systems/gems.js'
 import { renderWorld } from './render.js'
 import { drawHud } from './ui/hud.js'
@@ -235,7 +235,9 @@ function _openChest() {
   gameState.chestsOpened += 1
   nc.node.opened = true
   gameState.nearestChest = null
-  gameState.upgradeChoices = pickChestCards(player, 3 + (player.extraChoices || 0))
+  gameState.upgradeChoices = nc.node.sparkly
+    ? pickSparklyCards(player, 3 + (player.extraChoices || 0))
+    : pickChestCards(player, 3 + (player.extraChoices || 0))
   gameState.state = 'chest'
   return true
 }

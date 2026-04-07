@@ -98,6 +98,18 @@ export function createChestNode(x, y) {
   }
 }
 
+export function createSparklyChestNode(x, y) {
+  return {
+    id: nextId++,
+    type: 'chestNode',
+    pos: { x, y },
+    radius: 14,
+    opened: false,
+    bobTimer: 0,
+    sparkly: true,
+  }
+}
+
 export function createPlayer() {
   return {
     id: nextId++,
