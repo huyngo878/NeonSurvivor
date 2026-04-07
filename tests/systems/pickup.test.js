@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { updatePickup } from '../../src/systems/pickup.js'
-import { createPlayer, createChest, createPickup, createMagnet, createGem, createWeapon } from '../../src/entities.js'
+import { updatePickup, updateChestNodes, chestCost } from '../../src/systems/pickup.js'
+import { createPlayer, createChest, createPickup, createWeapon, createMagnet, createGem, createChestNode, initProjectilePool } from '../../src/entities.js'
 
 describe('updatePickup', () => {
   it('adds weapon to player when pickup is within range', () => {
@@ -78,5 +78,67 @@ describe('updatePickup - magnet', () => {
     updatePickup(entities, player, 0.016, { state: 'playing' })
     expect(gem1.attracted).toBe(true)
     expect(gem2.attracted).toBe(true)
+  })
+})
+
+describe('chestCost', () => {
+  it('returns 10 when 0 chests opened', () => {
+    expect(chestCost(0)).toBe(10)
+  })
+
+  it('returns 12 when 1 chest opened', () => {
+    expect(chestCost(1)).toBe(12)
+  })
+
+  it('increases monotonically', () => {
+    for (let i = 0; i < 10; i++) {
+      expect(chestCost(i + 1)).toBeGreaterThan(chestCost(i))
+    }
+  })
+})
+
+describe('updateChestNodes', () => {
+  it('sets nearestChest when player is within 80px of an unopened node', () => {
+    const player = createPlayer()
+    player.pos = { x: 100, y: 100 }
+    const node = createChestNode(160, 100)  // 60px away
+    const entities = [player, node]
+    const gameState = { nearestChest: null, chestsOpened: 0 }
+    updateChestNodes(entities, player, gameState)
+    expect(gameState.nearestChest).not.toBeNull()
+    expect(gameState.nearestChest.node).toBe(node)
+    expect(gameState.nearestChest.cost).toBe(10)
+  })
+
+  it('sets nearestChest to null when no node is in range', () => {
+    const player = createPlayer()
+    player.pos = { x: 100, y: 100 }
+    const node = createChestNode(500, 500)  // far away
+    const entities = [player, node]
+    const gameState = { nearestChest: null, chestsOpened: 0 }
+    updateChestNodes(entities, player, gameState)
+    expect(gameState.nearestChest).toBeNull()
+  })
+
+  it('ignores opened nodes', () => {
+    const player = createPlayer()
+    player.pos = { x: 100, y: 100 }
+    const node = createChestNode(110, 100)
+    node.opened = true
+    const entities = [player, node]
+    const gameState = { nearestChest: null, chestsOpened: 0 }
+    updateChestNodes(entities, player, gameState)
+    expect(gameState.nearestChest).toBeNull()
+  })
+
+  it('picks the nearest node when multiple are in range', () => {
+    const player = createPlayer()
+    player.pos = { x: 100, y: 100 }
+    const near = createChestNode(130, 100)   // 30px
+    const farther = createChestNode(170, 100)  // 70px
+    const entities = [player, near, farther]
+    const gameState = { nearestChest: null, chestsOpened: 0 }
+    updateChestNodes(entities, player, gameState)
+    expect(gameState.nearestChest.node).toBe(near)
   })
 })

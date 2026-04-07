@@ -43,6 +43,30 @@ export function updatePickup(entities, player, dt, gameState) {
   }
 }
 
+export function chestCost(chestsOpened) {
+  return Math.floor(10 * Math.pow(1.22, chestsOpened))
+}
+
+export function updateChestNodes(entities, player, gameState) {
+  if (!player) return
+  const PROXIMITY = 80
+  let nearest = null
+  let nearestDist = Infinity
+
+  for (const e of entities) {
+    if (e.type !== 'chestNode' || e.opened) continue
+    const dist = Math.hypot(e.pos.x - player.pos.x, e.pos.y - player.pos.y)
+    if (dist <= PROXIMITY && dist < nearestDist) {
+      nearest = e
+      nearestDist = dist
+    }
+  }
+
+  gameState.nearestChest = nearest
+    ? { node: nearest, cost: chestCost(gameState.chestsOpened || 0) }
+    : null
+}
+
 function _upgradeWeapon(weapon) {
   if (weapon.type === 'wand') {
     weapon.shots += 1
