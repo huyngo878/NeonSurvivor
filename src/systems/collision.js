@@ -34,7 +34,7 @@ function cellKey(cx, cy) { return `${cx},${cy}` }
 
 // --- Hit Detection ---
 
-export function updateCollision(entities, gameState) {
+export function updateCollision(entities, gameState, dt = 0) {
   const player = entities.find(e => e.type === 'player')
   const enemies = entities.filter(e => e.type === 'enemy')
   const projectiles = entities.filter(e => e.type === 'projectile' && e.active)
@@ -42,6 +42,18 @@ export function updateCollision(entities, gameState) {
 
   const hash = createSpatialHash()
   for (const enemy of enemies) shInsert(hash, enemy)
+
+  // Tick bleed DoT
+  for (const e of enemies) {
+    if (e.dead) continue
+    if (e.bleedTimer > 0) {
+      e.bleedTimer = Math.max(0, e.bleedTimer - dt)
+      e.hp -= e.bleedDps * dt
+      if (e.hp <= 0 && !e.dead) {
+        _killEnemy(e, entities, player, gameState)
+      }
+    }
+  }
 
   // Handle exploding rockets (expired aoe projectiles set proj.explode in movement.js)
   for (const proj of projectiles) {
@@ -107,6 +119,10 @@ export function updateCollision(entities, gameState) {
         _pushEnemy(enemy, player.pos.x, player.pos.y, weapon.knockback || 0)
         weapon.hitIds.add(enemy.id)
         if (weapon.slowOnHit) enemy.slowTimer = 1.5
+        if (weapon.bleedOnHit) {
+          enemy.bleedTimer = 3
+          enemy.bleedDps = (enemy.bleedDps || 0) + weapon.bleedDps
+        }
         if (enemy.hp <= 0) {
           _killEnemy(enemy, entities, player, gameState)
         }

@@ -169,6 +169,27 @@ export const CARDS = [
       weapon.forkCount = Math.min(3, weapon.forkCount + 1)
     },
   },
+  {
+    id: 'wand_homing',
+    label: 'SEEKER CORE',
+    desc: 'Wand projectiles home toward enemies',
+    rarity: 'uncommon',
+    requires: 'wand',
+    icon: '⟳',
+    unique: true,
+    apply: player => { _weapon(player, 'wand').homing = 2 },
+  },
+  {
+    id: 'wand_strong_homing',
+    label: 'LOCKED ON',
+    desc: 'Wand projectiles track enemies relentlessly',
+    rarity: 'epic',
+    requires: 'wand',
+    icon: '⊕',
+    unique: true,
+    available: player => (_weapon(player, 'wand')?.homing || 0) > 0 && player.level >= 6,
+    apply: player => { _weapon(player, 'wand').homing = 8 },
+  },
 
   {
     id: 'whip_knockback',
@@ -232,6 +253,19 @@ export const CARDS = [
     icon: '*',
     unique: true,
     apply: player => { _weapon(player, 'whip').slowOnHit = true },
+  },
+  {
+    id: 'whip_bleed',
+    label: 'BARBED WIRE',
+    desc: 'Whip applies 5 damage/sec bleed for 3s',
+    rarity: 'uncommon',
+    requires: 'whip',
+    icon: '~',
+    apply: player => {
+      const w = _weapon(player, 'whip')
+      w.bleedOnHit = true
+      w.bleedDps = (w.bleedDps || 0) + 5
+    },
   },
   {
     id: 'rocket_multi',

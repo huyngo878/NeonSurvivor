@@ -159,6 +159,34 @@ describe('rocket stat cards', () => {
   })
 })
 
+describe('bleed card', () => {
+  it('whip_bleed sets bleedOnHit=true and bleedDps > 0', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('whip')]
+    CARDS.find(c => c.id === 'whip_bleed').apply(player)
+    expect(player.weapons[0].bleedOnHit).toBe(true)
+    expect(player.weapons[0].bleedDps).toBeGreaterThan(0)
+  })
+})
+
+describe('homing cards', () => {
+  it('wand_homing sets weapon.homing > 0', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    expect(player.weapons[0].homing).toBe(0)
+    CARDS.find(c => c.id === 'wand_homing').apply(player)
+    expect(player.weapons[0].homing).toBeGreaterThan(0)
+  })
+
+  it('wand_strong_homing not available without wand_homing', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    player.level = 10
+    const picks = pickChestCards(player, 100)
+    expect(picks.some(c => c.id === 'wand_strong_homing')).toBe(false)
+  })
+})
+
 describe('new stat cards', () => {
   it('wand_slow sets weapon.slowOnHit to true', () => {
     const player = createPlayer()

@@ -375,7 +375,7 @@ function loop(timestamp) {
     const effectiveInput = isMobile ? { ...input, ...getJoystickInput() } : input
     updateMovement(entities, dt, effectiveInput)
     updateWeapons(entities, dt)
-    updateCollision(entities, gameState)
+    updateCollision(entities, gameState, dt)
     updateSpawner(entities, spawnerState, dt, gameState.time, gameState)
     if (player) {
       updatePickup(entities, player, dt, gameState)

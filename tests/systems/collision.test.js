@@ -268,3 +268,35 @@ describe('updateCollision — slow on hit', () => {
     expect(enemy.slowTimer || 0).toBe(0)
   })
 })
+
+describe('updateCollision — bleed DoT', () => {
+  it('whip with bleedOnHit sets bleedTimer and bleedDps on enemy', () => {
+    const player = createPlayer()
+    player.pos = { x: 500, y: 500 }
+    player.weapons = [createWeapon('whip')]
+    player.weapons[0].active = true
+    player.weapons[0].activeTimer = 0.1
+    player.weapons[0].bleedOnHit = true
+    player.weapons[0].bleedDps = 5
+    player.weapons[0].aimAngle = 0  // facing right
+    const enemy = createEnemy('chaser', 550, 500)
+    const pool = initProjectilePool()
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision([player, enemy, ...pool], gameState, 0)
+    expect(enemy.bleedTimer).toBeGreaterThan(0)
+    expect(enemy.bleedDps).toBeGreaterThan(0)
+  })
+
+  it('bleed deals damage each dt tick', () => {
+    const player = createPlayer()
+    const enemy = createEnemy('chaser', 200, 200)
+    enemy.bleedTimer = 3
+    enemy.bleedDps = 10
+    const pool = initProjectilePool()
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision([player, enemy, ...pool], gameState, 0.5)
+    // 10 dps * 0.5s = 5 damage; chaser maxHp is 30
+    expect(enemy.hp).toBeCloseTo(25)
+    expect(enemy.bleedTimer).toBeCloseTo(2.5)
+  })
+})
