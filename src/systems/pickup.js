@@ -44,7 +44,7 @@ export function updatePickup(entities, player, dt, gameState) {
 }
 
 export function chestCost(chestsOpened) {
-  return Math.floor(10 * Math.pow(1.22, chestsOpened))
+  return chestsOpened === 0 ? 5 : Math.floor(10 * Math.pow(1.22, chestsOpened))
 }
 
 export function updateChestNodes(entities, player, gameState, dt = 0) {

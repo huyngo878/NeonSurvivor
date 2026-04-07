@@ -82,16 +82,20 @@ describe('updatePickup - magnet', () => {
 })
 
 describe('chestCost', () => {
-  it('returns 10 when 0 chests opened', () => {
-    expect(chestCost(0)).toBe(10)
+  it('returns 5 when 0 chests opened (first chest discount)', () => {
+    expect(chestCost(0)).toBe(5)
   })
 
   it('returns 12 when 1 chest opened', () => {
     expect(chestCost(1)).toBe(12)
   })
 
-  it('increases monotonically', () => {
-    for (let i = 0; i < 10; i++) {
+  it('returns 14 when 2 chests opened', () => {
+    expect(chestCost(2)).toBe(14)
+  })
+
+  it('increases monotonically after first chest', () => {
+    for (let i = 1; i < 10; i++) {
       expect(chestCost(i + 1)).toBeGreaterThan(chestCost(i))
     }
   })
@@ -107,7 +111,7 @@ describe('updateChestNodes', () => {
     updateChestNodes(entities, player, gameState)
     expect(gameState.nearestChest).not.toBeNull()
     expect(gameState.nearestChest.node).toBe(node)
-    expect(gameState.nearestChest.cost).toBe(10)
+    expect(gameState.nearestChest.cost).toBe(5)
   })
 
   it('sets nearestChest to null when no node is in range', () => {
