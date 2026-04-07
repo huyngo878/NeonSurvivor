@@ -117,16 +117,7 @@ document.addEventListener('keydown', e => {
   }
 
   if (e.code === 'KeyE' && gameState.state === 'playing') {
-    const nc = gameState.nearestChest
-    const player = entities.find(ent => ent.type === 'player')
-    if (nc && player && player.money >= nc.cost) {
-      player.money -= nc.cost
-      gameState.chestsOpened = (gameState.chestsOpened || 0) + 1
-      nc.node.opened = true
-      gameState.nearestChest = null
-      gameState.upgradeChoices = pickChestCards(player, 3 + (player.extraChoices || 0))
-      gameState.state = 'chest'
-    }
+    _openChest()
   }
 
   if (gameState.state === 'paused') {
@@ -220,19 +211,7 @@ if (isMobile) {
     if (gameState.state === 'playing' && inJoystickZone) {
       joystickTouchStart(t)
     } else {
-      if (gameState.state === 'playing' && !inJoystickZone) {
-        const nc = gameState.nearestChest
-        const player = entities.find(ent => ent.type === 'player')
-        if (nc && player && player.money >= nc.cost) {
-          player.money -= nc.cost
-          gameState.chestsOpened = (gameState.chestsOpened || 0) + 1
-          nc.node.opened = true
-          gameState.nearestChest = null
-          gameState.upgradeChoices = pickChestCards(player, 3 + (player.extraChoices || 0))
-          gameState.state = 'chest'
-          return
-        }
-      }
+      if (gameState.state === 'playing' && !inJoystickZone && _openChest()) return
       _handlePointer(t.clientX, t.clientY)
     }
   }, { passive: false })
@@ -246,6 +225,19 @@ if (isMobile) {
     e.preventDefault()
     joystickTouchEnd()
   }, { passive: false })
+}
+
+function _openChest() {
+  const nc = gameState.nearestChest
+  const player = entities.find(ent => ent.type === 'player')
+  if (!nc || !player || player.money < nc.cost) return false
+  player.money -= nc.cost
+  gameState.chestsOpened += 1
+  nc.node.opened = true
+  gameState.nearestChest = null
+  gameState.upgradeChoices = pickChestCards(player, 3 + (player.extraChoices || 0))
+  gameState.state = 'chest'
+  return true
 }
 
 function _navigateMenu(state) {
