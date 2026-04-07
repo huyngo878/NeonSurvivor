@@ -1,5 +1,5 @@
 import { CELL_SIZE } from '../constants.js'
-import { ENEMY_TYPES, createChest, createGem, createMagnet, createShockwave, createEnemyProjectile } from '../entities.js'
+import { ENEMY_TYPES, createGem, createMagnet, createShockwave, createEnemyProjectile } from '../entities.js'
 
 const MAX_ENEMY_RADIUS = Math.max(...Object.values(ENEMY_TYPES).map(e => e.radius))
 
@@ -149,13 +149,7 @@ function _dropGem(enemy, entities) {
 }
 
 function _rollPickupDrop(enemy, entities, player) {
-  const bonus = player ? (player.dropRateBonus || 0) : 0
-  const chestRate = 0.01 + bonus
   const magnetRate = 0.005
-
-  if (Math.random() < chestRate) {
-    entities.push(createChest(enemy.pos.x, enemy.pos.y))
-  }
 
   if (Math.random() < magnetRate) {
     entities.push(createMagnet(enemy.pos.x, enemy.pos.y))
@@ -213,6 +207,10 @@ function _killEnemy(enemy, entities, player, gameState) {
   enemy.dead = true
   _dropGem(enemy, entities)
   _rollPickupDrop(enemy, entities, player)
+  if (player) {
+    const cfg = ENEMY_TYPES[enemy.enemyType]
+    if (cfg) player.money = (player.money || 0) + cfg.moneyValue
+  }
   if (enemy.enemyType === 'boss') {
     gameState.kills += 9
   }

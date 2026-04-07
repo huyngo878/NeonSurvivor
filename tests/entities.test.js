@@ -42,6 +42,13 @@ describe('createEnemy', () => {
   it('throws on unknown enemy type', () => {
     expect(() => createEnemy('dragon', 0, 0)).toThrow('Unknown enemy type: dragon')
   })
+
+  it('all ENEMY_TYPES have a moneyValue', () => {
+    for (const [type, cfg] of Object.entries(ENEMY_TYPES)) {
+      expect(typeof cfg.moneyValue, `${type} missing moneyValue`).toBe('number')
+      expect(cfg.moneyValue).toBeGreaterThan(0)
+    }
+  })
 })
 
 describe('initProjectilePool', () => {

@@ -162,3 +162,46 @@ describe('updateCollision — whip arc', () => {
     expect(enemy.hp).toBe(enemy.maxHp)
   })
 })
+
+describe('updateCollision — money on kill', () => {
+  it('awards chaser moneyValue to player on kill', () => {
+    const player = createPlayer()
+    player.money = 0
+    const enemy = createEnemy('chaser', 200, 200)
+    enemy.hp = 1
+    const pool = initProjectilePool()
+    const proj = pool[0]
+    proj.active = true; proj.pos = { x: 200, y: 200 }; proj.vel = { x: 0, y: 0 }
+    proj.damage = 5; proj.radius = 4; proj.aoe = false; proj.weaponType = 'wand'
+    const gameState = { kills: 0, state: 'playing', time: 0, chestsOpened: 0 }
+    updateCollision([player, enemy, ...pool], gameState)
+    expect(player.money).toBe(1)
+  })
+
+  it('awards boss moneyValue 25 on kill', () => {
+    const player = createPlayer()
+    player.money = 10
+    const enemy = createEnemy('boss', 200, 200)
+    enemy.hp = 1
+    const pool = initProjectilePool()
+    const proj = pool[0]
+    proj.active = true; proj.pos = { x: 200, y: 200 }; proj.vel = { x: 0, y: 0 }
+    proj.damage = 5; proj.radius = 4; proj.aoe = false; proj.weaponType = 'wand'
+    const gameState = { kills: 0, state: 'playing', time: 0, chestsOpened: 0 }
+    updateCollision([player, enemy, ...pool], gameState)
+    expect(player.money).toBe(35)
+  })
+
+  it('does not crash when player has no money field', () => {
+    const player = createPlayer()
+    // no player.money set
+    const enemy = createEnemy('chaser', 200, 200)
+    enemy.hp = 1
+    const pool = initProjectilePool()
+    const proj = pool[0]
+    proj.active = true; proj.pos = { x: 200, y: 200 }; proj.vel = { x: 0, y: 0 }
+    proj.damage = 5; proj.radius = 4; proj.aoe = false; proj.weaponType = 'wand'
+    const gameState = { kills: 0, state: 'playing', time: 0, chestsOpened: 0 }
+    expect(() => updateCollision([player, enemy, ...pool], gameState)).not.toThrow()
+  })
+})

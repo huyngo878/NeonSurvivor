@@ -1,11 +1,11 @@
 import { WORLD_W, WORLD_H, POOL_SIZE } from './constants.js'
 
 export const ENEMY_TYPES = {
-  chaser:    { speed: 120, hp: 30,  maxHp: 30,  radius: 8,  color: '#ff0080', damage: 10, gemValue: 1, gemRadius: 6,  gemColor: '#00ff88' },
-  tank:      { speed: 55,  hp: 120, maxHp: 120, radius: 14, color: '#ff4400', damage: 20, gemValue: 3, gemRadius: 8,  gemColor: '#ffd700' },
-  speedster: { speed: 220, hp: 18,  maxHp: 18,  radius: 6,  color: '#ff44ff', damage: 8,  gemValue: 1, gemRadius: 6,  gemColor: '#00ffff' },
-  brute:     { speed: 35,  hp: 280, maxHp: 280, radius: 18, color: '#aa00ff', damage: 35, gemValue: 6, gemRadius: 10, gemColor: '#cc88ff' },
-  boss:      { speed: 70,  hp: 2500, maxHp: 2500, radius: 30, color: '#ffcc00', damage: 40, gemValue: 20, gemRadius: 12, gemColor: '#ffffff' },
+  chaser:    { speed: 120, hp: 30,   maxHp: 30,   radius: 8,  color: '#ff0080', damage: 10, gemValue: 1,  gemRadius: 6,  gemColor: '#00ff88', moneyValue: 1  },
+  tank:      { speed: 55,  hp: 120,  maxHp: 120,  radius: 14, color: '#ff4400', damage: 20, gemValue: 3,  gemRadius: 8,  gemColor: '#ffd700', moneyValue: 3  },
+  speedster: { speed: 220, hp: 18,   maxHp: 18,   radius: 6,  color: '#ff44ff', damage: 8,  gemValue: 1,  gemRadius: 6,  gemColor: '#00ffff', moneyValue: 2  },
+  brute:     { speed: 35,  hp: 280,  maxHp: 280,  radius: 18, color: '#aa00ff', damage: 35, gemValue: 6,  gemRadius: 10, gemColor: '#cc88ff', moneyValue: 5  },
+  boss:      { speed: 70,  hp: 2500, maxHp: 2500, radius: 30, color: '#ffcc00', damage: 40, gemValue: 20, gemRadius: 12, gemColor: '#ffffff', moneyValue: 25 },
 }
 
 const WEAPON_CONFIGS = {
@@ -106,6 +106,7 @@ export function createPlayer() {
     dropRateBonus: 0,   // extra chest drop % (meta upgrade)
     spawnDelayBonus: 0, // starting intervalMult bonus (meta upgrade)
     armor: 0,
+    money: 0,
   }
 }
 
