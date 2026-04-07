@@ -32,7 +32,7 @@ export function drawHud(ctx, canvas, player, gameState) {
   ctx.fillStyle = '#ffd700'
   ctx.shadowBlur = 8
   ctx.shadowColor = '#ffd700'
-  ctx.fillText(`💰 ${player.money || 0}$`, barX, barY + barH + 40)
+  ctx.fillText(`💰 ${player.money ?? 0}$`, barX, barY + barH + 40)
   ctx.restore()
 
   const mm = String(Math.floor(gameState.time / 60)).padStart(2, '0')
@@ -156,7 +156,7 @@ export function drawHud(ctx, canvas, player, gameState) {
     const screenX = (node.pos.x - gameState.camera.x) * zoom
     const screenY = (node.pos.y - gameState.camera.y) * zoom - 28
 
-    const canAfford = (player.money || 0) >= cost
+    const canAfford = (player.money ?? 0) >= cost
     const labelColor = canAfford ? '#00ff88' : '#ff4444'
     const text = `💰 ${cost}$  E to open`
 
@@ -166,7 +166,7 @@ export function drawHud(ctx, canvas, player, gameState) {
     const textW = ctx.measureText(text).width
     ctx.fillStyle = 'rgba(0,0,0,0.75)'
     ctx.beginPath()
-    ctx.roundRect(screenX - textW / 2 - 8, screenY - 16, textW + 16, 22, 4)
+    ctx.roundRect(screenX - textW / 2 - 8, screenY - 14, textW + 16, 20, 4)
     ctx.fill()
     ctx.fillStyle = labelColor
     ctx.shadowBlur = 6
