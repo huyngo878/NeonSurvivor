@@ -1,6 +1,6 @@
 import { createWeapon } from './entities.js'
 
-const WEIGHTS = { common: 55, rare: 25, epic: 10, legendary: 10 }
+const WEIGHTS = { common: 50, uncommon: 30, rare: 15, epic: 5, legendary: 3 }
 
 export const CARDS = [
   {
@@ -37,6 +37,36 @@ export const CARDS = [
     rarity: 'common',
     icon: '>',
     apply: player => { player.speed *= 1.1 },
+  },
+  {
+    id: 'wand_firerate',
+    label: 'QUICKLOAD',
+    desc: 'Wand fires 12% faster',
+    rarity: 'common',
+    requires: 'wand',
+    icon: '↑',
+    apply: player => {
+      const w = _weapon(player, 'wand')
+      w.cooldown = Math.max(0.15, w.cooldown * 0.88)
+    },
+  },
+  {
+    id: 'wand_range',
+    label: 'LONG REACH',
+    desc: 'Wand range +60',
+    rarity: 'uncommon',
+    requires: 'wand',
+    icon: '→',
+    apply: player => { _weapon(player, 'wand').range += 60 },
+  },
+  {
+    id: 'whip_range',
+    label: 'EXTENDED CHAIN',
+    desc: 'Whip range +20',
+    rarity: 'common',
+    requires: 'whip',
+    icon: '↔',
+    apply: player => { _weapon(player, 'whip').range += 20 },
   },
   {
     id: 'unlock_wand',

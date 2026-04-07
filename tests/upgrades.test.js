@@ -8,7 +8,7 @@ describe('CARDS', () => {
       expect(typeof card.id).toBe('string')
       expect(typeof card.label).toBe('string')
       expect(typeof card.desc).toBe('string')
-      expect(['common', 'rare', 'epic', 'legendary']).toContain(card.rarity)
+      expect(['common', 'uncommon', 'rare', 'epic', 'legendary']).toContain(card.rarity)
       expect(typeof card.icon).toBe('string')
       expect(typeof card.apply).toBe('function')
     }
@@ -130,5 +130,32 @@ describe('pickChestCards', () => {
     player.weapons[0].forkCount = 3
     const picks = pickChestCards(player, 100)
     expect(picks.some(card => card.id === 'wand_fork')).toBe(false)
+  })
+})
+
+describe('new stat cards', () => {
+  it('wand_firerate reduces wand cooldown', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    const before = player.weapons[0].cooldown
+    CARDS.find(c => c.id === 'wand_firerate').apply(player)
+    expect(player.weapons[0].cooldown).toBeLessThan(before)
+    expect(player.weapons[0].cooldown).toBeGreaterThan(0)
+  })
+
+  it('wand_range increases wand range', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    const before = player.weapons[0].range
+    CARDS.find(c => c.id === 'wand_range').apply(player)
+    expect(player.weapons[0].range).toBeGreaterThan(before)
+  })
+
+  it('whip_range increases whip range', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('whip')]
+    const before = player.weapons[0].range
+    CARDS.find(c => c.id === 'whip_range').apply(player)
+    expect(player.weapons[0].range).toBeGreaterThan(before)
   })
 })
