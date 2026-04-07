@@ -293,6 +293,21 @@ export const CARDS = [
     },
   },
   {
+    id: 'wand_explode',
+    label: 'ARCANE BURST',
+    desc: 'Wand projectiles explode on impact for bonus AoE damage',
+    rarity: 'epic',
+    requires: 'wand',
+    icon: '*',
+    unique: true,
+    available: player => player.level >= 7,
+    apply: player => {
+      const w = _weapon(player, 'wand')
+      w.explodeOnImpact = true
+      w.explodeRadius = 70
+    },
+  },
+  {
     id: 'rocket_multi',
     label: 'SALVO BAY',
     desc: 'Fire 1 extra rocket each time the launcher shoots',

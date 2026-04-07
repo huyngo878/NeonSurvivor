@@ -196,6 +196,16 @@ describe('homing cards', () => {
   })
 })
 
+describe('wand explode card', () => {
+  it('wand_explode sets explodeOnImpact=true and explodeRadius > 0', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    CARDS.find(c => c.id === 'wand_explode').apply(player)
+    expect(player.weapons[0].explodeOnImpact).toBe(true)
+    expect(player.weapons[0].explodeRadius).toBeGreaterThan(0)
+  })
+})
+
 describe('new stat cards', () => {
   it('wand_slow sets weapon.slowOnHit to true', () => {
     const player = createPlayer()

@@ -287,6 +287,25 @@ describe('updateCollision — whip shockwave', () => {
   })
 })
 
+describe('updateCollision — wand explode on impact', () => {
+  it('wand projectile with explodeOnImpact adds a shockwave when it hits', () => {
+    const player = createPlayer()
+    const enemy = createEnemy('chaser', 200, 200)
+    const pool = initProjectilePool()
+    const proj = pool[0]
+    proj.active = true; proj.pos = { x: 200, y: 200 }; proj.vel = { x: 0, y: 0 }
+    proj.damage = 5; proj.radius = 4; proj.aoe = false; proj.weaponType = 'wand'
+    proj.bouncesRemaining = 0; proj.piercesRemaining = 0
+    proj.hitEnemyIds = new Set()
+    proj.explodeOnImpact = true; proj.explodeRadius = 70
+    const entities = [player, enemy, ...pool]
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision(entities, gameState)
+    expect(entities.some(e => e.type === 'shockwave')).toBe(true)
+    expect(proj.active).toBe(false)
+  })
+})
+
 describe('updateCollision — bleed DoT', () => {
   it('whip with bleedOnHit sets bleedTimer and bleedDps on enemy', () => {
     const player = createPlayer()

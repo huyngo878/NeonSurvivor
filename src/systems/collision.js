@@ -76,12 +76,13 @@ export function updateCollision(entities, gameState, dt = 0) {
         proj.hitEnemyIds.add(enemy.id)
         enemy.hp -= proj.damage
         _applyHitImpulse(enemy, proj)
-        if (proj.slow) enemy.slowTimer = 1.5
-        if (enemy.hp <= 0) {
-          _killEnemy(enemy, entities, player, gameState)
-        }
+        if (enemy.hp <= 0) _killEnemy(enemy, entities, player, gameState)
         if (proj.weaponType === 'wand' && proj.forkCountRemaining > 0 && !proj.forked) {
           _forkProjectile(proj, enemy, enemies, entities)
+        }
+        if (proj.slow) enemy.slowTimer = 1.5
+        if (proj.explodeOnImpact && proj.explodeRadius > 0) {
+          _aoeExplosion(proj.pos.x, proj.pos.y, proj.explodeRadius, proj.damage * 0.6, enemies, entities, player, gameState, enemy)
         }
         if (proj.aoe) {
           _triggerRocketExplosions(proj, enemies, entities, player, gameState, enemy)

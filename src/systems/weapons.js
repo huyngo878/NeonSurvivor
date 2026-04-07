@@ -51,6 +51,9 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
     proj.hitEnemyIds = new Set()
     proj.piercesRemaining = weapon.pierceCount || 0
     proj.slow = weapon.slowOnHit || false
+    proj.homing = weapon.homing || 0
+    proj.explodeOnImpact = weapon.explodeOnImpact || false
+    proj.explodeRadius = weapon.explodeRadius || 0
   }
 }
 
