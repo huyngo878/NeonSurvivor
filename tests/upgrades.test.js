@@ -159,6 +159,15 @@ describe('rocket stat cards', () => {
   })
 })
 
+describe('shockwave and circular cards', () => {
+  it('whip_circular sets sweepAngle to 2*PI', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('whip')]
+    CARDS.find(c => c.id === 'whip_circular').apply(player)
+    expect(player.weapons[0].sweepAngle).toBeCloseTo(Math.PI * 2)
+  })
+})
+
 describe('bleed card', () => {
   it('whip_bleed sets bleedOnHit=true and bleedDps > 0', () => {
     const player = createPlayer()

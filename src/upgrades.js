@@ -255,6 +255,31 @@ export const CARDS = [
     apply: player => { _weapon(player, 'whip').slowOnHit = true },
   },
   {
+    id: 'whip_shockwave',
+    label: 'IMPACT PULSE',
+    desc: 'Whip hits emit a shockwave that staggers nearby enemies',
+    rarity: 'rare',
+    requires: 'whip',
+    icon: '◎',
+    unique: true,
+    apply: player => { _weapon(player, 'whip').shockwaveOnHit = true },
+  },
+  {
+    id: 'whip_circular',
+    label: 'DEATH SPIN',
+    desc: 'Whip sweeps in a full 360° circle',
+    rarity: 'epic',
+    requires: 'whip',
+    icon: '↺',
+    unique: true,
+    available: player => player.level >= 8,
+    apply: player => {
+      const w = _weapon(player, 'whip')
+      w.sweepAngle = Math.PI * 2
+      w.range = Math.max(w.range, 150)
+    },
+  },
+  {
     id: 'whip_bleed',
     label: 'BARBED WIRE',
     desc: 'Whip applies 5 damage/sec bleed for 3s',

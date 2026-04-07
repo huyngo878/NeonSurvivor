@@ -269,6 +269,24 @@ describe('updateCollision — slow on hit', () => {
   })
 })
 
+describe('updateCollision — whip shockwave', () => {
+  it('shockwave entity is added to entities when whip hits with shockwaveOnHit=true', () => {
+    const player = createPlayer()
+    player.pos = { x: 500, y: 500 }
+    player.weapons = [createWeapon('whip')]
+    player.weapons[0].active = true
+    player.weapons[0].activeTimer = 0.1
+    player.weapons[0].aimAngle = 0
+    player.weapons[0].shockwaveOnHit = true
+    const enemy = createEnemy('chaser', 550, 500)
+    const pool = initProjectilePool()
+    const entities = [player, enemy, ...pool]
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision(entities, gameState)
+    expect(entities.some(e => e.type === 'shockwave')).toBe(true)
+  })
+})
+
 describe('updateCollision — bleed DoT', () => {
   it('whip with bleedOnHit sets bleedTimer and bleedDps on enemy', () => {
     const player = createPlayer()

@@ -17,7 +17,7 @@ const WEAPON_CONFIGS = {
     type: 'whip', cooldown: 0.9, damage: 11, range: 120,
     sweepAngle: Math.PI, activeDuration: 0.12, aimAngle: 0,
     knockback: 18, critChance: 0, slowOnHit: false,
-    bleedOnHit: false, bleedDps: 0,
+    bleedOnHit: false, bleedDps: 0, shockwaveOnHit: false,
   },
   rocket: {
     type: 'rocket', cooldown: 2.0, damage: 60, range: 500, shots: 1, aoeRadius: 80,

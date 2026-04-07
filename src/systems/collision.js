@@ -125,6 +125,9 @@ export function updateCollision(entities, gameState, dt = 0) {
           enemy.bleedTimer = 3
           enemy.bleedDps = (enemy.bleedDps || 0) + weapon.bleedDps
         }
+        if (weapon.shockwaveOnHit) {
+          entities.push(createShockwave(enemy.pos.x, enemy.pos.y, weapon.range * 0.6, '#ffd700'))
+        }
         if (enemy.hp <= 0) {
           _killEnemy(enemy, entities, player, gameState)
         }
