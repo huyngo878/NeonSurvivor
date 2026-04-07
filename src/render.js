@@ -180,7 +180,6 @@ function _drawChestNode(ctx, node, gameState) {
   }
 
   ctx.restore()
-  node.bobTimer += 0.016  // approximate dt — actual dt not passed to render functions
 }
 
 function _drawShockwave(ctx, shockwave) {

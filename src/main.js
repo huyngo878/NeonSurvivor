@@ -379,7 +379,7 @@ function loop(timestamp) {
     updateSpawner(entities, spawnerState, dt, gameState.time, gameState)
     if (player) {
       updatePickup(entities, player, dt, gameState)
-      updateChestNodes(entities, player, gameState)
+      updateChestNodes(entities, player, gameState, dt)
       updateGems(entities, player, dt, gameState)
       updateCamera(player)
       gameState.camera = camera

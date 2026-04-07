@@ -47,14 +47,16 @@ export function chestCost(chestsOpened) {
   return Math.floor(10 * Math.pow(1.22, chestsOpened))
 }
 
-export function updateChestNodes(entities, player, gameState) {
+export function updateChestNodes(entities, player, gameState, dt = 0) {
   if (!player) return
   const PROXIMITY = 80
   let nearest = null
   let nearestDist = Infinity
 
   for (const e of entities) {
-    if (e.type !== 'chestNode' || e.opened) continue
+    if (e.type !== 'chestNode') continue
+    if (dt > 0) e.bobTimer += dt
+    if (e.opened) continue
     const dist = Math.hypot(e.pos.x - player.pos.x, e.pos.y - player.pos.y)
     if (dist <= PROXIMITY && dist < nearestDist) {
       nearest = e
