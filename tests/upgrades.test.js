@@ -262,3 +262,20 @@ describe('legendaryUnique lock', () => {
     expect(picks.some(c => c.id === 'rocket_inferno')).toBe(true)
   })
 })
+
+describe('whip phantom strikes', () => {
+  it('whip_phantom sets weapon.phantom to true', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('whip')]
+    CARDS.find(c => c.id === 'whip_phantom').apply(player)
+    expect(player.weapons[0].phantom).toBe(true)
+  })
+
+  it('whip_damage_pct increases whip damage by 20%', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('whip')]
+    const before = player.weapons[0].damage
+    CARDS.find(c => c.id === 'whip_damage_pct').apply(player)
+    expect(player.weapons[0].damage).toBeCloseTo(before * 1.2, 0)
+  })
+})

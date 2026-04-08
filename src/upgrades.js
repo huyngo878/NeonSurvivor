@@ -356,6 +356,28 @@ export const CARDS = [
     apply: player => { _weapon(player, 'whip').chainLightning = 2 },
   },
   {
+    id: 'whip_phantom',
+    label: 'PHANTOM STRIKES',
+    desc: 'Whip summons 2 phantom strikes at ±70° for 70% damage',
+    rarity: 'legendary',
+    legendaryUnique: 'whip',
+    requires: 'whip',
+    icon: '👻',
+    apply: player => { _weapon(player, 'whip').phantom = true },
+  },
+  {
+    id: 'whip_damage_pct',
+    label: 'RAZOR EDGE',
+    desc: 'Whip damage +20%',
+    rarity: 'rare',
+    requires: 'whip',
+    icon: 'D',
+    apply: player => {
+      const w = _weapon(player, 'whip')
+      w.damage = Math.round(w.damage * 1.2)
+    },
+  },
+  {
     id: 'wand_explode',
     label: 'ARCANE BURST',
     desc: 'Wand projectiles explode on impact for bonus AoE damage',
