@@ -81,6 +81,7 @@ export function updateCollision(entities, gameState, dt = 0) {
 
   // Projectile vs Enemy
   for (const proj of projectiles) {
+    if (!proj.active) continue
     const candidates = shQuery(hash, proj.pos.x, proj.pos.y, proj.radius + MAX_ENEMY_RADIUS)
     for (const enemy of candidates) {
       if (proj.hitEnemyIds?.has(enemy.id) || proj.lastHitEnemyId === enemy.id) continue
@@ -249,9 +250,9 @@ function _triggerRocketExplosions(proj, enemies, entities, player, gameState, sk
     entities.push(createFireZone(proj.pos.x, proj.pos.y, proj.aoeRadius * 0.8, proj.damage * 0.3, 3.0))
   }
 
-  if (proj.fragmentChance && Math.random() < proj.fragmentChance) {
-    for (let i = 0; i < 6; i++) {
-      const angle = (Math.PI * 2 * i) / 6
+  const _spawnFragments = (count, dmgMult) => {
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count
       const fragment = entities.find(e => e.type === 'projectile' && !e.active)
       if (!fragment) break
       fragment.active = true
@@ -260,7 +261,7 @@ function _triggerRocketExplosions(proj, enemies, entities, player, gameState, sk
       fragment.vel.x = Math.cos(angle) * 260
       fragment.vel.y = Math.sin(angle) * 260
       fragment.age = 0
-      fragment.damage = proj.damage * 0.3
+      fragment.damage = proj.damage * dmgMult
       fragment.radius = 4
       fragment.aoe = true
       fragment.aoeRadius = Math.max(24, proj.aoeRadius * 0.35)
@@ -268,8 +269,17 @@ function _triggerRocketExplosions(proj, enemies, entities, player, gameState, sk
       fragment.explode = false
       fragment.explosionCount = 1
       fragment.fragmentChance = 0
+      fragment.clusterBarrage = false
       fragment.knockback = proj.knockback || 0
+      fragment.inferno = false
+      fragment.chainReaction = false
     }
+  }
+
+  if (proj.clusterBarrage) {
+    _spawnFragments(8, 0.4)
+  } else if (proj.fragmentChance && Math.random() < proj.fragmentChance) {
+    _spawnFragments(6, 0.3)
   }
 }
 

@@ -29,7 +29,7 @@ const WEAPON_CONFIGS = {
   rocket: {
     type: 'rocket', cooldown: 2.0, damage: 60, range: 500, shots: 1, aoeRadius: 80,
     explosionCount: 1, knockback: 0, fragmentChance: 0,
-    projectileSpeed: 300, centerDamageBonus: 0, inferno: false,
+    projectileSpeed: 300, centerDamageBonus: 0, inferno: false, clusterBarrage: false,
   },
 }
 
@@ -242,6 +242,7 @@ export function initProjectilePool() {
       fragmentChance: 0,
       centerDamageBonus: 0,
       inferno: false,
+      clusterBarrage: false,
       lastHitEnemyId: null,
       hitEnemyIds: new Set(),
       piercesRemaining: 0,

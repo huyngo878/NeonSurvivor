@@ -457,6 +457,16 @@ export const CARDS = [
     apply: player => { _weapon(player, 'rocket').inferno = true },
   },
   {
+    id: 'rocket_cluster_barrage',
+    label: 'CLUSTER BARRAGE',
+    desc: 'Rockets split into 8 mini-rockets on impact, each exploding independently',
+    rarity: 'legendary',
+    legendaryUnique: 'rocket',
+    requires: 'rocket',
+    icon: '%',
+    apply: player => { _weapon(player, 'rocket').clusterBarrage = true },
+  },
+  {
     id: 'rocket_firerate',
     label: 'RAPID RELOAD',
     desc: 'Rocket fires 15% faster',

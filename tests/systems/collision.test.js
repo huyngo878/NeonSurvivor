@@ -416,3 +416,33 @@ describe('fire zone', () => {
     expect(entities.some(e => e.type === 'fireZone')).toBe(false)
   })
 })
+
+describe('rocket cluster barrage', () => {
+  it('spawns 8 fragments guaranteed when clusterBarrage is true', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('rocket')]
+    const enemy = createEnemy('chaser', 200, 200)
+    const pool = initProjectilePool()
+    const proj = pool[0]
+    proj.active = true
+    proj.pos = { x: 200, y: 200 }
+    proj.vel = { x: 0, y: 0 }
+    proj.damage = 60
+    proj.radius = 7
+    proj.aoe = true
+    proj.aoeRadius = 80
+    proj.weaponType = 'rocket'
+    proj.explode = true
+    proj.explosionCount = 1
+    proj.knockback = 0
+    proj.fragmentChance = 0
+    proj.clusterBarrage = true
+    proj.inferno = false
+    proj.chainReaction = false
+    const gameState = { kills: 0, state: 'playing', time: 0, chestsOpened: 0 }
+    const entities = [player, enemy, ...pool]
+    updateCollision(entities, gameState, 0.016)
+    const fragments = entities.filter(e => e.type === 'projectile' && e.active && e !== proj)
+    expect(fragments.length).toBe(8)
+  })
+})
