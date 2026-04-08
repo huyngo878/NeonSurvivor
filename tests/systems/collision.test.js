@@ -178,7 +178,7 @@ describe('updateCollision — money on kill', () => {
     expect(player.money).toBe(1)
   })
 
-  it('awards boss moneyValue 12 on kill', () => {
+  it('awards boss moneyValue 25 on kill', () => {
     const player = createPlayer()
     player.money = 10
     const enemy = createEnemy('boss', 200, 200)
@@ -189,7 +189,7 @@ describe('updateCollision — money on kill', () => {
     proj.damage = 5; proj.radius = 4; proj.aoe = false; proj.weaponType = 'wand'
     const gameState = { kills: 0, state: 'playing', time: 0, chestsOpened: 0 }
     updateCollision([player, enemy, ...pool], gameState)
-    expect(player.money).toBe(22)
+    expect(player.money).toBe(35)
   })
 
   it('does not crash when player has no money field', () => {
