@@ -258,3 +258,19 @@ describe('wand - echo wand', () => {
     expect(weapon.echoQueue.length).toBe(0)
   })
 })
+
+describe('whip - time echo', () => {
+  it('sets echoActive after echoTimer expires when echo is true', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('whip')]
+    const weapon = player.weapons[0]
+    weapon.echo = true
+    weapon.timer = 0
+    const enemy = createEnemy('chaser', player.pos.x + 80, player.pos.y)
+    updateWeapons([player, enemy], 0.016)  // swing fires, echoTimer set to 0.75
+    expect(weapon.echoTimer).toBeGreaterThan(0)
+    expect(weapon.echoActive).toBe(false)
+    updateWeapons([player, enemy], 0.8)   // tick past delay
+    expect(weapon.echoActive).toBe(true)
+  })
+})

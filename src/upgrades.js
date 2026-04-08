@@ -336,6 +336,16 @@ export const CARDS = [
     },
   },
   {
+    id: 'whip_time_echo',
+    label: 'TIME ECHO',
+    desc: 'Each whip swing repeats as a ghost strike 0.75s later for 80% damage',
+    rarity: 'legendary',
+    legendaryUnique: 'whip',
+    requires: 'whip',
+    icon: '⏳',
+    apply: player => { _weapon(player, 'whip').echo = true },
+  },
+  {
     id: 'wand_explode',
     label: 'ARCANE BURST',
     desc: 'Wand projectiles explode on impact for bonus AoE damage',

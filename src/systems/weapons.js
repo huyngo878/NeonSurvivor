@@ -182,11 +182,28 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
 }
 
 function _tickWhip(weapon, dt, player, enemies) {
+  // Tick echo delay (runs even during active main swing)
+  if (weapon.echo && weapon.echoTimer >= 0) {
+    weapon.echoTimer -= dt
+    if (weapon.echoTimer <= 0) {
+      weapon.echoActive = true
+      weapon.echoActiveTimer = weapon.activeDuration
+      weapon.echoHitIds = new Set()
+      weapon.echoTimer = -1
+    }
+  } else if (weapon.echoActive) {
+    // Tick echo active duration (only when not just activated this frame)
+    weapon.echoActiveTimer -= dt
+    if (weapon.echoActiveTimer <= 0) weapon.echoActive = false
+  }
+
+  // Tick main active duration
   if (weapon.active) {
     weapon.activeTimer -= dt
     if (weapon.activeTimer <= 0) weapon.active = false
     return
   }
+
   weapon.timer -= dt
   if (weapon.timer > 0) return
   weapon.timer = weapon.cooldown
@@ -209,6 +226,8 @@ function _tickWhip(weapon, dt, player, enemies) {
   weapon.active = true
   weapon.activeTimer = weapon.activeDuration
   weapon.hitIds = new Set()
+  if (weapon.phantom) weapon.phantomHitIds = [new Set(), new Set()]
+  if (weapon.echo) weapon.echoTimer = 0.75
 }
 
 function _tickRocket(weapon, dt, player, enemies, projectiles) {
