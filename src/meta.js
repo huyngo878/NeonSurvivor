@@ -31,7 +31,7 @@ export function _reset() {
 }
 
 export function calcPrestige(kills, timeSecs, level) {
-  return Math.floor(kills * (timeSecs / 60) * level / 10)
+  return Math.floor(kills / 4)
 }
 
 export function saveRun(run) {

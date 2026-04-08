@@ -10,8 +10,8 @@ beforeEach(() => {
 })
 
 describe('calcPrestige', () => {
-  it('calculates prestige from kills, time, and level', () => {
-    expect(calcPrestige(87, 272, 6)).toBe(Math.floor(87 * (272 / 60) * 6 / 10))
+  it('calculates prestige linearly from kills', () => {
+    expect(calcPrestige(87, 272, 6)).toBe(Math.floor(87 / 4))
   })
 
   it('returns 0 for zero kills', () => {
