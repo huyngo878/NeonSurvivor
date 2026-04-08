@@ -109,32 +109,46 @@ export function updateCollision(entities, gameState, dt = 0) {
   // Whip arc vs Enemy
   if (player) {
     for (const weapon of player.weapons) {
-      if (weapon.type !== 'whip' || !weapon.active) continue
-      const facingAngle = weapon.aimAngle
-      const candidates = shQuery(hash, player.pos.x, player.pos.y, weapon.range + MAX_ENEMY_RADIUS)
-      for (const enemy of candidates) {
-        if (weapon.hitIds.has(enemy.id)) continue
-        const dist = Math.hypot(enemy.pos.x - player.pos.x, enemy.pos.y - player.pos.y)
-        if (dist > weapon.range + enemy.radius) continue
-        const angleToEnemy = Math.atan2(enemy.pos.y - player.pos.y, enemy.pos.x - player.pos.x)
-        let diff = angleToEnemy - facingAngle
-        while (diff > Math.PI)  diff -= 2 * Math.PI
-        while (diff < -Math.PI) diff += 2 * Math.PI
-        if (Math.abs(diff) > weapon.sweepAngle / 2) continue
-        const damage = Math.random() < (weapon.critChance || 0) ? weapon.damage * 2 : weapon.damage
-        enemy.hp -= damage
-        _pushEnemy(enemy, player.pos.x, player.pos.y, weapon.knockback || 0)
-        weapon.hitIds.add(enemy.id)
-        if (weapon.slowOnHit) enemy.slowTimer = 1.5
-        if (weapon.bleedOnHit) {
-          enemy.bleedTimer = 3
-          enemy.bleedDps = (enemy.bleedDps || 0) + weapon.bleedDps
+      if (weapon.type !== 'whip') continue
+
+      // Build list of swings this frame
+      const swings = []
+      if (weapon.active) {
+        swings.push({ aimAngle: weapon.aimAngle, hitIds: weapon.hitIds, damageMult: 1 })
+        if (weapon.phantom) {
+          swings.push({ aimAngle: weapon.aimAngle - 1.2, hitIds: weapon.phantomHitIds[0], damageMult: 0.7 })
+          swings.push({ aimAngle: weapon.aimAngle + 1.2, hitIds: weapon.phantomHitIds[1], damageMult: 0.7 })
         }
-        if (weapon.shockwaveOnHit) {
-          entities.push(createShockwave(enemy.pos.x, enemy.pos.y, weapon.range * 0.6, '#ffd700'))
-        }
-        if (enemy.hp <= 0) {
-          _killEnemy(enemy, entities, player, gameState)
+      }
+      if (weapon.echoActive) {
+        swings.push({ aimAngle: weapon.aimAngle, hitIds: weapon.echoHitIds, damageMult: 0.8 })
+      }
+
+      for (const swing of swings) {
+        const candidates = shQuery(hash, player.pos.x, player.pos.y, weapon.range + MAX_ENEMY_RADIUS)
+        for (const enemy of candidates) {
+          if (swing.hitIds.has(enemy.id)) continue
+          const dist = Math.hypot(enemy.pos.x - player.pos.x, enemy.pos.y - player.pos.y)
+          if (dist > weapon.range + enemy.radius) continue
+          const angleToEnemy = Math.atan2(enemy.pos.y - player.pos.y, enemy.pos.x - player.pos.x)
+          let diff = angleToEnemy - swing.aimAngle
+          while (diff > Math.PI)  diff -= 2 * Math.PI
+          while (diff < -Math.PI) diff += 2 * Math.PI
+          if (Math.abs(diff) > weapon.sweepAngle / 2) continue
+          const baseDamage = Math.random() < (weapon.critChance || 0) ? weapon.damage * 2 : weapon.damage
+          const damage = baseDamage * swing.damageMult
+          enemy.hp -= damage
+          _pushEnemy(enemy, player.pos.x, player.pos.y, weapon.knockback || 0)
+          swing.hitIds.add(enemy.id)
+          if (weapon.slowOnHit) enemy.slowTimer = 1.5
+          if (weapon.bleedOnHit) {
+            enemy.bleedTimer = 3
+            enemy.bleedDps = (enemy.bleedDps || 0) + weapon.bleedDps
+          }
+          if (weapon.shockwaveOnHit) {
+            entities.push(createShockwave(enemy.pos.x, enemy.pos.y, weapon.range * 0.6, '#ffd700'))
+          }
+          if (enemy.hp <= 0) _killEnemy(enemy, entities, player, gameState)
         }
       }
     }

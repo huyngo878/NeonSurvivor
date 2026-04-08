@@ -43,6 +43,17 @@ export function createWeapon(type) {
     base.active = false
     base.activeTimer = 0
     base.hitIds = new Set()
+    // Echo Whip
+    base.echo = false
+    base.echoTimer = -1
+    base.echoActive = false
+    base.echoActiveTimer = 0
+    base.echoHitIds = new Set()
+    // Phantom Strikes
+    base.phantom = false
+    base.phantomHitIds = [new Set(), new Set()]
+    // Chain Lightning
+    base.chainLightning = 0
   }
   if (type === 'wand') {
     base.echoQueue = []
