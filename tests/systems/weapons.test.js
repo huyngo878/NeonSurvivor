@@ -227,3 +227,33 @@ describe('wand - arcane overload', () => {
     expect(empowered.damage).toBeGreaterThan(weapon.damage)
   })
 })
+
+describe('wand - echo wand', () => {
+  it('does not fire echo immediately when echo is disabled', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    player.weapons[0].timer = 0
+    const enemy = createEnemy('chaser', player.pos.x + 100, player.pos.y)
+    const pool = initProjectilePool()
+    updateWeapons([player, enemy, ...pool], 0.016)
+    const active = pool.filter(p => p.active)
+    expect(active.length).toBe(1)  // only the original shot
+  })
+
+  it('fires an echo shot after delay when echo is enabled', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    const weapon = player.weapons[0]
+    weapon.echo = true
+    weapon.timer = 0
+    const enemy = createEnemy('chaser', player.pos.x + 100, player.pos.y)
+    const pool = initProjectilePool()
+    const entities = [player, enemy, ...pool]
+    updateWeapons(entities, 0.016)  // fires 1 shot, queues echo
+    expect(pool.filter(p => p.active).length).toBe(1)
+    expect(weapon.echoQueue.length).toBe(1)
+    updateWeapons(entities, 0.6)   // tick past the echo delay
+    expect(pool.filter(p => p.active).length).toBe(2)
+    expect(weapon.echoQueue.length).toBe(0)
+  })
+})

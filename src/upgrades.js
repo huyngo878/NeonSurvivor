@@ -202,6 +202,16 @@ export const CARDS = [
       w.overloadCounter = 0
     },
   },
+  {
+    id: 'wand_echo',
+    label: 'ECHO WAND',
+    desc: 'Each wand projectile fires a ghost copy 0.6s later on the same path',
+    rarity: 'legendary',
+    legendaryUnique: 'wand',
+    requires: 'wand',
+    icon: '↩',
+    apply: player => { _weapon(player, 'wand').echo = true },
+  },
 
   {
     id: 'whip_knockback',

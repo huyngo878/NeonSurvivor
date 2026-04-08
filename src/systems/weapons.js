@@ -16,6 +16,42 @@ export function updateWeapons(entities, dt) {
 }
 
 function _tickWand(weapon, dt, player, enemies, projectiles) {
+  // Echo Wand: tick queued echo shots (runs every frame, independent of cooldown)
+  if (weapon.echo && weapon.echoQueue && weapon.echoQueue.length > 0) {
+    for (let i = weapon.echoQueue.length - 1; i >= 0; i--) {
+      const entry = weapon.echoQueue[i]
+      entry.timer -= dt
+      if (entry.timer <= 0) {
+        const proj = projectiles.find(p => !p.active)
+        if (proj) {
+          proj.active = true
+          proj.pos.x = entry.pos.x
+          proj.pos.y = entry.pos.y
+          proj.vel.x = entry.vel.x
+          proj.vel.y = entry.vel.y
+          proj.age = 0
+          proj.damage = entry.damage
+          proj.radius = 4
+          proj.aoe = false
+          proj.aoeRadius = 0
+          proj.weaponType = 'wand'
+          proj.explode = false
+          proj.bouncesRemaining = weapon.bounce
+          proj.forkCountRemaining = 0
+          proj.forked = false
+          proj.lastHitEnemyId = null
+          proj.hitEnemyIds = new Set()
+          proj.piercesRemaining = 0
+          proj.slow = weapon.slowOnHit || false
+          proj.homing = 0
+          proj.explodeOnImpact = false
+          proj.explodeRadius = 0
+        }
+        weapon.echoQueue.splice(i, 1)
+      }
+    }
+  }
+
   weapon.timer -= dt
   if (weapon.timer > 0) return
   weapon.timer = weapon.cooldown
@@ -54,6 +90,14 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
     proj.homing = weapon.homing || 0
     proj.explodeOnImpact = weapon.explodeOnImpact || false
     proj.explodeRadius = weapon.explodeRadius || 0
+    if (weapon.echo) {
+      weapon.echoQueue.push({
+        pos: { x: proj.pos.x, y: proj.pos.y },
+        vel: { x: proj.vel.x, y: proj.vel.y },
+        damage: proj.damage,
+        timer: 0.6,
+      })
+    }
   }
 
   // Multicast: chance to fire a bonus projectile at each target
@@ -130,6 +174,7 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
       }
     }
   }
+
 }
 
 function _tickWhip(weapon, dt, player, enemies) {

@@ -10,12 +10,13 @@ export const ENEMY_TYPES = {
 
 const WEAPON_CONFIGS = {
   wand: {
-    type: 'wand', cooldown: 0.53, damage: 22, range: 400, shots: 1, projectileSpeed: 400,
+    type: 'wand', cooldown: 0.65, damage: 22, range: 400, shots: 1, projectileSpeed: 400,
     bounce: 0, forkCount: 0, pierceCount: 0, slowOnHit: false, homing: 0,
     explodeOnImpact: false, explodeRadius: 0, multicastChance: 0,
     overloadActive: false,
     overloadCounter: 0,
     overloadThreshold: 5,
+    echo: false,
   },
   whip: {
     type: 'whip', cooldown: 0.9, damage: 11, range: 120,
@@ -40,6 +41,9 @@ export function createWeapon(type) {
     base.active = false
     base.activeTimer = 0
     base.hitIds = new Set()
+  }
+  if (type === 'wand') {
+    base.echoQueue = []
   }
   return base
 }
