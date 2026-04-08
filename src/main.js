@@ -252,6 +252,10 @@ function _navigateMenu(state) {
 function _applyUpgrade(upgrade) {
   const player = entities.find(e => e.type === 'player')
   if (player) upgrade.apply(player)
+  if (player && upgrade.legendaryUnique) {
+    player.uniqueWeapons = player.uniqueWeapons || {}
+    player.uniqueWeapons[upgrade.legendaryUnique] = upgrade.id
+  }
   if (player) player.cardHistory = [...(player.cardHistory || []), upgrade.id]
   gameState.upgradesTaken = [...(gameState.upgradesTaken || []), upgrade.id]
   gameState.upgradeChoices = null

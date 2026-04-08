@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { pickChestCards, CARDS } from '../src/upgrades.js'
+import { pickChestCards, pickSparklyCards, CARDS } from '../src/upgrades.js'
 import { createPlayer, createWeapon } from '../src/entities.js'
 
 describe('CARDS', () => {
@@ -239,5 +239,26 @@ describe('new stat cards', () => {
     expect(player.weapons[0].pierceCount).toBe(0)
     CARDS.find(c => c.id === 'wand_pierce').apply(player)
     expect(player.weapons[0].pierceCount).toBe(1)
+  })
+})
+
+describe('legendaryUnique lock', () => {
+  it('once a legendaryUnique wand card is taken, other legendaryUnique wand cards are excluded', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    player.uniqueWeapons = { wand: 'wand_arcane_overload' }
+    const picks = pickChestCards(player, 100)
+    const legendaryWandIds = ['wand_arcane_overload', 'wand_echo', 'wand_chain_beam']
+    for (const id of legendaryWandIds) {
+      expect(picks.some(c => c.id === id)).toBe(false)
+    }
+  })
+
+  it('legendaryUnique for one weapon does not block uniques for another weapon', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand'), createWeapon('rocket')]
+    player.uniqueWeapons = { wand: 'wand_arcane_overload' }
+    const picks = pickChestCards(player, 100)
+    expect(picks.some(c => c.id === 'rocket_inferno')).toBe(true)
   })
 })

@@ -132,6 +132,7 @@ export function createPlayer() {
     spawnDelayBonus: 0, // starting intervalMult bonus (meta upgrade)
     armor: 0,
     money: 0,
+    uniqueWeapons: {},
   }
 }
 
