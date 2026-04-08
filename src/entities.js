@@ -17,6 +17,8 @@ const WEAPON_CONFIGS = {
     overloadCounter: 0,
     overloadThreshold: 5,
     echo: false,
+    chainBeam: 0,
+    critChance: 0,
   },
   whip: {
     type: 'whip', cooldown: 0.9, damage: 11, range: 120,
@@ -223,6 +225,8 @@ export function initProjectilePool() {
       homing: 0,
       explodeOnImpact: false,
       explodeRadius: 0,
+      chainBeam: 0,
+      critChance: 0,
     })
   }
   return pool

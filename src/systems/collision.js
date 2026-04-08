@@ -74,8 +74,12 @@ export function updateCollision(entities, gameState, dt = 0) {
       if (dist < proj.radius + enemy.radius) {
         if (!proj.hitEnemyIds) proj.hitEnemyIds = new Set()
         proj.hitEnemyIds.add(enemy.id)
-        enemy.hp -= proj.damage
+        const critDamage = Math.random() < (proj.critChance || 0) ? proj.damage * 2 : proj.damage
+        enemy.hp -= critDamage
         _applyHitImpulse(enemy, proj)
+        if (proj.chainBeam > 0) {
+          _chainBeamJump(enemy, proj.hitEnemyIds, critDamage * 0.7, proj.chainBeam, enemies, entities, player, gameState)
+        }
         if (enemy.hp <= 0) _killEnemy(enemy, entities, player, gameState)
         if (proj.weaponType === 'wand' && proj.forkCountRemaining > 0 && !proj.forked) {
           _forkProjectile(proj, enemy, enemies, entities)
@@ -297,6 +301,19 @@ function _forkProjectile(proj, hitEnemy, enemies, entities) {
     fork.lastHitEnemyId = hitEnemy.id
     fork.hitEnemyIds = new Set(proj.hitEnemyIds || [])
   }
+}
+
+function _chainBeamJump(fromEnemy, hitEnemyIds, damage, hopsLeft, enemies, entities, player, gameState) {
+  const target = enemies
+    .filter(e => !e.dead && !hitEnemyIds.has(e.id))
+    .map(e => ({ e, dist: Math.hypot(e.pos.x - fromEnemy.pos.x, e.pos.y - fromEnemy.pos.y) }))
+    .filter(({ dist }) => dist < 220)
+    .sort((a, b) => a.dist - b.dist)[0]
+  if (!target) return
+  hitEnemyIds.add(target.e.id)
+  target.e.hp -= damage
+  if (target.e.hp <= 0) _killEnemy(target.e, entities, player, gameState)
+  if (hopsLeft > 1) _chainBeamJump(target.e, hitEnemyIds, damage * 0.7, hopsLeft - 1, enemies, entities, player, gameState)
 }
 
 function _applyHitImpulse(enemy, proj) {

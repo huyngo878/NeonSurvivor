@@ -351,3 +351,29 @@ describe('updateCollision — bleed DoT', () => {
     expect(enemy.bleedDps).toBe(0)   // reset after expiry
   })
 })
+
+describe('wand chain beam', () => {
+  it('chains damage to nearby enemies on hit when chainBeam > 0', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    const e1 = createEnemy('chaser', player.pos.x + 100, player.pos.y)
+    const e2 = createEnemy('chaser', player.pos.x + 140, player.pos.y)
+    const e3 = createEnemy('chaser', player.pos.x + 180, player.pos.y)
+    const pool = initProjectilePool()
+    const proj = pool[0]
+    proj.active = true
+    proj.pos = { x: e1.pos.x, y: e1.pos.y }
+    proj.vel = { x: 0, y: 0 }
+    proj.damage = 20
+    proj.radius = 4
+    proj.aoe = false
+    proj.weaponType = 'wand'
+    proj.chainBeam = 2  // chain to 2 more enemies
+    const gameState = { kills: 0, state: 'playing', time: 0, chestsOpened: 0 }
+    updateCollision([player, e1, e2, e3, ...pool], gameState)
+    // e1 hit by projectile, e2 and e3 chained
+    expect(e1.hp).toBeLessThan(e1.maxHp)
+    expect(e2.hp).toBeLessThan(e2.maxHp)
+    expect(e3.hp).toBeLessThan(e3.maxHp)
+  })
+})

@@ -212,6 +212,28 @@ export const CARDS = [
     icon: '↩',
     apply: player => { _weapon(player, 'wand').echo = true },
   },
+  {
+    id: 'wand_chain_beam',
+    label: 'CHAIN BEAM',
+    desc: 'Wand projectiles chain to 3 nearby enemies on hit, dealing 70% reduced damage per hop',
+    rarity: 'legendary',
+    legendaryUnique: 'wand',
+    requires: 'wand',
+    icon: '⚡',
+    apply: player => { _weapon(player, 'wand').chainBeam = 3 },
+  },
+  {
+    id: 'wand_crit',
+    label: 'ARCANE FOCUS',
+    desc: '+15% crit chance (crits deal 2× damage)',
+    rarity: 'epic',
+    requires: 'wand',
+    icon: '!',
+    apply: player => {
+      const w = _weapon(player, 'wand')
+      w.critChance = Math.min(0.6, (w.critChance || 0) + 0.15)
+    },
+  },
 
   {
     id: 'whip_knockback',

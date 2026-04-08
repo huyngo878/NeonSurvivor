@@ -90,6 +90,8 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
     proj.homing = weapon.homing || 0
     proj.explodeOnImpact = weapon.explodeOnImpact || false
     proj.explodeRadius = weapon.explodeRadius || 0
+    proj.chainBeam = weapon.chainBeam || 0
+    proj.critChance = weapon.critChance || 0
     if (weapon.echo) {
       weapon.echoQueue.push({
         pos: { x: proj.pos.x, y: proj.pos.y },
@@ -133,6 +135,8 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
       proj.homing = weapon.homing || 0
       proj.explodeOnImpact = weapon.explodeOnImpact || false
       proj.explodeRadius = weapon.explodeRadius || 0
+      proj.chainBeam = weapon.chainBeam || 0
+      proj.critChance = weapon.critChance || 0
     }
   }
 
