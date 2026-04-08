@@ -64,6 +64,7 @@ export function updateSpawner(entities, state, dt, gameTime, gameState) {
     state.timers[i] = interval
 
     let count = Math.max(1, Math.round(waveDef.count * densityScale))
+    if (wave <= 10) count = Math.ceil(count * 1.5)  // 50% more enemies in waves 1-10
     if (waveDef.enemyType === 'speedster') count = Math.max(1, Math.floor(count * 0.6))
     const enemyOverrides = _enemyOverrides(wave, waveDef.enemyType)
 
