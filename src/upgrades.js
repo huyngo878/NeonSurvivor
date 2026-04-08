@@ -447,6 +447,16 @@ export const CARDS = [
     apply: player => { _weapon(player, 'rocket').fragmentChance = 0.45 },
   },
   {
+    id: 'rocket_inferno',
+    label: 'INFERNO LAUNCHER',
+    desc: 'Rockets leave a burning zone on impact, dealing 30% rocket damage per second for 3s',
+    rarity: 'legendary',
+    legendaryUnique: 'rocket',
+    requires: 'rocket',
+    icon: '🔥',
+    apply: player => { _weapon(player, 'rocket').inferno = true },
+  },
+  {
     id: 'rocket_firerate',
     label: 'RAPID RELOAD',
     desc: 'Rocket fires 15% faster',

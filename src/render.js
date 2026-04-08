@@ -10,6 +10,7 @@ export function renderWorld(ctx, canvas, entities, camera, zoom = 1, gameState =
     else if (e.type === 'gem') _drawGem(ctx, e)
     else if (e.type === 'shockwave') _drawShockwave(ctx, e)
     else if (e.type === 'chestNode') _drawChestNode(ctx, e, gameState)
+    else if (e.type === 'fireZone') _drawFireZone(ctx, e)
   }
 
   for (const e of entities) {
@@ -214,6 +215,23 @@ function _drawShockwave(ctx, shockwave) {
   ctx.shadowColor = shockwave.color
   ctx.beginPath()
   ctx.arc(shockwave.pos.x, shockwave.pos.y, shockwave.radius, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.restore()
+}
+
+function _drawFireZone(ctx, zone) {
+  const alpha = (1 - zone.age / zone.lifetime) * 0.45
+  const pulse = 0.85 + 0.15 * Math.sin(zone.age * 8)
+  ctx.save()
+  ctx.globalAlpha = alpha * pulse
+  ctx.shadowBlur = 20
+  ctx.shadowColor = '#ff6600'
+  ctx.fillStyle = 'rgba(255, 80, 0, 0.3)'
+  ctx.strokeStyle = '#ff6600'
+  ctx.lineWidth = 2
+  ctx.beginPath()
+  ctx.arc(zone.pos.x, zone.pos.y, zone.radius, 0, Math.PI * 2)
+  ctx.fill()
   ctx.stroke()
   ctx.restore()
 }

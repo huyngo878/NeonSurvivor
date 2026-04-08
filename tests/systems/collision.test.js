@@ -395,3 +395,24 @@ describe('wand chain beam', () => {
     expect(e3.hp).toBeLessThan(e3.maxHp)
   })
 })
+
+describe('fire zone', () => {
+  it('damages enemies inside the zone each tick', () => {
+    const player = createPlayer()
+    const enemy = createEnemy('chaser', 200, 200)
+    const zone = { type: 'fireZone', id: 9999, pos: { x: 200, y: 200 }, radius: 60, dps: 20, lifetime: 3, age: 0 }
+    const gameState = { kills: 0, state: 'playing', time: 0, chestsOpened: 0 }
+    updateCollision([player, enemy, zone], gameState, 0.1)
+    expect(enemy.hp).toBeLessThan(enemy.maxHp)  // took 2 damage (20 dps * 0.1s)
+  })
+
+  it('fire zone expires and is removed when age >= lifetime', () => {
+    const player = createPlayer()
+    const enemy = createEnemy('chaser', 500, 500)  // out of range
+    const zone = { type: 'fireZone', id: 9999, pos: { x: 200, y: 200 }, radius: 60, dps: 20, lifetime: 1, age: 0.99 }
+    const gameState = { kills: 0, state: 'playing', time: 0, chestsOpened: 0 }
+    const entities = [player, enemy, zone]
+    updateCollision(entities, gameState, 0.1)
+    expect(entities.some(e => e.type === 'fireZone')).toBe(false)
+  })
+})

@@ -29,7 +29,7 @@ const WEAPON_CONFIGS = {
   rocket: {
     type: 'rocket', cooldown: 2.0, damage: 60, range: 500, shots: 1, aoeRadius: 80,
     explosionCount: 1, knockback: 0, fragmentChance: 0,
-    projectileSpeed: 300, centerDamageBonus: 0,
+    projectileSpeed: 300, centerDamageBonus: 0, inferno: false,
   },
 }
 
@@ -191,6 +191,18 @@ export function createShockwave(x, y, radius, color = '#ffb347') {
   }
 }
 
+export function createFireZone(x, y, radius, dps, duration) {
+  return {
+    id: nextId++,
+    type: 'fireZone',
+    pos: { x, y },
+    radius,
+    dps,
+    lifetime: duration,
+    age: 0,
+  }
+}
+
 export function createEnemyProjectile(x, y, vx, vy, pattern = 'burst') {
   return {
     id: nextId++,
@@ -229,6 +241,7 @@ export function initProjectilePool() {
       knockback: 0,
       fragmentChance: 0,
       centerDamageBonus: 0,
+      inferno: false,
       lastHitEnemyId: null,
       hitEnemyIds: new Set(),
       piercesRemaining: 0,

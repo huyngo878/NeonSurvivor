@@ -1,5 +1,5 @@
 import { CELL_SIZE } from '../constants.js'
-import { ENEMY_TYPES, createGem, createMagnet, createShockwave, createEnemyProjectile } from '../entities.js'
+import { ENEMY_TYPES, createGem, createMagnet, createShockwave, createEnemyProjectile, createFireZone } from '../entities.js'
 
 const MAX_ENEMY_RADIUS = Math.max(...Object.values(ENEMY_TYPES).map(e => e.radius))
 
@@ -53,6 +53,20 @@ export function updateCollision(entities, gameState, dt = 0) {
       if (e.bleedTimer === 0) e.bleedDps = 0
       if (e.hp <= 0 && !e.dead) {
         _killEnemy(e, entities, player, gameState)
+      }
+    }
+  }
+
+  // Tick fire zones
+  for (const zone of entities.filter(e => e.type === 'fireZone')) {
+    zone.age += dt
+    if (zone.age >= zone.lifetime) { zone.dead = true; continue }
+    for (const enemy of enemies) {
+      if (enemy.dead) continue
+      const dist = Math.hypot(enemy.pos.x - zone.pos.x, enemy.pos.y - zone.pos.y)
+      if (dist < zone.radius + enemy.radius) {
+        enemy.hp -= zone.dps * dt
+        if (enemy.hp <= 0 && !enemy.dead) _killEnemy(enemy, entities, player, gameState)
       }
     }
   }
@@ -231,6 +245,10 @@ function _triggerRocketExplosions(proj, enemies, entities, player, gameState, sk
     const centerBonus = i === 0 ? (proj.centerDamageBonus || 0) : 0
     _aoeExplosion(proj.pos.x, proj.pos.y, radius, damage, enemies, entities, player, gameState, skipEnemy, centerBonus)
   }
+  if (proj.inferno) {
+    entities.push(createFireZone(proj.pos.x, proj.pos.y, proj.aoeRadius * 0.8, proj.damage * 0.3, 3.0))
+  }
+
   if (proj.fragmentChance && Math.random() < proj.fragmentChance) {
     for (let i = 0; i < 6; i++) {
       const angle = (Math.PI * 2 * i) / 6
