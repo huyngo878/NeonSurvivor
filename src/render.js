@@ -48,7 +48,8 @@ function _drawPlayer(ctx, player) {
       ctx.shadowColor = '#ffd700'
       ctx.globalAlpha = weapon.activeTimer / weapon.activeDuration
       ctx.beginPath()
-      ctx.arc(x, y, weapon.range, angle - Math.PI / 2, angle + Math.PI / 2)
+      const halfSweep = weapon.sweepAngle / 2
+      ctx.arc(x, y, weapon.range, angle - halfSweep, angle + halfSweep)
       ctx.stroke()
       ctx.restore()
     }

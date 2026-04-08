@@ -128,23 +128,30 @@ function _tickRocket(weapon, dt, player, enemies, projectiles) {
   if (weapon.timer > 0) return
   weapon.timer = weapon.cooldown
 
-  const inRange = enemies
+  const sorted = enemies
     .map(e => ({ e, dist: Math.hypot(e.pos.x - player.pos.x, e.pos.y - player.pos.y) }))
     .filter(({ dist }) => dist <= weapon.range)
     .sort((a, b) => a.dist - b.dist)
-    .slice(0, weapon.shots)
 
-  for (const { e: target } of inRange) {
+  if (sorted.length === 0) return
+
+  for (let s = 0; s < weapon.shots; s++) {
+    const { e: target } = sorted[s % sorted.length]
     const proj = projectiles.find(p => !p.active)
     if (!proj) break
     const dx = target.pos.x - player.pos.x
     const dy = target.pos.y - player.pos.y
     const dist = Math.hypot(dx, dy)
+    // slight angle spread when hitting the same target multiple times
+    const spread = sorted.length === 1 && weapon.shots > 1
+      ? (s - (weapon.shots - 1) / 2) * 0.15
+      : 0
+    const angle = Math.atan2(dy, dx) + spread
     proj.active = true
     proj.pos.x = player.pos.x
     proj.pos.y = player.pos.y
-    proj.vel.x = (dx / dist) * weapon.projectileSpeed
-    proj.vel.y = (dy / dist) * weapon.projectileSpeed
+    proj.vel.x = Math.cos(angle) * weapon.projectileSpeed
+    proj.vel.y = Math.sin(angle) * weapon.projectileSpeed
     proj.age = 0
     proj.damage = weapon.damage
     proj.radius = 7
