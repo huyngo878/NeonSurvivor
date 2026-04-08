@@ -252,6 +252,7 @@ describe('wand - echo wand', () => {
     updateWeapons(entities, 0.016)  // fires 1 shot, queues echo
     expect(pool.filter(p => p.active).length).toBe(1)
     expect(weapon.echoQueue.length).toBe(1)
+    weapon.timer = 999  // prevent main shot from firing during echo tick
     updateWeapons(entities, 0.6)   // tick past the echo delay
     expect(pool.filter(p => p.active).length).toBe(2)
     expect(weapon.echoQueue.length).toBe(0)

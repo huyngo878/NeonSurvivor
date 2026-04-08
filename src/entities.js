@@ -10,7 +10,7 @@ export const ENEMY_TYPES = {
 
 const WEAPON_CONFIGS = {
   wand: {
-    type: 'wand', cooldown: 0.65, damage: 22, range: 400, shots: 1, projectileSpeed: 400,
+    type: 'wand', cooldown: 0.53, damage: 22, range: 400, shots: 1, projectileSpeed: 400,
     bounce: 0, forkCount: 0, pierceCount: 0, slowOnHit: false, homing: 0,
     explodeOnImpact: false, explodeRadius: 0, multicastChance: 0,
     overloadActive: false,
