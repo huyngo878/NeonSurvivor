@@ -227,7 +227,7 @@ function _tickWhip(weapon, dt, player, enemies) {
   weapon.activeTimer = weapon.activeDuration
   weapon.hitIds = new Set()
   if (weapon.phantom) weapon.phantomHitIds = [new Set(), new Set()]
-  if (weapon.echo) weapon.echoTimer = 0.75
+  if (weapon.echo && weapon.echoTimer < 0) weapon.echoTimer = 0.75
 }
 
 function _tickRocket(weapon, dt, player, enemies, projectiles) {
