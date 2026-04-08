@@ -188,6 +188,20 @@ export const CARDS = [
     unique: true,
     apply: player => { _weapon(player, 'wand').multicastChance = 0.3 },
   },
+  {
+    id: 'wand_arcane_overload',
+    label: 'ARCANE OVERLOAD',
+    desc: 'Every 5th wand shot fires a devastating empowered blast',
+    rarity: 'legendary',
+    legendaryUnique: 'wand',
+    requires: 'wand',
+    icon: '★',
+    apply: player => {
+      const w = _weapon(player, 'wand')
+      w.overloadActive = true
+      w.overloadCounter = 0
+    },
+  },
 
   {
     id: 'whip_knockback',

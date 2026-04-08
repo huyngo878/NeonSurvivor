@@ -206,3 +206,24 @@ describe('updateWeapons - rocket', () => {
     expect(fired.knockback).toBe(40)
   })
 })
+
+describe('wand - arcane overload', () => {
+  it('fires an empowered shot every overloadThreshold regular shots', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    const weapon = player.weapons[0]
+    weapon.overloadActive = true
+    weapon.overloadCounter = 4  // one more shot triggers overload
+    weapon.timer = 0
+    const enemy = createEnemy('chaser', player.pos.x + 100, player.pos.y)
+    const pool = initProjectilePool()
+    updateWeapons([player, enemy, ...pool], 0.016)
+    // Counter should have reset to 0 and an empowered shot fired
+    expect(weapon.overloadCounter).toBe(0)
+    // Empowered shot is larger and has AoE
+    const empowered = pool.find(p => p.active && p.radius > 4)
+    expect(empowered).toBeDefined()
+    expect(empowered.aoe).toBe(true)
+    expect(empowered.damage).toBeGreaterThan(weapon.damage)
+  })
+})

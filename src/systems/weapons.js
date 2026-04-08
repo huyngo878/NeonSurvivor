@@ -91,6 +91,45 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
       proj.explodeRadius = weapon.explodeRadius || 0
     }
   }
+
+  // Arcane Overload: every Nth shot fires an empowered projectile
+  if (weapon.overloadActive) {
+    weapon.overloadCounter += inRange.length
+    if (weapon.overloadCounter >= weapon.overloadThreshold) {
+      weapon.overloadCounter = 0
+      const target = inRange[0]?.e
+      if (target) {
+        const proj = projectiles.find(p => !p.active)
+        if (proj) {
+          const dx = target.pos.x - player.pos.x
+          const dy = target.pos.y - player.pos.y
+          const dist = Math.hypot(dx, dy)
+          proj.active = true
+          proj.pos.x = player.pos.x
+          proj.pos.y = player.pos.y
+          proj.vel.x = (dx / dist) * weapon.projectileSpeed
+          proj.vel.y = (dy / dist) * weapon.projectileSpeed
+          proj.age = 0
+          proj.damage = weapon.damage * 3
+          proj.radius = 10
+          proj.aoe = true
+          proj.aoeRadius = 60
+          proj.weaponType = 'wand'
+          proj.explode = false
+          proj.bouncesRemaining = 0
+          proj.forkCountRemaining = 0
+          proj.forked = false
+          proj.lastHitEnemyId = null
+          proj.hitEnemyIds = new Set()
+          proj.piercesRemaining = 0
+          proj.slow = weapon.slowOnHit || false
+          proj.homing = 0
+          proj.explodeOnImpact = false
+          proj.explodeRadius = 0
+        }
+      }
+    }
+  }
 }
 
 function _tickWhip(weapon, dt, player, enemies) {
