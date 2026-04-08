@@ -352,6 +352,24 @@ describe('updateCollision — bleed DoT', () => {
   })
 })
 
+describe('whip chain lightning', () => {
+  it('chains to a nearby enemy when chainLightning > 0', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('whip')]
+    const weapon = player.weapons[0]
+    weapon.active = true
+    weapon.activeTimer = 0.1
+    weapon.aimAngle = 0
+    weapon.chainLightning = 2
+    const e1 = createEnemy('chaser', player.pos.x + 80, player.pos.y)    // in whip range
+    const e2 = createEnemy('chaser', player.pos.x + 160, player.pos.y)   // outside whip range, near e1, should chain
+    const gameState = { kills: 0, state: 'playing', time: 0, chestsOpened: 0 }
+    updateCollision([player, e1, e2], gameState)
+    expect(e1.hp).toBeLessThan(e1.maxHp)  // hit by whip
+    expect(e2.hp).toBeLessThan(e2.maxHp)  // hit by chain
+  })
+})
+
 describe('wand chain beam', () => {
   it('chains damage to nearby enemies on hit when chainBeam > 0', () => {
     const player = createPlayer()

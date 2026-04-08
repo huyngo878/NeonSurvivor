@@ -149,6 +149,10 @@ export function updateCollision(entities, gameState, dt = 0) {
             entities.push(createShockwave(enemy.pos.x, enemy.pos.y, weapon.range * 0.6, '#ffd700'))
           }
           if (enemy.hp <= 0) _killEnemy(enemy, entities, player, gameState)
+          if (weapon.chainLightning > 0) {
+            const chainHitIds = new Set([enemy.id])
+            _chainLightning(enemy, weapon, enemies, entities, player, gameState, weapon.chainLightning, chainHitIds)
+          }
         }
       }
     }
@@ -328,6 +332,21 @@ function _chainBeamJump(fromEnemy, hitEnemyIds, damage, hopsLeft, enemies, entit
   target.e.hp -= damage
   if (target.e.hp <= 0) _killEnemy(target.e, entities, player, gameState)
   if (hopsLeft > 1) _chainBeamJump(target.e, hitEnemyIds, damage * 0.7, hopsLeft - 1, enemies, entities, player, gameState)
+}
+
+function _chainLightning(fromEnemy, weapon, enemies, entities, player, gameState, hopsLeft, hitIds) {
+  const target = enemies
+    .filter(e => !e.dead && !hitIds.has(e.id))
+    .map(e => ({ e, dist: Math.hypot(e.pos.x - fromEnemy.pos.x, e.pos.y - fromEnemy.pos.y) }))
+    .filter(({ dist }) => dist < 200)
+    .sort((a, b) => a.dist - b.dist)[0]
+  if (!target) return
+  hitIds.add(target.e.id)
+  const damage = weapon.damage * 0.5
+  target.e.hp -= damage
+  entities.push(createShockwave(target.e.pos.x, target.e.pos.y, 30, '#aaddff'))
+  if (target.e.hp <= 0) _killEnemy(target.e, entities, player, gameState)
+  if (hopsLeft > 1) _chainLightning(target.e, weapon, enemies, entities, player, gameState, hopsLeft - 1, hitIds)
 }
 
 function _applyHitImpulse(enemy, proj) {

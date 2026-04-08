@@ -346,6 +346,16 @@ export const CARDS = [
     apply: player => { _weapon(player, 'whip').echo = true },
   },
   {
+    id: 'whip_chain_lightning',
+    label: 'CHAIN LIGHTNING',
+    desc: 'Whip hits arc chain lightning to 2 nearby enemies for 50% damage',
+    rarity: 'legendary',
+    legendaryUnique: 'whip',
+    requires: 'whip',
+    icon: '⚡',
+    apply: player => { _weapon(player, 'whip').chainLightning = 2 },
+  },
+  {
     id: 'wand_explode',
     label: 'ARCANE BURST',
     desc: 'Wand projectiles explode on impact for bonus AoE damage',
