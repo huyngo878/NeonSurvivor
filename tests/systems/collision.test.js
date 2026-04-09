@@ -478,3 +478,88 @@ describe('rocket cluster barrage', () => {
     expect(fragments.length).toBe(8)
   })
 })
+
+describe('updateCollision — chain beam', () => {
+  function makeChainBeamProj(pool, x, y) {
+    const proj = pool[0]
+    proj.active = true
+    proj.pos = { x, y }
+    proj.vel = { x: 0, y: 0 }
+    proj.damage = 20
+    proj.radius = 4
+    proj.weaponType = 'wand'
+    proj.aoe = false
+    proj.chainBeam = 3
+    proj.hitEnemyIds.clear()
+    proj.piercesRemaining = 0
+    proj.bouncesRemaining = 0
+    proj.forkCountRemaining = 0
+    proj.forked = false
+    proj.critChance = 0
+    proj.slow = false
+    proj.explodeOnImpact = false
+    return proj
+  }
+
+  it('damages a second nearby enemy via chain beam', () => {
+    const player = createPlayer()
+    const pool = initProjectilePool()
+    const enemy1 = createEnemy('chaser', 200, 200)
+    const enemy2 = createEnemy('chaser', 210, 200)  // within 220px
+    makeChainBeamProj(pool, 200, 200)
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision([player, enemy1, enemy2, ...pool], gameState)
+    expect(enemy2.hp).toBeLessThan(enemy2.maxHp)
+  })
+
+  it('emits a shockwave entity for each chain beam hop', () => {
+    const player = createPlayer()
+    const pool = initProjectilePool()
+    const enemy1 = createEnemy('chaser', 200, 200)
+    const enemy2 = createEnemy('chaser', 210, 200)
+    makeChainBeamProj(pool, 200, 200)
+    const entities = [player, enemy1, enemy2, ...pool]
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision(entities, gameState)
+    const shockwaves = entities.filter(e => e.type === 'shockwave')
+    expect(shockwaves.length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('fork projectile inherits chainBeam and piercesRemaining from parent', () => {
+    // Set up projectile manually in pool — no need to fire via weapon
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    const pool = initProjectilePool()
+
+    const proj = pool[0]
+    proj.active = true
+    proj.pos = { x: 200, y: 200 }
+    proj.vel = { x: 1, y: 0 }
+    proj.damage = 10
+    proj.radius = 4
+    proj.weaponType = 'wand'
+    proj.aoe = false
+    proj.chainBeam = 3
+    proj.piercesRemaining = 2
+    proj.bouncesRemaining = 0
+    proj.forkCountRemaining = 1
+    proj.forked = false
+    proj.critChance = 0
+    proj.slow = false
+    proj.explodeOnImpact = false
+    proj.hitEnemyIds.clear()
+
+    const hitEnemy = createEnemy('chaser', 200, 200)   // main hit
+    const forkTarget = createEnemy('chaser', 250, 200)  // fork aims here
+
+    const entities = [player, hitEnemy, forkTarget, ...pool]
+    const gameState = { kills: 0, state: 'playing', time: 0 }
+    updateCollision(entities, gameState)
+
+    // A fork projectile should have been spawned from pool[1..] onwards
+    const forkProj = pool.slice(1).find(p => p.active)
+    expect(forkProj).toBeDefined()
+    expect(forkProj.chainBeam).toBe(3)
+    expect(forkProj.piercesRemaining).toBe(2)
+  })
+})

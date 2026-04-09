@@ -105,6 +105,7 @@ function _tickWand(weapon, dt, player, enemies, projectiles, frame) {
           proj.homing = 0
           proj.explodeOnImpact = false
           proj.explodeRadius = 0
+          proj.chainBeam = weapon.chainBeam || 0
         }
         weapon.echoQueue.splice(i, 1)
       }
@@ -184,7 +185,7 @@ function _tickWand(weapon, dt, player, enemies, projectiles, frame) {
         sProj.homing = 0
         sProj.explodeOnImpact = false
         sProj.explodeRadius = 0
-        sProj.chainBeam = 0
+        sProj.chainBeam = weapon.chainBeam || 0
         sProj.critChance = weapon.critChance || 0
       }
     }

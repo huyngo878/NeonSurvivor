@@ -376,6 +376,8 @@ function _forkProjectile(proj, hitEnemy, enemies, entities) {
     fork.forked = false
     fork.lastHitEnemyId = hitEnemy.id
     fork.hitEnemyIds = new Set(proj.hitEnemyIds || [])
+    fork.chainBeam = proj.chainBeam || 0
+    fork.piercesRemaining = proj.piercesRemaining || 0
   }
 }
 
@@ -388,6 +390,7 @@ function _chainBeamJump(fromEnemy, hitEnemyIds, damage, hopsLeft, enemies, entit
   if (!target) return
   hitEnemyIds.add(target.e.id)
   target.e.hp -= damage
+  entities.push(createShockwave(target.e.pos.x, target.e.pos.y, 35, '#00ccff'))
   if (target.e.hp <= 0) _killEnemy(target.e, entities, player, gameState)
   if (hopsLeft > 1) _chainBeamJump(target.e, hitEnemyIds, damage * 0.7, hopsLeft - 1, enemies, entities, player, gameState)
 }

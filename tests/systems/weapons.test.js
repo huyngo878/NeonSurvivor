@@ -274,3 +274,57 @@ describe('whip - time echo', () => {
     expect(weapon.echoActive).toBe(true)
   })
 })
+
+describe('updateWeapons — chainBeam inheritance', () => {
+  it('main wand projectile gets chainBeam from weapon', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    player.weapons[0].timer = 0
+    player.weapons[0].chainBeam = 3
+    const enemy = createEnemy('chaser', player.pos.x + 100, player.pos.y)
+    const pool = initProjectilePool()
+    updateWeapons([player, enemy, ...pool], 0.016)
+    const fired = pool.find(p => p.active)
+    expect(fired.chainBeam).toBe(3)
+  })
+
+  it('echo projectile inherits chainBeam from weapon', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    const w = player.weapons[0]
+    w.timer = 0
+    w.echo = true
+    w.chainBeam = 3
+    w.echoQueue = []
+    const enemy = createEnemy('chaser', player.pos.x + 100, player.pos.y)
+    const pool = initProjectilePool()
+    const entities = [player, enemy, ...pool]
+    // First tick fires main shot and queues echo
+    updateWeapons(entities, 0.016)
+    expect(w.echoQueue.length).toBe(1)
+    // Reset weapon timer so it does NOT re-fire during the echo-flush tick
+    w.timer = 100
+    // Deactivate main proj to free pool slot, then flush echo with dt > 0.6
+    pool.forEach(p => { p.active = false })
+    updateWeapons(entities, 0.7)
+    const echoFired = pool.find(p => p.active)
+    expect(echoFired).toBeDefined()
+    expect(echoFired.chainBeam).toBe(3)
+  })
+
+  it('split reality projectiles inherit chainBeam from weapon', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    const w = player.weapons[0]
+    w.timer = 0
+    w.splitReality = true
+    w.chainBeam = 3
+    const enemy = createEnemy('chaser', player.pos.x + 100, player.pos.y)
+    const pool = initProjectilePool()
+    updateWeapons([player, enemy, ...pool], 0.016)
+    const fired = pool.filter(p => p.active)
+    // Main shot + 2 split reality shots = 3 active projectiles
+    expect(fired.length).toBe(3)
+    expect(fired.every(p => p.chainBeam === 3)).toBe(true)
+  })
+})
