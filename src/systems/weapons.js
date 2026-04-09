@@ -53,7 +53,7 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
           proj.forkCountRemaining = 0
           proj.forked = false
           proj.lastHitEnemyId = null
-          proj.hitEnemyIds = new Set()
+          proj.hitEnemyIds.clear()
           proj.piercesRemaining = 0
           proj.slow = weapon.slowOnHit || false
           proj.homing = 0
@@ -97,7 +97,7 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
     proj.forkCountRemaining = weapon.forkCount
     proj.forked = false
     proj.lastHitEnemyId = null
-    proj.hitEnemyIds = new Set()
+    proj.hitEnemyIds.clear()
     proj.piercesRemaining = weapon.pierceCount || 0
     proj.slow = weapon.slowOnHit || false
     proj.homing = weapon.homing || 0
@@ -142,7 +142,7 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
       proj.forkCountRemaining = weapon.forkCount
       proj.forked = false
       proj.lastHitEnemyId = null
-      proj.hitEnemyIds = new Set()
+      proj.hitEnemyIds.clear()
       proj.piercesRemaining = weapon.pierceCount || 0
       proj.slow = weapon.slowOnHit || false
       proj.homing = weapon.homing || 0
@@ -181,7 +181,7 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
           proj.forkCountRemaining = 0
           proj.forked = false
           proj.lastHitEnemyId = null
-          proj.hitEnemyIds = new Set()
+          proj.hitEnemyIds.clear()
           proj.piercesRemaining = 0
           proj.slow = weapon.slowOnHit || false
           proj.homing = 0
@@ -201,7 +201,7 @@ function _tickWhip(weapon, dt, player, enemies) {
     if (weapon.echoTimer <= 0) {
       weapon.echoActive = true
       weapon.echoActiveTimer = weapon.activeDuration
-      weapon.echoHitIds = new Set()
+      weapon.echoHitIds.clear()
       weapon.echoTimer = -1
     }
   } else if (weapon.echoActive) {
@@ -238,8 +238,8 @@ function _tickWhip(weapon, dt, player, enemies) {
 
   weapon.active = true
   weapon.activeTimer = weapon.activeDuration
-  weapon.hitIds = new Set()
-  if (weapon.phantom) weapon.phantomHitIds = [new Set(), new Set()]
+  weapon.hitIds.clear()
+  if (weapon.phantom) { weapon.phantomHitIds[0].clear(); weapon.phantomHitIds[1].clear() }
   if (weapon.echo && weapon.echoTimer < 0) weapon.echoTimer = 0.75
 }
 
@@ -287,6 +287,6 @@ function _tickRocket(weapon, dt, player, enemies, projectiles) {
     proj.clusterBarrage = weapon.clusterBarrage || false
     proj.chainReaction = weapon.chainReaction || false
     proj.lastHitEnemyId = null
-    proj.hitEnemyIds = new Set()
+    proj.hitEnemyIds.clear()
   }
 }
