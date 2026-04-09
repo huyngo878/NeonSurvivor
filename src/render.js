@@ -62,8 +62,10 @@ function _drawPlayer(ctx, player) {
 function _drawEnemy(ctx, enemy) {
   const { x, y } = enemy.pos
   ctx.save()
-  ctx.shadowBlur = enemy.enemyType === 'boss' ? 24 : 15
-  ctx.shadowColor = enemy.color
+  if (enemy.enemyType === 'boss') {
+    ctx.shadowBlur = 24
+    ctx.shadowColor = enemy.color
+  }
   ctx.fillStyle = enemy.color
   ctx.beginPath()
   ctx.arc(x, y, enemy.radius, 0, Math.PI * 2)
@@ -89,8 +91,10 @@ function _drawProjectile(ctx, proj) {
   const isRocket = proj.weaponType === 'rocket'
   const color = isRocket ? '#ff6600' : '#ffffff'
   ctx.save()
-  ctx.shadowBlur = isRocket ? 16 : 12
-  ctx.shadowColor = color
+  if (isRocket) {
+    ctx.shadowBlur = 16
+    ctx.shadowColor = color
+  }
   ctx.fillStyle = color
   ctx.beginPath()
   ctx.arc(x, y, proj.radius, 0, Math.PI * 2)
@@ -113,8 +117,6 @@ function _drawProjectile(ctx, proj) {
 
 function _drawEnemyProjectile(ctx, proj) {
   ctx.save()
-  ctx.shadowBlur = 12
-  ctx.shadowColor = '#ff3355'
   ctx.fillStyle = '#ff3355'
   ctx.beginPath()
   ctx.arc(proj.pos.x, proj.pos.y, proj.radius, 0, Math.PI * 2)
