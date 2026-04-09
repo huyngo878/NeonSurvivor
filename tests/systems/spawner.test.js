@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { updateSpawner, createSpawnerState, getDensityMultiplier, getHealthMultiplier } from '../../src/systems/spawner.js'
 import { createPlayer, initProjectilePool } from '../../src/entities.js'
-import { SPAWN_RADIUS, WAVE_DURATION } from '../../src/constants.js'
+import { WAVE_DURATION } from '../../src/constants.js'
 
 describe('updateSpawner', () => {
   it('spawns chaser enemies on first frame of wave 1', () => {
@@ -36,14 +36,19 @@ describe('updateSpawner', () => {
     expect(enemies[0].enemyType).toBe('boss')
   })
 
-  it('spawns enemy at exactly SPAWN_RADIUS distance from player', () => {
+  it('spawns enemy at least 400px from player and within world bounds', () => {
     const player = createPlayer()
     const entities = [player, ...initProjectilePool()]
     const state = createSpawnerState()
     updateSpawner(entities, state, 0.016, 0.016, {})
     const enemy = entities.find(entity => entity.type === 'enemy')
+    expect(enemy).toBeDefined()
     const dist = Math.hypot(enemy.pos.x - player.pos.x, enemy.pos.y - player.pos.y)
-    expect(dist).toBeCloseTo(SPAWN_RADIUS, 1)
+    expect(dist).toBeGreaterThanOrEqual(400)
+    expect(enemy.pos.x).toBeGreaterThanOrEqual(0)
+    expect(enemy.pos.x).toBeLessThanOrEqual(3000)
+    expect(enemy.pos.y).toBeGreaterThanOrEqual(0)
+    expect(enemy.pos.y).toBeLessThanOrEqual(3000)
   })
 
   it('uses linear scaling before a spike and spikes on wave 11', () => {

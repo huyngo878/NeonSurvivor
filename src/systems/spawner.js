@@ -1,4 +1,4 @@
-import { SPAWN_RADIUS, WAVE_DURATION, MAX_ENEMIES, DENSITY_MULT } from '../constants.js'
+import { WORLD_W, WORLD_H, WAVE_DURATION, MAX_ENEMIES, DENSITY_MULT } from '../constants.js'
 import { createEnemy, ENEMY_TYPES } from '../entities.js'
 
 const BASE_WAVES = [
@@ -102,9 +102,13 @@ function _piecewiseScale(wave, linearStep, spikeMult) {
 }
 
 function _spawnEnemy(enemyType, player, overrides) {
-  const angle = Math.random() * Math.PI * 2
-  const x = player.pos.x + Math.cos(angle) * SPAWN_RADIUS
-  const y = player.pos.y + Math.sin(angle) * SPAWN_RADIUS
+  const MIN_DIST = 400
+  let x, y, attempts = 0
+  do {
+    x = Math.random() * WORLD_W
+    y = Math.random() * WORLD_H
+    attempts++
+  } while (Math.hypot(x - player.pos.x, y - player.pos.y) < MIN_DIST && attempts < 10)
   return createEnemy(enemyType, x, y, overrides)
 }
 
