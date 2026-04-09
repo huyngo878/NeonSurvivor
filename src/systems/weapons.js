@@ -1,3 +1,16 @@
+let _poolNext = 0
+
+function _getProjectile(pool) {
+  for (let i = 0; i < pool.length; i++) {
+    const idx = (_poolNext + i) % pool.length
+    if (!pool[idx].active) {
+      _poolNext = (idx + 1) % pool.length
+      return pool[idx]
+    }
+  }
+  return null
+}
+
 export function updateWeapons(entities, dt) {
   const player = entities.find(e => e.type === 'player')
   if (!player) return
@@ -22,7 +35,7 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
       const entry = weapon.echoQueue[i]
       entry.timer -= dt
       if (entry.timer <= 0) {
-        const proj = projectiles.find(p => !p.active)
+        const proj = _getProjectile(projectiles)
         if (proj) {
           proj.active = true
           proj.pos.x = entry.pos.x
@@ -63,7 +76,7 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
     .slice(0, weapon.shots)
 
   for (const { e: target } of inRange) {
-    const proj = projectiles.find(p => !p.active)
+    const proj = _getProjectile(projectiles)
     if (!proj) break
     const dx = target.pos.x - player.pos.x
     const dy = target.pos.y - player.pos.y
@@ -106,7 +119,7 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
   if (weapon.multicastChance > 0) {
     for (const { e: target } of inRange) {
       if (Math.random() >= weapon.multicastChance) continue
-      const proj = projectiles.find(p => !p.active)
+      const proj = _getProjectile(projectiles)
       if (!proj) break
       const dx = target.pos.x - player.pos.x
       const dy = target.pos.y - player.pos.y
@@ -147,7 +160,7 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
       weapon.overloadCounter = 0
       const target = inRange[0]?.e
       if (target) {
-        const proj = projectiles.find(p => !p.active)
+        const proj = _getProjectile(projectiles)
         if (proj) {
           const dx = target.pos.x - player.pos.x
           const dy = target.pos.y - player.pos.y
@@ -244,7 +257,7 @@ function _tickRocket(weapon, dt, player, enemies, projectiles) {
 
   for (let s = 0; s < weapon.shots; s++) {
     const { e: target } = sorted[s % sorted.length]
-    const proj = projectiles.find(p => !p.active)
+    const proj = _getProjectile(projectiles)
     if (!proj) break
     const dx = target.pos.x - player.pos.x
     const dy = target.pos.y - player.pos.y
