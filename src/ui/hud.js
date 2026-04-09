@@ -181,106 +181,186 @@ export function drawHud(ctx, canvas, player, gameState) {
 function drawUpgradeHud(ctx, canvas, player, gameState) {
   if (!player || player.weapons.length === 0) return
 
-  const lines = []
+  // Build sections: each section = { color, label, stats[], tags[] }
+  const sections = []
 
   for (const w of player.weapons) {
     if (w.type === 'wand') {
-      const fr = (1 / w.cooldown).toFixed(2)
-      lines.push(`WAND  DMG:${w.damage}  FR:${fr}/s  RNG:${w.range}  SHOTS:${w.shots}`)
-      const mods = []
-      if (w.pierceCount > 0)    mods.push(`PIERCE:${w.pierceCount}`)
-      if (w.bounce > 0)         mods.push(`BOUNCE:${w.bounce}`)
-      if (w.forkCount > 0)      mods.push(`FORK:${w.forkCount}`)
-      if (w.critChance > 0)     mods.push(`CRIT:${Math.round(w.critChance * 100)}%`)
-      if (w.slowOnHit)          mods.push('[SLOW]')
-      if (w.homing > 0)         mods.push('[HOMING]')
-      if (w.multicastChance > 0) mods.push('[MULTICAST]')
-      if (w.explodeOnImpact)    mods.push('[EXPLODE]')
-      if (w.chainBeam > 0)      mods.push('[CHAIN BEAM]')
-      if (w.echo)               mods.push('[ECHO]')
-      if (w.splitReality)       mods.push('[SPLIT]')
-      if (w.overloadActive)     mods.push('[OVERLOAD]')
-      if (w.novaBurst)          mods.push('[NOVA]')
-      if (w.evolving)           mods.push(`[EVO:+${w.evolutionBonus}]`)
-      if (mods.length > 0) lines.push('  ' + mods.join('  '))
+      const tags = []
+      if (w.pierceCount > 0)     tags.push(`Pierce x${w.pierceCount}`)
+      if (w.bounce > 0)          tags.push(`Bounce x${w.bounce}`)
+      if (w.forkCount > 0)       tags.push(`Fork x${w.forkCount}`)
+      if (w.critChance > 0)      tags.push(`Crit ${Math.round(w.critChance * 100)}%`)
+      if (w.slowOnHit)           tags.push('Slow')
+      if (w.homing > 0)          tags.push('Homing')
+      if (w.multicastChance > 0) tags.push('Multicast')
+      if (w.explodeOnImpact)     tags.push('Explode')
+      if (w.chainBeam > 0)       tags.push('Chain Beam')
+      if (w.echo)                tags.push('Echo')
+      if (w.splitReality)        tags.push('Split Reality')
+      if (w.overloadActive)      tags.push('Overload')
+      if (w.novaBurst)           tags.push('Nova Burst')
+      if (w.evolving)            tags.push(`Adaptive +${w.evolutionBonus}`)
+      sections.push({
+        color: '#00ffc8',
+        label: 'WAND',
+        stats: [
+          `Damage: ${w.damage}    Shots: ${w.shots}`,
+          `Rate: ${(1 / w.cooldown).toFixed(2)}/s    Range: ${w.range}`,
+        ],
+        tags,
+      })
     } else if (w.type === 'whip') {
-      const fr = (1 / w.cooldown).toFixed(2)
-      lines.push(`WHIP  DMG:${w.damage}  FR:${fr}/s  RNG:${w.range}`)
-      const mods = []
-      if (w.critChance > 0)    mods.push(`CRIT:${Math.round(w.critChance * 100)}%`)
-      if (w.knockback > 18)    mods.push(`KB:${w.knockback}`)
-      if (w.slowOnHit)         mods.push('[SLOW]')
-      if (w.bleedOnHit)        mods.push(`[BLEED ${w.bleedDps}/s]`)
-      if (w.shockwaveOnHit)    mods.push('[SHOCKWAVE]')
-      if (w.chainLightning > 0) mods.push('[LIGHTNING]')
-      if (w.echo)              mods.push('[ECHO]')
-      if (w.phantom)           mods.push('[PHANTOM]')
-      if (w.gravitySlamOnHit)  mods.push('[GSLAM]')
-      if (w.boomerang)         mods.push('[BOOMERANG]')
-      if (w.orbitBlades)       mods.push('[ORBIT]')
-      if (mods.length > 0) lines.push('  ' + mods.join('  '))
+      const tags = []
+      if (w.critChance > 0)     tags.push(`Crit ${Math.round(w.critChance * 100)}%`)
+      if (w.knockback > 18)     tags.push(`Knockback ${w.knockback}`)
+      if (w.slowOnHit)          tags.push('Slow')
+      if (w.bleedOnHit)         tags.push(`Bleed ${w.bleedDps}/s`)
+      if (w.shockwaveOnHit)     tags.push('Shockwave')
+      if (w.chainLightning > 0) tags.push('Chain Lightning')
+      if (w.echo)               tags.push('Time Echo')
+      if (w.phantom)            tags.push('Phantom Strikes')
+      if (w.gravitySlamOnHit)   tags.push('Gravity Slam')
+      if (w.boomerang)          tags.push('Boomerang')
+      if (w.orbitBlades)        tags.push('Orbit Blades')
+      sections.push({
+        color: '#ffd700',
+        label: 'WHIP',
+        stats: [
+          `Damage: ${w.damage}    Range: ${w.range}`,
+          `Rate: ${(1 / w.cooldown).toFixed(2)}/s`,
+        ],
+        tags,
+      })
     } else if (w.type === 'rocket') {
-      const fr = (1 / w.cooldown).toFixed(2)
-      lines.push(`RCKT  DMG:${w.damage}  FR:${fr}/s  AoE:${w.aoeRadius}  SHOTS:${w.shots}`)
-      const mods = []
-      if (w.knockback > 0)         mods.push(`KB:${w.knockback}`)
-      if (w.fragmentChance > 0)    mods.push(`[FRAG ${Math.round(w.fragmentChance * 100)}%]`)
-      if (w.centerDamageBonus > 0) mods.push(`[CTR+${Math.round(w.centerDamageBonus * 100)}%]`)
-      if (w.explosionCount > 1)    mods.push('[DBL EXP]')
-      if (w.inferno)               mods.push('[INFERNO]')
-      if (w.clusterBarrage)        mods.push('[CLUSTER]')
-      if (w.chainReaction)         mods.push('[CHAIN RXN]')
-      if (w.rocketRain)            mods.push('[RAIN]')
-      if (w.gravityWell)           mods.push('[GWELL]')
-      if (mods.length > 0) lines.push('  ' + mods.join('  '))
+      const tags = []
+      if (w.knockback > 0)          tags.push(`Knockback ${w.knockback}`)
+      if (w.fragmentChance > 0)     tags.push(`Fragments ${Math.round(w.fragmentChance * 100)}%`)
+      if (w.centerDamageBonus > 0)  tags.push(`Center +${Math.round(w.centerDamageBonus * 100)}%`)
+      if (w.explosionCount > 1)     tags.push('Double Explosion')
+      if (w.inferno)                tags.push('Inferno')
+      if (w.clusterBarrage)         tags.push('Cluster Barrage')
+      if (w.chainReaction)          tags.push('Chain Reaction')
+      if (w.rocketRain)             tags.push('Rocket Rain')
+      if (w.gravityWell)            tags.push('Gravity Well')
+      sections.push({
+        color: '#ff6600',
+        label: 'ROCKET',
+        stats: [
+          `Damage: ${w.damage}    Shots: ${w.shots}`,
+          `Rate: ${(1 / w.cooldown).toFixed(2)}/s    AoE: ${w.aoeRadius}`,
+        ],
+        tags,
+      })
     }
   }
 
-  // Player stat upgrades (only show above base values)
-  const playerMods = []
-  if (player.armor > 0)     playerMods.push(`ARM:${player.armor}`)
-  if (player.maxHp > 100)   playerMods.push(`HP:${player.maxHp}`)
-  if (player.speed > 200)   playerMods.push(`SPD:${Math.round(player.speed)}`)
-  if (playerMods.length > 0) {
-    lines.push('── PLAYER ──')
-    lines.push('  ' + playerMods.join('  '))
+  // Player upgrades section
+  const playerTags = []
+  if (player.armor > 0)    playerTags.push(`Armor ${player.armor}`)
+  if (player.maxHp > 100)  playerTags.push(`Max HP ${player.maxHp}`)
+  if (player.speed > 200)  playerTags.push(`Speed ${Math.round(player.speed)}`)
+  if (playerTags.length > 0) {
+    sections.push({ color: '#aaaaaa', label: 'PLAYER', stats: [], tags: playerTags })
   }
 
-  if (lines.length === 0) return
+  if (sections.length === 0) return
 
-  const fontSize = 11
-  const lineH = 15
-  const padX = 8
-  const padY = 6
+  const HEADER_SIZE = 13
+  const STAT_SIZE = 12
+  const TAG_SIZE = 11
+  const padX = 10
+  const padY = 8
+  const sectionGap = 6
+  const headerH = 18
+  const statH = 16
+  const tagH = 15
+  const margin = 10
 
   ctx.save()
-  ctx.font = `${fontSize}px monospace`
-  const maxW = lines.reduce((m, l) => Math.max(m, ctx.measureText(l).width), 0)
+
+  // Measure max width needed
+  let maxW = 0
+  for (const sec of sections) {
+    ctx.font = `bold ${HEADER_SIZE}px monospace`
+    maxW = Math.max(maxW, ctx.measureText(sec.label).width)
+    ctx.font = `${STAT_SIZE}px monospace`
+    for (const s of sec.stats) maxW = Math.max(maxW, ctx.measureText(s).width)
+    ctx.font = `${TAG_SIZE}px monospace`
+    // Tags are rendered as a wrapping row — measure each tag with prefix
+    for (const t of sec.tags) maxW = Math.max(maxW, ctx.measureText(`  ▸ ${t}`).width)
+  }
+  maxW = Math.max(maxW, 160) // minimum width
+
+  // Compute total height
+  let totalH = padY
+  for (let si = 0; si < sections.length; si++) {
+    const sec = sections[si]
+    totalH += headerH
+    totalH += sec.stats.length * statH
+    totalH += sec.tags.length * tagH
+    if (si < sections.length - 1) totalH += sectionGap
+  }
+  totalH += padY
+
   const boxW = maxW + padX * 2
-  const boxH = lines.length * lineH + padY * 2
-
-  // Position above XP bar (XP bar is at canvas.clientHeight - 16, height 12)
-  // Leave 48px gap to clear XP bar + level text
-  const margin = 8
+  const boxH = totalH
   const bx = canvas.clientWidth - boxW - margin
-  const by = canvas.clientHeight - boxH - 48
+  const by = canvas.clientHeight - boxH - 52
 
-  ctx.fillStyle = 'rgba(0,0,0,0.65)'
-  ctx.strokeStyle = 'rgba(0,255,200,0.15)'
+  // Background
+  ctx.fillStyle = 'rgba(0,0,0,0.78)'
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)'
   ctx.lineWidth = 1
   ctx.fillRect(bx, by, boxW, boxH)
   ctx.strokeRect(bx, by, boxW, boxH)
 
-  ctx.textAlign = 'left'
-  lines.forEach((line, i) => {
-    const ty = by + padY + (i + 1) * lineH - 3
-    if (line.startsWith('WAND'))      ctx.fillStyle = '#00ffc8'
-    else if (line.startsWith('WHIP')) ctx.fillStyle = '#ffd700'
-    else if (line.startsWith('RCKT')) ctx.fillStyle = '#ff6600'
-    else if (line.startsWith('──'))   ctx.fillStyle = 'rgba(0,255,200,0.45)'
-    else                              ctx.fillStyle = 'rgba(255,255,255,0.55)'
-    ctx.fillText(line, bx + padX, ty)
-  })
+  let cy = by + padY
+
+  for (let si = 0; si < sections.length; si++) {
+    const sec = sections[si]
+
+    // Colored left bar accent
+    ctx.fillStyle = sec.color
+    ctx.fillRect(bx, cy, 3, headerH + sec.stats.length * statH + sec.tags.length * tagH)
+
+    // Weapon header
+    ctx.font = `bold ${HEADER_SIZE}px monospace`
+    ctx.fillStyle = sec.color
+    ctx.shadowBlur = 8
+    ctx.shadowColor = sec.color
+    ctx.textAlign = 'left'
+    ctx.fillText(sec.label, bx + padX + 5, cy + HEADER_SIZE)
+    ctx.shadowBlur = 0
+    cy += headerH
+
+    // Stats rows
+    ctx.font = `${STAT_SIZE}px monospace`
+    ctx.fillStyle = 'rgba(220,220,220,0.9)'
+    for (const stat of sec.stats) {
+      ctx.fillText(stat, bx + padX + 5, cy + STAT_SIZE - 2)
+      cy += statH
+    }
+
+    // Upgrade tags — each on its own line with a bullet
+    ctx.font = `${TAG_SIZE}px monospace`
+    for (const tag of sec.tags) {
+      ctx.fillStyle = 'rgba(255,220,80,0.85)'
+      ctx.fillText(`  ▸ ${tag}`, bx + padX + 5, cy + TAG_SIZE - 2)
+      cy += tagH
+    }
+
+    if (si < sections.length - 1) {
+      // Divider
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)'
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(bx + 4, cy + sectionGap / 2)
+      ctx.lineTo(bx + boxW - 4, cy + sectionGap / 2)
+      ctx.stroke()
+      cy += sectionGap
+    }
+  }
 
   ctx.restore()
 }
