@@ -222,7 +222,7 @@ function _rollPickupDrop(enemy, entities) {
   }
 }
 
-function _aoeExplosion(cx, cy, radius, damage, enemies, entities, player, gameState, skipEnemy, centerBonus = 0) {
+function _aoeExplosion(cx, cy, radius, damage, enemies, entities, player, gameState, skipEnemy, centerBonus = 0, chainReaction = false) {
   entities.push(createShockwave(cx, cy, radius))
   for (const enemy of enemies) {
     if (enemy === skipEnemy || enemy.dead) continue
@@ -232,7 +232,11 @@ function _aoeExplosion(cx, cy, radius, damage, enemies, entities, player, gameSt
       enemy.hp -= effectiveDamage
       _pushEnemy(enemy, cx, cy, player?.weapons.find(w => w.type === 'rocket')?.knockback || 0)
       if (enemy.hp <= 0) {
+        const deathPos = { x: enemy.pos.x, y: enemy.pos.y }
         _killEnemy(enemy, entities, player, gameState)
+        if (chainReaction) {
+          _aoeExplosion(deathPos.x, deathPos.y, radius * 0.5, damage * 0.4, enemies, entities, player, gameState, enemy, 0, false)
+        }
       }
     }
   }
@@ -244,7 +248,7 @@ function _triggerRocketExplosions(proj, enemies, entities, player, gameState, sk
     const radius = proj.aoeRadius + i * 24
     const damage = proj.damage * (i === 0 ? 0.5 : 0.35)
     const centerBonus = i === 0 ? (proj.centerDamageBonus || 0) : 0
-    _aoeExplosion(proj.pos.x, proj.pos.y, radius, damage, enemies, entities, player, gameState, skipEnemy, centerBonus)
+    _aoeExplosion(proj.pos.x, proj.pos.y, radius, damage, enemies, entities, player, gameState, skipEnemy, centerBonus, i === 0 ? (proj.chainReaction || false) : false)
   }
   if (proj.inferno) {
     entities.push(createFireZone(proj.pos.x, proj.pos.y, proj.aoeRadius * 0.8, proj.damage * 0.3, 3.0))

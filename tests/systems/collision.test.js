@@ -417,6 +417,38 @@ describe('fire zone', () => {
   })
 })
 
+describe('rocket chain reaction', () => {
+  it('killed enemies trigger secondary explosion when chainReaction is true', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('rocket')]
+    // e1 is center of explosion (will die), e2 is nearby (gets chain explosion)
+    const e1 = createEnemy('chaser', 200, 200)
+    e1.hp = 1   // one-shot by explosion
+    const e2 = createEnemy('chaser', 230, 200)  // within chain radius
+    const pool = initProjectilePool()
+    const proj = pool[0]
+    proj.active = true
+    proj.pos = { x: 200, y: 200 }
+    proj.vel = { x: 0, y: 0 }
+    proj.damage = 100
+    proj.radius = 7
+    proj.aoe = true
+    proj.aoeRadius = 80
+    proj.weaponType = 'rocket'
+    proj.explode = true
+    proj.explosionCount = 1
+    proj.knockback = 0
+    proj.fragmentChance = 0
+    proj.clusterBarrage = false
+    proj.inferno = false
+    proj.chainReaction = true
+    const gameState = { kills: 0, state: 'playing', time: 0, chestsOpened: 0 }
+    const hpBefore = e2.hp
+    updateCollision([player, e1, e2, ...pool], gameState, 0.016)
+    expect(e2.hp).toBeLessThan(hpBefore)  // e2 took chain explosion damage
+  })
+})
+
 describe('rocket cluster barrage', () => {
   it('spawns 8 fragments guaranteed when clusterBarrage is true', () => {
     const player = createPlayer()

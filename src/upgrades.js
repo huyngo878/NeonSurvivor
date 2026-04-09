@@ -467,6 +467,16 @@ export const CARDS = [
     apply: player => { _weapon(player, 'rocket').clusterBarrage = true },
   },
   {
+    id: 'rocket_chain_reaction',
+    label: 'CHAIN REACTION',
+    desc: 'Enemies killed by rockets explode, chaining to nearby enemies at 40% damage',
+    rarity: 'legendary',
+    legendaryUnique: 'rocket',
+    requires: 'rocket',
+    icon: '☢',
+    apply: player => { _weapon(player, 'rocket').chainReaction = true },
+  },
+  {
     id: 'rocket_firerate',
     label: 'RAPID RELOAD',
     desc: 'Rocket fires 15% faster',

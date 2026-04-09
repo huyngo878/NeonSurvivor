@@ -272,6 +272,7 @@ function _tickRocket(weapon, dt, player, enemies, projectiles) {
     proj.centerDamageBonus = weapon.centerDamageBonus || 0
     proj.inferno = weapon.inferno || false
     proj.clusterBarrage = weapon.clusterBarrage || false
+    proj.chainReaction = weapon.chainReaction || false
     proj.lastHitEnemyId = null
     proj.hitEnemyIds = new Set()
   }
