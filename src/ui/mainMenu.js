@@ -117,7 +117,7 @@ export function drawMainMenu(ctx, canvas, gameState) {
   ctx.save()
   ctx.font = '13px monospace'
   ctx.textAlign = 'right'
-  ctx.fillStyle = '#222'
+  ctx.fillStyle = '#555'
   ctx.fillText('v0.1.0', canvas.clientWidth - 16, canvas.clientHeight - 14)
   ctx.restore()
 }
