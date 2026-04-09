@@ -517,7 +517,8 @@ export function pickSparklyCards(player, n) {
     if (card.excludes && _weapon(player, card.excludes)) return false
     if (card.unique && player.cardHistory?.includes(card.id)) return false
     if (card.available && !card.available(player)) return false
-    if (card.legendaryUnique && player.uniqueWeapons?.[card.legendaryUnique]) return false
+    // legendaryUnique filter temporarily disabled
+    // if (card.legendaryUnique && player.uniqueWeapons?.[card.legendaryUnique]) return false
     return true
   })
   return _weightedSample(eligible, n, SPARKLY_WEIGHTS)
@@ -529,7 +530,8 @@ export function pickChestCards(player, n) {
     if (card.excludes && _weapon(player, card.excludes)) return false
     if (card.unique && player.cardHistory?.includes(card.id)) return false
     if (card.available && !card.available(player)) return false
-    if (card.legendaryUnique && player.uniqueWeapons?.[card.legendaryUnique]) return false
+    // legendaryUnique filter temporarily disabled
+    // if (card.legendaryUnique && player.uniqueWeapons?.[card.legendaryUnique]) return false
     return true
   })
   return _weightedSample(eligible, n)
