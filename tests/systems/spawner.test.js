@@ -52,3 +52,23 @@ describe('updateSpawner', () => {
     expect(getHealthMultiplier(11)).toBeGreaterThan(getHealthMultiplier(10))
   })
 })
+
+describe('getDensityMultiplier — steeper scaling', () => {
+  it('wave 10 density is at least 3.0x', () => {
+    expect(getDensityMultiplier(10)).toBeGreaterThanOrEqual(3.0)
+  })
+
+  it('wave 20 density is at least 6.0x', () => {
+    expect(getDensityMultiplier(20)).toBeGreaterThanOrEqual(6.0)
+  })
+
+  it('wave 30 density is at least 12.0x', () => {
+    expect(getDensityMultiplier(30)).toBeGreaterThanOrEqual(12.0)
+  })
+
+  it('density still increases each wave', () => {
+    for (let w = 1; w < 30; w++) {
+      expect(getDensityMultiplier(w + 1)).toBeGreaterThan(getDensityMultiplier(w))
+    }
+  })
+})

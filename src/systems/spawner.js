@@ -78,15 +78,15 @@ export function updateSpawner(entities, state, dt, gameTime, gameState) {
 }
 
 export function getDensityMultiplier(wave) {
-  const base = _piecewiseScale(wave, 0.12, 1.25)
+  const base = _piecewiseScale(wave, 0.225, 1.60)
   if (wave < 20) return base
-  return base * (1 + (wave - 20) * 0.04)
+  return base * (1 + (wave - 20) * 0.06)
 }
 
 export function getHealthMultiplier(wave) {
-  const base = _piecewiseScale(wave, 0.10, 1.25)
+  const base = _piecewiseScale(wave, 0.18, 1.60)
   if (wave < 20) return base
-  return base * (1 + (wave - 20) * 0.04)
+  return base * (1 + (wave - 20) * 0.06)
 }
 
 function _piecewiseScale(wave, linearStep, spikeMult) {
