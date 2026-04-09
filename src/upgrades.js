@@ -562,6 +562,32 @@ export const CARDS = [
     apply: player => { _weapon(player, 'rocket').chainReaction = true },
   },
   {
+    id: 'rocket_nuclear',
+    label: 'NUCLEAR STRIKE',
+    desc: 'Rocket deals 4× damage and 2.5× blast radius, fires 80% slower, adds inferno',
+    rarity: 'legendary',
+    legendaryUnique: 'rocket',
+    requires: 'rocket',
+    icon: 'N',
+    apply: player => {
+      const w = _weapon(player, 'rocket')
+      w.damage = Math.round(w.damage * 4)
+      w.aoeRadius = Math.round(w.aoeRadius * 2.5)
+      w.cooldown *= 1.8
+      w.inferno = true
+    },
+  },
+  {
+    id: 'rocket_rain',
+    label: 'ROCKET RAIN',
+    desc: 'Each rocket fired also launches 2 mini-rockets at additional targets for 40% damage',
+    rarity: 'legendary',
+    legendaryUnique: 'rocket',
+    requires: 'rocket',
+    icon: 'R',
+    apply: player => { _weapon(player, 'rocket').rocketRain = true },
+  },
+  {
     id: 'rocket_firerate',
     label: 'RAPID RELOAD',
     desc: 'Rocket fires 15% faster',

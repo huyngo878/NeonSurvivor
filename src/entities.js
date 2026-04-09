@@ -37,6 +37,7 @@ const WEAPON_CONFIGS = {
     type: 'rocket', cooldown: 2.0, damage: 60, range: 500, shots: 1, aoeRadius: 80,
     explosionCount: 1, knockback: 0, fragmentChance: 0,
     projectileSpeed: 300, centerDamageBonus: 0, inferno: false, clusterBarrage: false, chainReaction: false,
+    rocketRain: false,
   },
 }
 

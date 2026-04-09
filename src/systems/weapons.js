@@ -415,4 +415,39 @@ function _tickRocket(weapon, dt, player, enemies, projectiles, frame) {
     proj.lastHitEnemyId = null
     proj.hitEnemyIds.clear()
   }
+
+  // Rocket Rain: 2 mini-rockets at additional targets
+  if (weapon.rocketRain && sorted.length > 0) {
+    for (let r = 0; r < 2; r++) {
+      const targetIdx = Math.min(r + 1, sorted.length - 1)
+      const { e: target } = sorted[targetIdx]
+      const miniProj = _getProjectile(projectiles)
+      if (!miniProj) break
+      const dx = target.pos.x - player.pos.x
+      const dy = target.pos.y - player.pos.y
+      const dist = Math.hypot(dx, dy) || 1
+      miniProj.active = true
+      miniProj.pos.x = player.pos.x
+      miniProj.pos.y = player.pos.y
+      miniProj.vel.x = (dx / dist) * weapon.projectileSpeed
+      miniProj.vel.y = (dy / dist) * weapon.projectileSpeed
+      miniProj.age = 0
+      miniProj.damage = weapon.damage * 0.4
+      miniProj.radius = 5
+      miniProj.aoe = true
+      miniProj.aoeRadius = Math.round(weapon.aoeRadius * 0.5)
+      miniProj.weaponType = 'rocket'
+      miniProj.explode = false
+      miniProj.explosionCount = 1
+      miniProj.knockback = weapon.knockback
+      miniProj.fragmentChance = 0
+      miniProj.centerDamageBonus = 0
+      miniProj.inferno = false
+      miniProj.clusterBarrage = false
+      miniProj.chainReaction = false
+      miniProj.gravityWell = false
+      miniProj.lastHitEnemyId = null
+      miniProj.hitEnemyIds.clear()
+    }
+  }
 }
