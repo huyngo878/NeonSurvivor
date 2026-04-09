@@ -1,4 +1,17 @@
 let _poolNext = 0
+let _frameCount = 0
+let _targetCache = { frame: -1, list: [] }
+
+function _getSortedEnemies(enemies, player, frame) {
+  if (_targetCache.frame !== frame) {
+    _targetCache.frame = frame
+    _targetCache.list = enemies
+      .filter(e => !e.dead)
+      .map(e => ({ e, dist: Math.hypot(e.pos.x - player.pos.x, e.pos.y - player.pos.y) }))
+      .sort((a, b) => a.dist - b.dist)
+  }
+  return _targetCache.list
+}
 
 function _getProjectile(pool) {
   for (let i = 0; i < pool.length; i++) {
@@ -12,6 +25,7 @@ function _getProjectile(pool) {
 }
 
 export function updateWeapons(entities, dt) {
+  _frameCount++
   const player = entities.find(e => e.type === 'player')
   if (!player) return
   const enemies = entities.filter(e => e.type === 'enemy')
@@ -19,16 +33,16 @@ export function updateWeapons(entities, dt) {
 
   for (const weapon of player.weapons) {
     if (weapon.type === 'wand') {
-      _tickWand(weapon, dt, player, enemies, projectiles)
+      _tickWand(weapon, dt, player, enemies, projectiles, _frameCount)
     } else if (weapon.type === 'whip') {
       _tickWhip(weapon, dt, player, enemies)
     } else if (weapon.type === 'rocket') {
-      _tickRocket(weapon, dt, player, enemies, projectiles)
+      _tickRocket(weapon, dt, player, enemies, projectiles, _frameCount)
     }
   }
 }
 
-function _tickWand(weapon, dt, player, enemies, projectiles) {
+function _tickWand(weapon, dt, player, enemies, projectiles, frame) {
   // Echo Wand: tick queued echo shots (runs every frame, independent of cooldown)
   if (weapon.echo && weapon.echoQueue && weapon.echoQueue.length > 0) {
     for (let i = weapon.echoQueue.length - 1; i >= 0; i--) {
@@ -69,10 +83,8 @@ function _tickWand(weapon, dt, player, enemies, projectiles) {
   if (weapon.timer > 0) return
   weapon.timer = weapon.cooldown
 
-  const inRange = enemies
-    .map(e => ({ e, dist: Math.hypot(e.pos.x - player.pos.x, e.pos.y - player.pos.y) }))
+  const inRange = _getSortedEnemies(enemies, player, frame)
     .filter(({ dist }) => dist <= weapon.range)
-    .sort((a, b) => a.dist - b.dist)
     .slice(0, weapon.shots)
 
   for (const { e: target } of inRange) {
@@ -243,15 +255,13 @@ function _tickWhip(weapon, dt, player, enemies) {
   if (weapon.echo && weapon.echoTimer < 0) weapon.echoTimer = 0.75
 }
 
-function _tickRocket(weapon, dt, player, enemies, projectiles) {
+function _tickRocket(weapon, dt, player, enemies, projectiles, frame) {
   weapon.timer -= dt
   if (weapon.timer > 0) return
   weapon.timer = weapon.cooldown
 
-  const sorted = enemies
-    .map(e => ({ e, dist: Math.hypot(e.pos.x - player.pos.x, e.pos.y - player.pos.y) }))
+  const sorted = _getSortedEnemies(enemies, player, frame)
     .filter(({ dist }) => dist <= weapon.range)
-    .sort((a, b) => a.dist - b.dist)
 
   if (sorted.length === 0) return
 
