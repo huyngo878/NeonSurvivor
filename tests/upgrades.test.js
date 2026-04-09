@@ -242,27 +242,6 @@ describe('new stat cards', () => {
   })
 })
 
-describe('legendaryUnique lock (disabled)', () => {
-  it('legendaryUnique wand cards still appear even when one is already taken', () => {
-    // Filter is temporarily disabled — all legendaryUnique cards should be offered
-    const player = createPlayer()
-    player.weapons = [createWeapon('wand')]
-    player.uniqueWeapons = { wand: 'wand_arcane_overload' }
-    const picks = pickChestCards(player, 100)
-    const legendaryWandIds = ['wand_arcane_overload', 'wand_echo', 'wand_chain_beam']
-    const anyPresent = legendaryWandIds.some(id => picks.some(c => c.id === id))
-    expect(anyPresent).toBe(true)
-  })
-
-  it('legendaryUnique for one weapon does not block uniques for another weapon', () => {
-    const player = createPlayer()
-    player.weapons = [createWeapon('wand'), createWeapon('rocket')]
-    player.uniqueWeapons = { wand: 'wand_arcane_overload' }
-    const picks = pickChestCards(player, 100)
-    expect(picks.some(c => c.id === 'rocket_inferno')).toBe(true)
-  })
-})
-
 describe('whip phantom strikes', () => {
   it('whip_phantom sets weapon.phantom to true', () => {
     const player = createPlayer()
@@ -277,5 +256,27 @@ describe('whip phantom strikes', () => {
     const before = player.weapons[0].damage
     CARDS.find(c => c.id === 'whip_damage_pct').apply(player)
     expect(player.weapons[0].damage).toBeCloseTo(before * 1.2, 0)
+  })
+})
+
+describe('legendaryUnique deduplication', () => {
+  it('does not offer a second legendaryUnique for the same weapon once one is taken', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand')]
+    // Simulate having taken wand_chain_beam
+    player.uniqueWeapons.wand = 'wand_chain_beam'
+    // Request a large sample to hit all eligible cards
+    const picks = pickChestCards(player, 100)
+    const wandLegendaries = picks.filter(c => c.legendaryUnique === 'wand')
+    expect(wandLegendaries).toHaveLength(0)
+  })
+
+  it('still offers legendaryUnique cards for other weapons', () => {
+    const player = createPlayer()
+    player.weapons = [createWeapon('wand'), createWeapon('rocket')]
+    player.uniqueWeapons.wand = 'wand_chain_beam'
+    const picks = pickChestCards(player, 100)
+    const rocketLegendaries = picks.filter(c => c.legendaryUnique === 'rocket')
+    expect(rocketLegendaries.length).toBeGreaterThan(0)
   })
 })
