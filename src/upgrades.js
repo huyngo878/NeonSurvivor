@@ -234,6 +234,41 @@ export const CARDS = [
       w.critChance = Math.min(0.6, (w.critChance || 0) + 0.15)
     },
   },
+  {
+    id: 'wand_split_reality',
+    label: 'SPLIT REALITY',
+    desc: 'Each wand shot fires 2 ghost copies at ±20° spread for 60% damage',
+    rarity: 'legendary',
+    legendaryUnique: 'wand',
+    requires: 'wand',
+    icon: 'Y',
+    apply: player => { _weapon(player, 'wand').splitReality = true },
+  },
+  {
+    id: 'wand_precision',
+    label: 'SNIPER CORE',
+    desc: 'Wand fires 50% slower but deals 2.5× damage with +200 range',
+    rarity: 'legendary',
+    legendaryUnique: 'wand',
+    requires: 'wand',
+    icon: 'O',
+    apply: player => {
+      const w = _weapon(player, 'wand')
+      w.damage = Math.round(w.damage * 2.5)
+      w.cooldown *= 1.5
+      w.range += 200
+    },
+  },
+  {
+    id: 'wand_rift',
+    label: 'DIMENSIONAL RIFT',
+    desc: 'Wand projectiles pierce through all enemies (pierce 20)',
+    rarity: 'legendary',
+    legendaryUnique: 'wand',
+    requires: 'wand',
+    icon: '8',
+    apply: player => { _weapon(player, 'wand').pierceCount = 20 },
+  },
 
   {
     id: 'whip_knockback',

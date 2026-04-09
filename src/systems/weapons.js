@@ -125,6 +125,37 @@ function _tickWand(weapon, dt, player, enemies, projectiles, frame) {
         timer: 0.6,
       })
     }
+    if (weapon.splitReality) {
+      for (const spread of [-0.35, 0.35]) {
+        const sProj = _getProjectile(projectiles)
+        if (!sProj) break
+        const angle = Math.atan2(dy, dx) + spread
+        sProj.active = true
+        sProj.pos.x = player.pos.x
+        sProj.pos.y = player.pos.y
+        sProj.vel.x = Math.cos(angle) * weapon.projectileSpeed
+        sProj.vel.y = Math.sin(angle) * weapon.projectileSpeed
+        sProj.age = 0
+        sProj.damage = weapon.damage * 0.6
+        sProj.radius = 4
+        sProj.aoe = false
+        sProj.aoeRadius = 0
+        sProj.weaponType = 'wand'
+        sProj.explode = false
+        sProj.bouncesRemaining = weapon.bounce
+        sProj.forkCountRemaining = 0
+        sProj.forked = false
+        sProj.lastHitEnemyId = null
+        sProj.hitEnemyIds.clear()
+        sProj.piercesRemaining = weapon.pierceCount || 0
+        sProj.slow = weapon.slowOnHit || false
+        sProj.homing = 0
+        sProj.explodeOnImpact = false
+        sProj.explodeRadius = 0
+        sProj.chainBeam = 0
+        sProj.critChance = weapon.critChance || 0
+      }
+    }
   }
 
   // Multicast: chance to fire a bonus projectile at each target

@@ -19,6 +19,7 @@ const WEAPON_CONFIGS = {
     echo: false,
     chainBeam: 0,
     critChance: 0,
+    splitReality: false,
   },
   whip: {
     type: 'whip', cooldown: 0.9, damage: 11, range: 120,
