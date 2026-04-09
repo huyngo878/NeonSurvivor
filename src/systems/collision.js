@@ -138,6 +138,9 @@ export function updateCollision(entities, gameState, dt = 0) {
       if (weapon.echoActive) {
         swings.push({ aimAngle: weapon.aimAngle, hitIds: weapon.echoHitIds, damageMult: 0.8 })
       }
+      if (weapon.boomerangActive) {
+        swings.push({ aimAngle: weapon.aimAngle, hitIds: weapon.boomerangHitIds, damageMult: 0.75 })
+      }
 
       for (const swing of swings) {
         const candidates = shQuery(hash, player.pos.x, player.pos.y, weapon.range + MAX_ENEMY_RADIUS)
@@ -151,9 +154,11 @@ export function updateCollision(entities, gameState, dt = 0) {
           while (diff < -Math.PI) diff += 2 * Math.PI
           if (Math.abs(diff) > weapon.sweepAngle / 2) continue
           const baseDamage = Math.random() < (weapon.critChance || 0) ? weapon.damage * 2 : weapon.damage
-          const damage = baseDamage * swing.damageMult
+          const gravityMult = weapon.gravitySlamOnHit ? 1.5 : 1
+          const damage = baseDamage * swing.damageMult * gravityMult
           enemy.hp -= damage
-          _pushEnemy(enemy, player.pos.x, player.pos.y, weapon.knockback || 0)
+          const knockbackStrength = weapon.gravitySlamOnHit ? -120 : (weapon.knockback || 0)
+          _pushEnemy(enemy, player.pos.x, player.pos.y, knockbackStrength)
           swing.hitIds.add(enemy.id)
           if (weapon.slowOnHit) enemy.slowTimer = 1.5
           if (weapon.bleedOnHit) {

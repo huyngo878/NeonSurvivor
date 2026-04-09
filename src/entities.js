@@ -31,6 +31,7 @@ const WEAPON_CONFIGS = {
     sweepAngle: Math.PI, activeDuration: 0.12, aimAngle: 0,
     knockback: 18, critChance: 0, slowOnHit: false,
     bleedOnHit: false, bleedDps: 0, shockwaveOnHit: false,
+    gravitySlamOnHit: false,
   },
   rocket: {
     type: 'rocket', cooldown: 2.0, damage: 60, range: 500, shots: 1, aoeRadius: 80,
@@ -60,6 +61,15 @@ export function createWeapon(type) {
     base.phantomHitIds = [new Set(), new Set()]
     // Chain Lightning
     base.chainLightning = 0
+    // Boomerang Whip
+    base.boomerang = false
+    base.boomerangTimer = -1
+    base.boomerangActive = false
+    base.boomerangActiveTimer = 0
+    base.boomerangHitIds = new Set()
+    // Orbit Blades
+    base.orbitBlades = false
+    base.orbitBladesPending = false
   }
   if (type === 'wand') {
     base.echoQueue = []

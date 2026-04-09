@@ -36,6 +36,38 @@ export function updateWeapons(entities, dt) {
       _tickWand(weapon, dt, player, enemies, projectiles, _frameCount)
     } else if (weapon.type === 'whip') {
       _tickWhip(weapon, dt, player, enemies)
+      if (weapon.orbitBladesPending) {
+        weapon.orbitBladesPending = false
+        for (let i = 0; i < 4; i++) {
+          const angle = (Math.PI * 2 * i) / 4
+          const proj = _getProjectile(projectiles)
+          if (!proj) break
+          proj.active = true
+          proj.pos.x = player.pos.x
+          proj.pos.y = player.pos.y
+          proj.vel.x = Math.cos(angle) * 300
+          proj.vel.y = Math.sin(angle) * 300
+          proj.age = 0
+          proj.damage = weapon.damage * 0.5
+          proj.radius = 5
+          proj.aoe = false
+          proj.aoeRadius = 0
+          proj.weaponType = 'wand'
+          proj.explode = false
+          proj.bouncesRemaining = 0
+          proj.forkCountRemaining = 0
+          proj.forked = false
+          proj.lastHitEnemyId = null
+          proj.hitEnemyIds.clear()
+          proj.piercesRemaining = 0
+          proj.slow = false
+          proj.homing = 0
+          proj.explodeOnImpact = false
+          proj.explodeRadius = 0
+          proj.chainBeam = 0
+          proj.critChance = weapon.critChance || 0
+        }
+      }
     } else if (weapon.type === 'rocket') {
       _tickRocket(weapon, dt, player, enemies, projectiles, _frameCount)
     }
@@ -275,6 +307,20 @@ function _tickWand(weapon, dt, player, enemies, projectiles, frame) {
 }
 
 function _tickWhip(weapon, dt, player, enemies) {
+  // Tick boomerang return swing
+  if (weapon.boomerang && weapon.boomerangTimer >= 0) {
+    weapon.boomerangTimer -= dt
+    if (weapon.boomerangTimer <= 0) {
+      weapon.boomerangActive = true
+      weapon.boomerangActiveTimer = weapon.activeDuration
+      weapon.boomerangHitIds.clear()
+      weapon.boomerangTimer = -1
+    }
+  } else if (weapon.boomerangActive) {
+    weapon.boomerangActiveTimer -= dt
+    if (weapon.boomerangActiveTimer <= 0) weapon.boomerangActive = false
+  }
+
   // Tick echo delay (runs even during active main swing)
   if (weapon.echo && weapon.echoTimer >= 0) {
     weapon.echoTimer -= dt
@@ -321,6 +367,8 @@ function _tickWhip(weapon, dt, player, enemies) {
   weapon.hitIds.clear()
   if (weapon.phantom) { weapon.phantomHitIds[0].clear(); weapon.phantomHitIds[1].clear() }
   if (weapon.echo && weapon.echoTimer < 0) weapon.echoTimer = 0.75
+  if (weapon.boomerang && weapon.boomerangTimer < 0) weapon.boomerangTimer = 0.35
+  if (weapon.orbitBlades) weapon.orbitBladesPending = true
 }
 
 function _tickRocket(weapon, dt, player, enemies, projectiles, frame) {
