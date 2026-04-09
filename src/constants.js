@@ -5,3 +5,5 @@ export const POOL_SIZE = 500
 export const CELL_SIZE = 64
 export const SPAWN_RADIUS = 600
 export const WAVE_DURATION = 20
+export const MAX_ENEMIES = 150
+export const DENSITY_MULT = 2.0

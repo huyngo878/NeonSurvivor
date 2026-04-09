@@ -1,4 +1,4 @@
-import { SPAWN_RADIUS, WAVE_DURATION } from '../constants.js'
+import { SPAWN_RADIUS, WAVE_DURATION, MAX_ENEMIES, DENSITY_MULT } from '../constants.js'
 import { createEnemy, ENEMY_TYPES } from '../entities.js'
 
 const BASE_WAVES = [
@@ -42,10 +42,13 @@ export function updateSpawner(entities, state, dt, gameTime, gameState) {
     return
   }
 
+  const activeEnemyCount = entities.filter(e => e.type === 'enemy' && !e.dead).length
+  if (activeEnemyCount >= MAX_ENEMIES) return
+
   // Odd-wave burst: extra chasers when a new odd wave begins
   if (wave % 2 === 1 && wave > 1 && state.lastBurstWave !== wave) {
     state.lastBurstWave = wave
-    const burstCount = 2 + Math.floor(wave / 6)
+    const burstCount = Math.round((2 + Math.floor(wave / 6)) * DENSITY_MULT)
     const overrides = _enemyOverrides(wave, 'chaser')
     for (let b = 0; b < burstCount; b++) {
       entities.push(_spawnEnemy('chaser', player, overrides))
@@ -63,7 +66,7 @@ export function updateSpawner(entities, state, dt, gameTime, gameState) {
     let interval = Math.max(0.2, waveDef.interval * state.intervalMult / densityScale)
     state.timers[i] = interval
 
-    let count = Math.max(1, Math.round(waveDef.count * densityScale))
+    let count = Math.max(1, Math.round(waveDef.count * densityScale * DENSITY_MULT))
     if (wave <= 10) count = Math.ceil(count * 1.5)  // 50% more enemies in waves 1-10
     if (waveDef.enemyType === 'speedster') count = Math.max(1, Math.floor(count * 0.6))
     const enemyOverrides = _enemyOverrides(wave, waveDef.enemyType)
