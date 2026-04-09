@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { updatePickup, updateChestNodes, chestCost } from '../../src/systems/pickup.js'
+import { updatePickup, updateChestNodes, chestCost, sparklyCost } from '../../src/systems/pickup.js'
 import { createPlayer, createChest, createPickup, createWeapon, createMagnet, createGem, createChestNode } from '../../src/entities.js'
 
 describe('updatePickup', () => {
@@ -98,6 +98,31 @@ describe('chestCost', () => {
     for (let i = 1; i < 10; i++) {
       expect(chestCost(i + 1)).toBeGreaterThan(chestCost(i))
     }
+  })
+})
+
+describe('sparklyCost', () => {
+  it('returns at least 25 when 0 chests opened', () => {
+    expect(sparklyCost(0)).toBeGreaterThanOrEqual(25)
+  })
+
+  it('is always more expensive than the regular chestCost', () => {
+    for (let i = 0; i < 15; i++) {
+      expect(sparklyCost(i)).toBeGreaterThan(chestCost(i))
+    }
+  })
+
+  it('increases monotonically', () => {
+    for (let i = 1; i < 15; i++) {
+      expect(sparklyCost(i)).toBeGreaterThanOrEqual(sparklyCost(i - 1))
+    }
+  })
+
+  it('is roughly 3.5x the regular cost at 5 chests opened', () => {
+    const regular = chestCost(5)
+    const sparkly = sparklyCost(5)
+    expect(sparkly).toBeGreaterThanOrEqual(Math.floor(regular * 3))
+    expect(sparkly).toBeLessThanOrEqual(Math.ceil(regular * 4))
   })
 })
 

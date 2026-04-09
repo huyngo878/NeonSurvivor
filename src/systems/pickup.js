@@ -47,6 +47,10 @@ export function chestCost(chestsOpened) {
   return chestsOpened === 0 ? 5 : Math.floor(10 * Math.pow(1.22, chestsOpened))
 }
 
+export function sparklyCost(chestsOpened) {
+  return Math.max(25, Math.floor(chestCost(chestsOpened) * 3.5))
+}
+
 export function updateChestNodes(entities, player, gameState, dt = 0) {
   if (!player) return
   const PROXIMITY = 80
@@ -65,7 +69,7 @@ export function updateChestNodes(entities, player, gameState, dt = 0) {
   }
 
   gameState.nearestChest = nearest
-    ? { node: nearest, cost: nearest.sparkly ? 15 : chestCost(gameState.chestsOpened || 0) }
+    ? { node: nearest, cost: nearest.sparkly ? sparklyCost(gameState.chestsOpened || 0) : chestCost(gameState.chestsOpened || 0) }
     : null
 }
 
