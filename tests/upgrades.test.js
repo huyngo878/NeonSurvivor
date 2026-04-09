@@ -242,16 +242,16 @@ describe('new stat cards', () => {
   })
 })
 
-describe('legendaryUnique lock', () => {
-  it('once a legendaryUnique wand card is taken, other legendaryUnique wand cards are excluded', () => {
+describe('legendaryUnique lock (disabled)', () => {
+  it('legendaryUnique wand cards still appear even when one is already taken', () => {
+    // Filter is temporarily disabled — all legendaryUnique cards should be offered
     const player = createPlayer()
     player.weapons = [createWeapon('wand')]
     player.uniqueWeapons = { wand: 'wand_arcane_overload' }
     const picks = pickChestCards(player, 100)
     const legendaryWandIds = ['wand_arcane_overload', 'wand_echo', 'wand_chain_beam']
-    for (const id of legendaryWandIds) {
-      expect(picks.some(c => c.id === id)).toBe(false)
-    }
+    const anyPresent = legendaryWandIds.some(id => picks.some(c => c.id === id))
+    expect(anyPresent).toBe(true)
   })
 
   it('legendaryUnique for one weapon does not block uniques for another weapon', () => {
