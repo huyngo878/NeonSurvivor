@@ -269,6 +269,26 @@ export const CARDS = [
     icon: '8',
     apply: player => { _weapon(player, 'wand').pierceCount = 20 },
   },
+  {
+    id: 'wand_evolving',
+    label: 'ADAPTIVE CORE',
+    desc: 'Wand permanently gains +1 damage for every 10 enemies killed (up to +50)',
+    rarity: 'legendary',
+    legendaryUnique: 'wand',
+    requires: 'wand',
+    icon: '^',
+    apply: player => { _weapon(player, 'wand').evolving = true },
+  },
+  {
+    id: 'wand_nova_burst',
+    label: 'NOVA BURST',
+    desc: 'Every 8th wand shot unleashes an 8-way radial nova at 1.5× damage',
+    rarity: 'legendary',
+    legendaryUnique: 'wand',
+    requires: 'wand',
+    icon: '*',
+    apply: player => { _weapon(player, 'wand').novaBurst = true },
+  },
 
   {
     id: 'whip_knockback',

@@ -299,6 +299,17 @@ function _killEnemy(enemy, entities, player, gameState) {
   if (enemy.enemyType === 'boss') {
     gameState.kills += 9
   }
+  // Adaptive Core: wand gains +1 damage per 10 kills
+  if (player) {
+    const evolvingWand = player.weapons?.find(w => w.type === 'wand' && w.evolving)
+    if (evolvingWand) {
+      evolvingWand.evolutionKills++
+      if (evolvingWand.evolutionKills % 10 === 0 && evolvingWand.evolutionBonus < 50) {
+        evolvingWand.evolutionBonus++
+        evolvingWand.damage++
+      }
+    }
+  }
 }
 
 function _retargetProjectile(proj, hitEnemy, enemies) {

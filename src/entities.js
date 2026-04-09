@@ -20,6 +20,11 @@ const WEAPON_CONFIGS = {
     chainBeam: 0,
     critChance: 0,
     splitReality: false,
+    novaBurst: false,
+    novaBurstCounter: 0,
+    evolving: false,
+    evolutionKills: 0,
+    evolutionBonus: 0,
   },
   whip: {
     type: 'whip', cooldown: 0.9, damage: 11, range: 120,

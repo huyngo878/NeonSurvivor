@@ -235,6 +235,43 @@ function _tickWand(weapon, dt, player, enemies, projectiles, frame) {
     }
   }
 
+  // Nova Burst: every 8 shots, fire 8-way radial nova
+  if (weapon.novaBurst) {
+    weapon.novaBurstCounter += inRange.length
+    if (weapon.novaBurstCounter >= 8) {
+      weapon.novaBurstCounter = 0
+      for (let i = 0; i < 8; i++) {
+        const novaProj = _getProjectile(projectiles)
+        if (!novaProj) break
+        const angle = (Math.PI * 2 * i) / 8
+        novaProj.active = true
+        novaProj.pos.x = player.pos.x
+        novaProj.pos.y = player.pos.y
+        novaProj.vel.x = Math.cos(angle) * weapon.projectileSpeed
+        novaProj.vel.y = Math.sin(angle) * weapon.projectileSpeed
+        novaProj.age = 0
+        novaProj.damage = weapon.damage * 1.5
+        novaProj.radius = 6
+        novaProj.aoe = false
+        novaProj.aoeRadius = 0
+        novaProj.weaponType = 'wand'
+        novaProj.explode = false
+        novaProj.bouncesRemaining = 0
+        novaProj.forkCountRemaining = 0
+        novaProj.forked = false
+        novaProj.lastHitEnemyId = null
+        novaProj.hitEnemyIds.clear()
+        novaProj.piercesRemaining = weapon.pierceCount || 0
+        novaProj.slow = weapon.slowOnHit || false
+        novaProj.homing = 0
+        novaProj.explodeOnImpact = false
+        novaProj.explodeRadius = 0
+        novaProj.chainBeam = 0
+        novaProj.critChance = weapon.critChance || 0
+      }
+    }
+  }
+
 }
 
 function _tickWhip(weapon, dt, player, enemies) {
