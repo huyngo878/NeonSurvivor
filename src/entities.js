@@ -38,6 +38,7 @@ const WEAPON_CONFIGS = {
     explosionCount: 1, knockback: 0, fragmentChance: 0,
     projectileSpeed: 300, centerDamageBonus: 0, inferno: false, clusterBarrage: false, chainReaction: false,
     rocketRain: false,
+    gravityWell: false,
   },
 }
 
@@ -217,6 +218,22 @@ export function createFireZone(x, y, radius, dps, duration) {
     dps,
     lifetime: duration,
     age: 0,
+    gravityPull: false,
+    pullStrength: 0,
+  }
+}
+
+export function createGravityWell(x, y, radius, pullStrength, duration) {
+  return {
+    id: nextId++,
+    type: 'fireZone',
+    pos: { x, y },
+    radius,
+    dps: 0,
+    lifetime: duration,
+    age: 0,
+    gravityPull: true,
+    pullStrength,
   }
 }
 
@@ -261,6 +278,7 @@ export function initProjectilePool() {
       inferno: false,
       clusterBarrage: false,
       chainReaction: false,
+      gravityWell: false,
       lastHitEnemyId: null,
       hitEnemyIds: new Set(),
       piercesRemaining: 0,

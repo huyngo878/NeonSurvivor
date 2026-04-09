@@ -412,6 +412,7 @@ function _tickRocket(weapon, dt, player, enemies, projectiles, frame) {
     proj.inferno = weapon.inferno || false
     proj.clusterBarrage = weapon.clusterBarrage || false
     proj.chainReaction = weapon.chainReaction || false
+    proj.gravityWell = weapon.gravityWell || false
     proj.lastHitEnemyId = null
     proj.hitEnemyIds.clear()
   }

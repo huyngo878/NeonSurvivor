@@ -588,6 +588,16 @@ export const CARDS = [
     apply: player => { _weapon(player, 'rocket').rocketRain = true },
   },
   {
+    id: 'rocket_gravity_well',
+    label: 'GRAVITY WELL',
+    desc: 'Explosions create a gravity well that pulls enemies into the blast zone for 3 seconds',
+    rarity: 'legendary',
+    legendaryUnique: 'rocket',
+    requires: 'rocket',
+    icon: 'G',
+    apply: player => { _weapon(player, 'rocket').gravityWell = true },
+  },
+  {
     id: 'rocket_firerate',
     label: 'RAPID RELOAD',
     desc: 'Rocket fires 15% faster',

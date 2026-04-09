@@ -1,5 +1,5 @@
 import { CELL_SIZE } from '../constants.js'
-import { ENEMY_TYPES, createGem, createMagnet, createShockwave, createEnemyProjectile, createFireZone } from '../entities.js'
+import { ENEMY_TYPES, createGem, createMagnet, createShockwave, createEnemyProjectile, createFireZone, createGravityWell } from '../entities.js'
 
 const MAX_ENEMY_RADIUS = Math.max(...Object.values(ENEMY_TYPES).map(e => e.radius))
 
@@ -63,10 +63,17 @@ export function updateCollision(entities, gameState, dt = 0) {
     if (zone.age >= zone.lifetime) { zone.dead = true; continue }
     for (const enemy of enemies) {
       if (enemy.dead) continue
-      const dist = Math.hypot(enemy.pos.x - zone.pos.x, enemy.pos.y - zone.pos.y)
+      const dx = zone.pos.x - enemy.pos.x
+      const dy = zone.pos.y - enemy.pos.y
+      const dist = Math.hypot(dx, dy)
       if (dist < zone.radius + enemy.radius) {
-        enemy.hp -= zone.dps * dt
-        if (enemy.hp <= 0 && !enemy.dead) _killEnemy(enemy, entities, player, gameState)
+        if (zone.gravityPull && dist > 0) {
+          enemy.pos.x += (dx / dist) * zone.pullStrength * dt
+          enemy.pos.y += (dy / dist) * zone.pullStrength * dt
+        } else if (!zone.gravityPull) {
+          enemy.hp -= zone.dps * dt
+          if (enemy.hp <= 0 && !enemy.dead) _killEnemy(enemy, entities, player, gameState)
+        }
       }
     }
   }
@@ -257,6 +264,9 @@ function _triggerRocketExplosions(proj, enemies, entities, player, gameState, sk
   }
   if (proj.inferno) {
     entities.push(createFireZone(proj.pos.x, proj.pos.y, proj.aoeRadius * 0.8, proj.damage * 0.3, 3.0))
+  }
+  if (proj.gravityWell) {
+    entities.push(createGravityWell(proj.pos.x, proj.pos.y, proj.aoeRadius * 1.5, 180, 3.0))
   }
 
   const _spawnFragments = (count, dmgMult) => {
